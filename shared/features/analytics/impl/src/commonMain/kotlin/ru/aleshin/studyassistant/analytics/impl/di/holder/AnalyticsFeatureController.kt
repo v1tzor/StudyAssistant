@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureController
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.domain.repositories.AnalyticsSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -49,6 +50,7 @@ public class AnalyticsFeatureController(
         bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
         bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
         bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+        bindSingleton<AnalyticsSettingsRepository> { dependencies.analyticsSettingsRepository }
         bindSingleton<NotificationSettingsRepository> { dependencies.notificationSettingsRepository }
         bindSingleton<HomeworksRepository> { dependencies.homeworksRepository }
         bindSingleton<TodoRepository> { dependencies.todoRepository }

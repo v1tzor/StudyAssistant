@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.preview.impl.domain.entities.PreviewFailures
  */
 internal interface GeneralSettingsInteractor {
 
+    suspend fun markSetupStarted(): UnitDomainResult<PreviewFailures>
     suspend fun completeOnboarding(): UnitDomainResult<PreviewFailures>
 
     class Base(
@@ -34,11 +35,17 @@ internal interface GeneralSettingsInteractor {
         private val eitherWrapper: PreviewEitherWrapper,
     ) : GeneralSettingsInteractor {
 
+        override suspend fun markSetupStarted() = eitherWrapper.wrapUnit {
+            val settings = settingsRepository.fetchSettings().first()
+            settingsRepository.updateSettings(settings.copy(isFirstStart = false))
+        }
+
         override suspend fun completeOnboarding() = eitherWrapper.wrapUnit {
             val settings = settingsRepository.fetchSettings().first()
             val updatedSettings = settings.copy(
                 isFirstStart = false,
                 isUnfinishedSetup = null,
+                isSetup = true,
             )
             settingsRepository.updateSettings(updatedSettings)
         }

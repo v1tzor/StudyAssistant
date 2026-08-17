@@ -24,4 +24,5 @@ data class AdsConfiguration(
     val infoOrganizationsBannerId: String,
     val aiQuotaRewardedId: String,
     val scheduleImportRewardedId: String,
+    val aiScheduleAnalysisRewardedId: String,
 )

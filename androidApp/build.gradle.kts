@@ -36,6 +36,8 @@ android {
         ?: providers.gradleProperty("studyassistant.ads.ai.rewarded.id").orNull.orEmpty()
     val yandexScheduleRewardedId = localProperties.getProperty("studyassistant.ads.schedule.rewarded.id")
         ?: providers.gradleProperty("studyassistant.ads.schedule.rewarded.id").orNull.orEmpty()
+    val yandexScheduleAiRewardedId = localProperties.getProperty("studyassistant.ads.ai.schedule.rewarded.id")
+        ?: providers.gradleProperty("studyassistant.ads.ai.schedule.rewarded.id").orNull.orEmpty()
 
     defaultConfig {
         applicationId = libs.versions.applicationId.get()
@@ -84,6 +86,7 @@ android {
             buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
             buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
             buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
         }
         getByName("debug") {
             isDebuggable = true
@@ -92,6 +95,7 @@ android {
             buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
             buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
             buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
+            buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
         }
     }
 

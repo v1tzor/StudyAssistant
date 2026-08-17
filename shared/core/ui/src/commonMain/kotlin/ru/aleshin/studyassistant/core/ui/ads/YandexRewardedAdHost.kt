@@ -47,12 +47,37 @@ fun YandexRewardedAdHost(
     val currentOnUnavailable by rememberUpdatedState(onUnavailable)
     val coroutineScope = rememberCoroutineScope()
     var handledRequestKey by remember { mutableStateOf<String?>(null) }
+    var deliveredRewardKey by remember { mutableStateOf<String?>(null) }
+
+    fun deliverRewarded(key: String) {
+        if (deliveredRewardKey == key) return
+        deliveredRewardKey = key
+        handledRequestKey = key
+        currentOnRewarded(key)
+    }
+
+    fun deliverUnavailable(key: String) {
+        if (deliveredRewardKey == key) return
+        RewardedAdSession.clear(key)
+        handledRequestKey = null
+        currentOnUnavailable()
+    }
+
+    LaunchedEffect(requestKey) {
+        if (requestKey == null) {
+            handledRequestKey = null
+            return@LaunchedEffect
+        }
+        if (RewardedAdSession.hasRewarded(requestKey)) {
+            deliverRewarded(requestKey)
+        }
+    }
 
     if (adUnitId.isBlank()) {
         LaunchedEffect(requestKey) {
             if (requestKey != null && requestKey != handledRequestKey) {
                 handledRequestKey = requestKey
-                currentOnUnavailable()
+                deliverUnavailable(requestKey)
             }
         }
         return
@@ -61,7 +86,22 @@ fun YandexRewardedAdHost(
 
     LaunchedEffect(requestKey, adUnitId) {
         if (requestKey == null || requestKey == handledRequestKey) return@LaunchedEffect
+        if (RewardedAdSession.hasRewarded(requestKey)) {
+            deliverRewarded(requestKey)
+            return@LaunchedEffect
+        }
+        if (RewardedAdSession.isPresented(requestKey)) {
+            handledRequestKey = requestKey
+            delay(REWARD_CALLBACK_GRACE_MS)
+            if (RewardedAdSession.hasRewarded(requestKey)) {
+                deliverRewarded(requestKey)
+            } else {
+                deliverUnavailable(requestKey)
+            }
+            return@LaunchedEffect
+        }
         handledRequestKey = requestKey
+        RewardedAdSession.markPresented(requestKey)
         runCatching {
             loader.loadAd(AdRequest(adUnitId = adUnitId))
         }.onSuccess { ad ->
@@ -71,13 +111,15 @@ fun YandexRewardedAdHost(
                     override fun onAdShown() = Unit
 
                     override fun onAdFailedToShow(adError: AdError) {
-                        currentOnUnavailable()
+                        deliverUnavailable(requestKey)
                     }
 
                     override fun onAdDismissed() {
                         coroutineScope.launch {
                             delay(REWARD_CALLBACK_GRACE_MS)
-                            if (!isRewarded) currentOnUnavailable()
+                            if (!isRewarded && !RewardedAdSession.hasRewarded(requestKey)) {
+                                deliverUnavailable(requestKey)
+                            }
                         }
                     }
 
@@ -88,16 +130,17 @@ fun YandexRewardedAdHost(
                     override fun onRewarded(reward: Reward) {
                         if (!isRewarded) {
                             isRewarded = true
-                            currentOnRewarded(requestKey)
+                            RewardedAdSession.markRewarded(requestKey)
+                            deliverRewarded(requestKey)
                         }
                     }
                 },
             )
             ad.show()
         }.onFailure {
-            currentOnUnavailable()
+            deliverUnavailable(requestKey)
         }
     }
 }
 
-private const val REWARD_CALLBACK_GRACE_MS = 400L
+private const val REWARD_CALLBACK_GRACE_MS = 2_000L

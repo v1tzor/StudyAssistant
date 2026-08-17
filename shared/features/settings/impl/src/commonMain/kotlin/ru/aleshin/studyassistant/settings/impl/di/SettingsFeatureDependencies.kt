@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRe
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
 
 /**
  * @author Stanislav Aleshin on 21.04.2024.
@@ -56,6 +57,7 @@ public interface SettingsFeatureDependencies : BaseFeatureDependencies {
     public val todosRepository: TodoRepository
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
+    public val userDataResetRepository: UserDataResetRepository
     public val startClassesReminderManager: StartClassesReminderManager
     public val endClassesReminderManager: EndClassesReminderManager
     public val homeworksReminderManager: HomeworksReminderManager

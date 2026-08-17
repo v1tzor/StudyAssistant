@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreSt
 import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
 import ru.aleshin.studyassistant.domain.entities.MainFailures
 import ru.aleshin.studyassistant.presentation.models.GeneralSettingsUi
+import ru.aleshin.studyassistant.preview.api.PreviewConfig
 
 /**
  * @author Stanislav Aleshin on 27.01.2024
@@ -54,6 +55,6 @@ data class MainInput(
 
 sealed class MainOutput : BaseOutput {
     data object NavigateToApp : MainOutput()
-    data object NavigateToPreview : MainOutput()
+    data class NavigateToPreview(val startConfig: PreviewConfig = PreviewConfig.Intro) : MainOutput()
     data class NavigateToDeepLink(val deepLinkUrl: DeepLinkUrl) : MainOutput()
 }

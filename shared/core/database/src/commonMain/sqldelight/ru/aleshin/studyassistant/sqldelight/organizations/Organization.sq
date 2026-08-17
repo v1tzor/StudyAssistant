@@ -41,3 +41,6 @@ fetchOrganizationsById:
 SELECT *
 FROM organizationEntity
 WHERE uid IN ?;
+
+deleteAllOrganizations:
+DELETE FROM organizationEntity;

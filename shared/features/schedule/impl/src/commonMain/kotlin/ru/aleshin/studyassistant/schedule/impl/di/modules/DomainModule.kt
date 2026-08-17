@@ -22,6 +22,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
+import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleImportHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.AnalysisInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.HomeworkInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsInteractor
@@ -39,6 +40,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleErrorHandler> { ScheduleErrorHandler.Base() }
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance(), instance()) }
     bindSingleton<ScheduleImportValidator> { ScheduleImportValidator.Base() }
+    bindSingleton<ScheduleImportHandler> { ScheduleImportHandler.Base(instance()) }
     bindSingleton<ImageCompressor> {
         createImageCompressor(instance<ScheduleFeatureDependencies>().appDispatchers)
     }
@@ -60,6 +62,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ScheduleImportInteractor> {
         ScheduleImportInteractor.Base(
+            instance(),
             instance(),
             instance(),
             instance(),

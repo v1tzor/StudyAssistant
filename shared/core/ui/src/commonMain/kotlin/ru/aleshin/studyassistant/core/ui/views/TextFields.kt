@@ -95,7 +95,7 @@ fun InfoTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    interactionSource: MutableInteractionSource?? = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         disabledLabelColor = MaterialTheme.colorScheme.onSurface,
         disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -107,10 +107,10 @@ fun InfoTextField(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.offset(y = 70.dp / 2 - 24.dp / 2).size(24.dp),
             painter = leadingInfoIcon,
             contentDescription = label,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -187,10 +187,10 @@ fun InfoTextField(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.offset(y = 70.dp / 2 - 24.dp / 2).size(24.dp),
             imageVector = leadingInfoIcon,
             contentDescription = label,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,

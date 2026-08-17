@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainOutput
+import ru.aleshin.studyassistant.preview.api.PreviewConfig
 import kotlin.time.ExperimentalTime
 
 /**
@@ -76,8 +77,13 @@ interface MainWorkProcessor :
                             OutputResult(MainOutput.NavigateToApp)
                         },
                         onRightAction = { settings ->
-                            val output = if (settings.isFirstStart) {
-                                MainOutput.NavigateToPreview
+                            val output = if (!settings.isSetup) {
+                                val startConfig = if (settings.isFirstStart) {
+                                    PreviewConfig.Intro
+                                } else {
+                                    PreviewConfig.Setup
+                                }
+                                MainOutput.NavigateToPreview(startConfig)
                             } else {
                                 MainOutput.NavigateToApp
                             }

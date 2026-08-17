@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Gene
 internal fun GeneralSettings.mapToUi() = GeneralSettingsUi(
     isFirstStart = isFirstStart,
     isUnfinishedSetup = isUnfinishedSetup,
+    isSetup = isSetup,
     languageType = languageType.mapToUi(),
     themeType = themeType.mapToUi(),
 )
@@ -34,6 +35,7 @@ internal fun GeneralSettings.mapToUi() = GeneralSettingsUi(
 internal fun GeneralSettingsUi.mapToDomain() = GeneralSettings(
     isFirstStart = isFirstStart,
     isUnfinishedSetup = isUnfinishedSetup,
+    isSetup = isSetup,
     languageType = languageType.mapToDomain(),
     themeType = themeType.mapToDomain(),
 )

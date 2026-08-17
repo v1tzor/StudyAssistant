@@ -1,0 +1,21 @@
+CREATE TABLE analyticsSettingsEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  period TEXT NOT NULL,
+  custom_from INTEGER,
+  custom_to INTEGER
+);
+
+INSERT INTO analyticsSettingsEntity (id, period, custom_from, custom_to)
+VALUES (1, 'MONTH', NULL, NULL);
+
+fetchSettings:
+SELECT *
+FROM analyticsSettingsEntity;
+
+updateSettings:
+INSERT OR REPLACE INTO analyticsSettingsEntity (id, period, custom_from, custom_to)
+VALUES ?;
+
+resetSettings:
+INSERT OR REPLACE INTO analyticsSettingsEntity (id, period, custom_from, custom_to)
+VALUES (1, 'MONTH', NULL, NULL);

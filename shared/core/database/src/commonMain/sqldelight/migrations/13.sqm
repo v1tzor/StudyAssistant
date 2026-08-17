@@ -1,0 +1,15 @@
+ALTER TABLE generalSettingsEntity ADD COLUMN is_setup INTEGER NOT NULL DEFAULT 0;
+
+UPDATE generalSettingsEntity
+SET is_setup = 1
+WHERE is_first_start = 0;
+
+UPDATE notificationSettingsEntity
+SET beginning_of_classes = 600000,
+    end_of_classes = 1,
+    unfinished_homeworks = 72000000,
+    high_workload = 7
+WHERE beginning_of_classes IS NULL
+  AND end_of_classes = 0
+  AND unfinished_homeworks IS NULL
+  AND high_workload IS NULL;

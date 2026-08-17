@@ -18,7 +18,9 @@ package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store
 
 import com.arkivanov.decompose.ComponentContext
 import ru.aleshin.studyassistant.core.common.architecture.component.ChildComponent
+import ru.aleshin.studyassistant.core.common.architecture.component.OutputConsumer
 import ru.aleshin.studyassistant.core.common.architecture.component.saveableStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralOutput
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralState
 
 /**
@@ -33,6 +35,7 @@ internal abstract class GeneralComponent(
     class Default(
         storeFactory: GeneralComposeStore.Factory,
         componentContext: ComponentContext,
+        outputConsumer: OutputConsumer<GeneralOutput>,
     ) : GeneralComponent(componentContext) {
 
         private companion object Companion {
@@ -43,6 +46,7 @@ internal abstract class GeneralComponent(
             storeFactory = storeFactory,
             defaultState = GeneralState(),
             stateSerializer = GeneralState.serializer(),
+            outputConsumer = outputConsumer,
             storeKey = COMPONENT_KEY,
         )
     }

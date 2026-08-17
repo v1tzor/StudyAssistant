@@ -17,8 +17,7 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store
 
 import ru.aleshin.studyassistant.core.common.architecture.component.EmptyInput
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyOutput
-import ru.aleshin.studyassistant.core.common.architecture.store.BaseSimpleComposeStore
+import ru.aleshin.studyassistant.core.common.architecture.store.BaseOnlyOutComposeStore
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.EffectCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
@@ -27,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEvent
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralOutput
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralState
 
 /**
@@ -37,7 +37,7 @@ internal class GeneralComposeStore(
     stateCommunicator: StateCommunicator<GeneralState>,
     effectCommunicator: EffectCommunicator<GeneralEffect>,
     coroutineManager: CoroutineManager,
-) : BaseSimpleComposeStore<GeneralState, GeneralEvent, GeneralAction, GeneralEffect>(
+) : BaseOnlyOutComposeStore<GeneralState, GeneralEvent, GeneralAction, GeneralEffect, GeneralOutput>(
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,
@@ -47,7 +47,7 @@ internal class GeneralComposeStore(
         dispatchEvent(GeneralEvent.Init)
     }
 
-    override suspend fun WorkScope<GeneralState, GeneralAction, GeneralEffect, EmptyOutput>.handleEvent(
+    override suspend fun WorkScope<GeneralState, GeneralAction, GeneralEffect, GeneralOutput>.handleEvent(
         event: GeneralEvent,
     ) {
         when (event) {
@@ -75,6 +75,18 @@ internal class GeneralComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is GeneralEvent.DeleteCurrentSchedule -> {
+                launchBackgroundWork(BackgroundKey.DATA_ACTION) {
+                    val command = GeneralWorkCommand.DeleteCurrentSchedule
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
+            is GeneralEvent.DeleteAllData -> {
+                launchBackgroundWork(BackgroundKey.DATA_ACTION) {
+                    val command = GeneralWorkCommand.DeleteAllData
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
         }
     }
 
@@ -88,13 +100,13 @@ internal class GeneralComposeStore(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SETTINGS, SETTINGS_ACTION,
+        LOAD_SETTINGS, SETTINGS_ACTION, DATA_ACTION,
     }
 
     class Factory(
         private val workProcessor: GeneralWorkProcessor,
         private val coroutineManager: CoroutineManager,
-    ) : BaseSimpleComposeStore.Factory<GeneralComposeStore, GeneralState> {
+    ) : BaseOnlyOutComposeStore.Factory<GeneralComposeStore, GeneralState> {
 
         override fun create(savedState: GeneralState): GeneralComposeStore {
             return GeneralComposeStore(

@@ -51,7 +51,6 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsRenderState
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.contract.AnalyticsEffect
@@ -74,6 +73,7 @@ import ru.aleshin.studyassistant.analytics.impl.resources.analytics_range_picker
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 
@@ -97,12 +97,9 @@ internal fun AnalyticsContent(
     var showRangePicker by remember { mutableStateOf(false) }
     val title = when (state.target) {
         null -> stringResource(Res.string.analytics_header)
-        is AnalyticsTarget.Organization -> state.data?.targetDetails?.organization?.shortName
-            ?: stringResource(Res.string.analytics_detail_organization)
-        is AnalyticsTarget.Subject -> state.data?.targetDetails?.subject?.name
-            ?: stringResource(Res.string.analytics_detail_subject)
-        is AnalyticsTarget.Employee -> state.data?.targetDetails?.employee?.fullName()
-            ?: stringResource(Res.string.analytics_detail_employee)
+        is AnalyticsTarget.Organization -> state.data?.targetDetails?.organization?.shortName ?: stringResource(Res.string.analytics_detail_organization)
+        is AnalyticsTarget.Subject -> state.data?.targetDetails?.subject?.name ?: stringResource(Res.string.analytics_detail_subject)
+        is AnalyticsTarget.Employee -> state.data?.targetDetails?.employee?.fullName() ?: stringResource(Res.string.analytics_detail_employee)
     }
 
     Scaffold(

@@ -41,6 +41,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRe
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
 import ru.aleshin.studyassistant.settings.api.SettingsContentProviderFactory
 import ru.aleshin.studyassistant.settings.api.SettingsFeatureApi
 import ru.aleshin.studyassistant.settings.impl.di.SettingsFeatureDependencies
@@ -72,6 +73,7 @@ public class SettingsFeatureController(
                 bindSingleton<TodoRepository> { dependencies.todosRepository }
                 bindSingleton<BaseScheduleRepository> { dependencies.baseScheduleRepository }
                 bindSingleton<CustomScheduleRepository> { dependencies.customScheduleRepository }
+                bindSingleton<UserDataResetRepository> { dependencies.userDataResetRepository }
         
                 bindSingleton<StartClassesReminderManager> { dependencies.startClassesReminderManager }
                 bindSingleton<EndClassesReminderManager> { dependencies.endClassesReminderManager }

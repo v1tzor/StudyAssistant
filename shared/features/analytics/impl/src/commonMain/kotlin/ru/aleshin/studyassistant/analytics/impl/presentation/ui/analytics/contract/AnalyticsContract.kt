@@ -19,7 +19,6 @@ package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.contr
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsFailures
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsOverviewUi
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsRangeSelectionUi
@@ -29,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.

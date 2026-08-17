@@ -24,19 +24,17 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResul
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
-import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
-import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
-import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleImportInteractor
 import ru.aleshin.studyassistant.schedule.impl.platform.CompressedScheduleImage
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportDraftUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportSessionUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportOutput
@@ -48,19 +46,16 @@ internal interface ImportWorkProcessor :
     FlowWorkProcessor<ImportWorkCommand, ImportAction, ImportEffect, ImportOutput> {
 
     class Base(
-        private val interactor: ScheduleImportInteractor,
+        private val importInteractor: ScheduleImportInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
     ) : ImportWorkProcessor {
 
-        private var preparedImage: CompressedScheduleImage? = null
-
         override suspend fun work(command: ImportWorkCommand) = when (command) {
             is ImportWorkCommand.LoadOrganizations -> loadOrganizationsWork()
-            is ImportWorkCommand.LoadCatalog -> loadCatalogWork(command.organizationId)
             is ImportWorkCommand.PrepareImage -> prepareImageWork(command.imageBytes)
-            is ImportWorkCommand.ExtractDraft -> extractDraftWork(command)
-            is ImportWorkCommand.PrepareImportReward -> prepareImportRewardWork(command)
-            is ImportWorkCommand.ApplyDraft -> applyDraftWork(command)
+            is ImportWorkCommand.ExtractDraft -> extractDraftWork(command.image, command.note, command.organizationId)
+            is ImportWorkCommand.PrepareImportReward -> prepareImportRewardWork(command.requestId, command.session)
+            is ImportWorkCommand.ApplySession -> applySessionWork(command.session, command.rewardChallengeId)
         }
 
         private fun loadOrganizationsWork() = flow {
@@ -70,79 +65,59 @@ internal interface ImportWorkProcessor :
                 },
                 onRightAction = { organizations ->
                     val action = ImportAction.SetupOrganizations(
-                        organizations = organizations.map { organization -> organization.mapToUi() },
+                        organizations = organizations.map { organization -> organization.mapToUi() }
                     )
                     emit(ActionResult(action))
-                },
-            )
-        }
-
-        private fun loadCatalogWork(organizationId: UID) = flow {
-            organizationsInteractor.fetchOrganizationById(organizationId).collectAndHandle(
-                onLeftAction = { failures ->
-                    emit(EffectResult(ImportEffect.ShowError(failures)))
-                },
-                onRightAction = { organization ->
-                    val action = ImportAction.SetupCatalog(
-                        subjects = organization.subjects.map { subject -> subject.mapToUi() },
-                        employees = organization.employee.map { employee -> employee.mapToUi() },
-                    )
-                    emit(ActionResult(action))
-                },
+                }
             )
         }
 
         private fun prepareImageWork(imageBytes: ByteArray) = flow<ImportWorkResult> {
-            interactor.prepareImage(imageBytes).handle(
+            importInteractor.prepareImage(imageBytes).handle(
                 onLeftAction = { failure ->
-                    preparedImage = null
-                    emit(ActionResult(ImportAction.UpdateHasPhoto(false)))
                     emit(EffectResult(ImportEffect.ShowError(failure)))
                 },
                 onRightAction = { image ->
-                    preparedImage = image
-                    emit(ActionResult(ImportAction.UpdateHasPhoto(true)))
-                },
+                    emit(ActionResult(ImportAction.UpdatePhoto(image)))
+                }
             )
         }.onStart {
-            emit(ActionResult(ImportAction.UpdateLoading(true)))
+            emit(ActionResult(ImportAction.UpdateLoadingPhoto(true)))
         }.onCompletion {
-            emit(ActionResult(ImportAction.UpdateLoading(false)))
+            emit(ActionResult(ImportAction.UpdateLoadingPhoto(false)))
         }
 
-        private fun extractDraftWork(command: ImportWorkCommand.ExtractDraft) = flow<ImportWorkResult> {
-            val image = preparedImage
-            if (image == null) {
-                emit(EffectResult(ImportEffect.ShowError(ScheduleFailures.InvalidImage)))
-                return@flow
-            }
-            interactor.extractDraft(
-                requestId = command.requestId,
+        private fun extractDraftWork(
+            image: CompressedScheduleImage,
+            note: String,
+            organizationId: UID
+        ) = flow<ImportWorkResult> {
+            val requestId = randomUUID()
+            importInteractor.extractDraft(
+                requestId = requestId,
                 image = image,
-                note = command.note,
-                organizationId = command.organizationId,
+                note = note,
+                organizationId = organizationId,
             ).handle(
                 onLeftAction = { failure -> emit(EffectResult(ImportEffect.ShowError(failure))) },
-                onRightAction = { draft ->
-                    val action = ImportAction.SetupDraft(
-                        draft = draft.mapToUi(),
-                        requestId = command.requestId,
-                    )
+                onRightAction = { session ->
+                    val action = ImportAction.SetupSession(session = session.mapToUi(), requestId = requestId)
                     emit(ActionResult(action))
                 },
             )
         }.onStart {
-            emit(ActionResult(ImportAction.UpdateLoading(true)))
+            emit(ActionResult(ImportAction.UpdateAnalysisProgress(true)))
         }.onCompletion {
-            emit(ActionResult(ImportAction.UpdateLoading(false)))
+            emit(ActionResult(ImportAction.UpdateAnalysisProgress(false)))
         }
 
         private fun prepareImportRewardWork(
-            command: ImportWorkCommand.PrepareImportReward,
+            requestId: UID,
+            session: ScheduleImportSessionUi
         ) = flow<ImportWorkResult> {
-            interactor.createImportReward(
-                requestId = command.requestId,
-                draft = command.draft.mapToDomain(),
+            importInteractor.createImportReward(
+                requestId = requestId,
+                session = session.mapToDomain(),
             ).handle(
                 onLeftAction = { failure ->
                     emit(ActionResult(ImportAction.UpdateRewardChallenge(null, false)))
@@ -158,11 +133,13 @@ internal interface ImportWorkProcessor :
             )
         }
 
-        private fun applyDraftWork(command: ImportWorkCommand.ApplyDraft) = flow<ImportWorkResult> {
-            interactor.applyDraft(
-                draft = command.draft.mapToDomain(),
-                organizationId = command.organizationId,
-                rewardChallengeId = command.rewardChallengeId,
+        private fun applySessionWork(
+            session: ScheduleImportSessionUi,
+            rewardChallengeId: String,
+        ) = flow<ImportWorkResult> {
+            importInteractor.applySession(
+                session = session.mapToDomain(),
+                rewardChallengeId = rewardChallengeId,
             ).handle(
                 onLeftAction = { failure ->
                     emit(ActionResult(ImportAction.UpdateRewardChallenge(null, false)))
@@ -181,20 +158,18 @@ internal interface ImportWorkProcessor :
 
 internal sealed class ImportWorkCommand : WorkCommand {
     data object LoadOrganizations : ImportWorkCommand()
-    data class LoadCatalog(val organizationId: UID) : ImportWorkCommand()
     data class PrepareImage(val imageBytes: ByteArray) : ImportWorkCommand()
     data class ExtractDraft(
-        val requestId: UID,
+        var image: CompressedScheduleImage,
         val note: String,
-        val organizationId: UID,
+        val organizationId: UID
     ) : ImportWorkCommand()
     data class PrepareImportReward(
         val requestId: UID,
-        val draft: ScheduleImportDraftUi,
+        val session: ScheduleImportSessionUi,
     ) : ImportWorkCommand()
-    data class ApplyDraft(
-        val draft: ScheduleImportDraftUi,
-        val organizationId: UID,
+    data class ApplySession(
+        val session: ScheduleImportSessionUi,
         val rewardChallengeId: String,
     ) : ImportWorkCommand()
 }

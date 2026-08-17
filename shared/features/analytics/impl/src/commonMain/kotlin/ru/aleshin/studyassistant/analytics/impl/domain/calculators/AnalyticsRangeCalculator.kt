@@ -25,9 +25,9 @@ import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGranularity
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsRangeSelection
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.

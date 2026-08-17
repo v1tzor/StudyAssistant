@@ -47,6 +47,7 @@ import ru.aleshin.studyassistant.core.domain.managers.reminders.WorkloadWarningM
 import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.AnalyticsSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -62,6 +63,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportReposito
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
 import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
@@ -105,6 +107,7 @@ val featureModule = DI.Module("Feature") {
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val analyticsSettingsRepository = instance<AnalyticsSettingsRepository>()
             override val notificationSettingsRepository = instance<NotificationSettingsRepository>()
             override val homeworksRepository = instance<HomeworksRepository>()
             override val todoRepository = instance<TodoRepository>()
@@ -292,6 +295,7 @@ val featureModule = DI.Module("Feature") {
             override val todosRepository = instance<TodoRepository>()
             override val baseScheduleRepository = instance<BaseScheduleRepository>()
             override val customScheduleRepository = instance<CustomScheduleRepository>()
+            override val userDataResetRepository = instance<UserDataResetRepository>()
             override val startClassesReminderManager = instance<StartClassesReminderManager>()
             override val endClassesReminderManager = instance<EndClassesReminderManager>()
             override val homeworksReminderManager = instance<HomeworksReminderManager>()

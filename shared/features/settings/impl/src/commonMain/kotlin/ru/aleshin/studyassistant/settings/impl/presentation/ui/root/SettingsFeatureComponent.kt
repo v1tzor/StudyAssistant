@@ -32,6 +32,7 @@ import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.store.AiSettin
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.store.AiSettingsComposeStore
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarComponent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarComposeStore
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralOutput
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store.GeneralComponent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store.GeneralComposeStore
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.store.AboutAppComponent
@@ -133,6 +134,7 @@ internal abstract class SettingsFeatureComponent(
                     component = GeneralComponent.Default(
                         storeFactory = generalStoreFactory,
                         componentContext = componentContext,
+                        outputConsumer = generalOutputConsumer(),
                     )
                 )
                 SettingsConfig.Notification -> Child.NotificationChild(
@@ -169,5 +171,13 @@ internal abstract class SettingsFeatureComponent(
         }
 
         private fun notificationOutputConsumer() = OutputConsumer<NotificationOutput> {}
+
+        private fun generalOutputConsumer() = OutputConsumer<GeneralOutput> { output ->
+            when (output) {
+                is GeneralOutput.NavigateToOnboarding -> {
+                    outputConsumer.consume(SettingsOutput.NavigateToOnboarding)
+                }
+            }
+        }
     }
 }

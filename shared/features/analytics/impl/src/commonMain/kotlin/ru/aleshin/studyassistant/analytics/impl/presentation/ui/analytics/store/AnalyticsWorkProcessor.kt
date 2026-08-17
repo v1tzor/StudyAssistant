@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.store
 
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
 import ru.aleshin.studyassistant.analytics.impl.domain.interactors.AnalyticsInteractor
 import ru.aleshin.studyassistant.analytics.impl.presentation.mappers.mapToDomain
@@ -32,6 +31,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResul
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.
@@ -40,36 +40,20 @@ internal interface AnalyticsWorkProcessor :
     FlowWorkProcessor<AnalyticsWorkCommand, AnalyticsAction, AnalyticsEffect, AnalyticsOutput> {
 
     class Base(
-        private val interactor: AnalyticsInteractor,
+        private val analyticsInteractor: AnalyticsInteractor,
     ) : AnalyticsWorkProcessor {
 
         override suspend fun work(command: AnalyticsWorkCommand) = when (command) {
             is AnalyticsWorkCommand.ObserveDefault -> observeDefaultWork(command.target)
             is AnalyticsWorkCommand.ObserveSelection -> observeSelectionWork(command.selection, command.target)
-            is AnalyticsWorkCommand.ChangePeriod -> changePeriodWork(
-                command.period,
-                command.selection,
-                command.target,
-            )
-            is AnalyticsWorkCommand.SelectPeriodAnchor -> selectPeriodAnchorWork(
-                command.period,
-                command.anchor,
-                command.target,
-            )
-            is AnalyticsWorkCommand.SelectCustomRange -> selectCustomRangeWork(
-                command.from,
-                command.to,
-                command.target,
-            )
-            is AnalyticsWorkCommand.ShiftPeriod -> shiftPeriodWork(
-                command.selection,
-                command.amount,
-                command.target,
-            )
+            is AnalyticsWorkCommand.ChangePeriod -> changePeriodWork(command.period, command.selection, command.target)
+            is AnalyticsWorkCommand.SelectPeriodAnchor -> selectPeriodAnchorWork(command.period, command.anchor, command.target)
+            is AnalyticsWorkCommand.SelectCustomRange -> selectCustomRangeWork(command.from, command.to, command.target)
+            is AnalyticsWorkCommand.ShiftPeriod -> shiftPeriodWork(command.selection, command.amount, command.target)
         }
 
         private fun observeDefaultWork(target: AnalyticsTarget?) = flow {
-            interactor.fetchDefault(target).collectAndHandle(
+            analyticsInteractor.fetchOverview(target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))
@@ -84,7 +68,7 @@ internal interface AnalyticsWorkProcessor :
             selection: AnalyticsRangeSelectionUi,
             target: AnalyticsTarget?,
         ) = flow {
-            interactor.fetchSelection(selection.mapToDomain(), target).collectAndHandle(
+            analyticsInteractor.fetchSelection(selection.mapToDomain(), target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))
@@ -100,7 +84,7 @@ internal interface AnalyticsWorkProcessor :
             selection: AnalyticsRangeSelectionUi,
             target: AnalyticsTarget?,
         ) = flow {
-            interactor.fetchChangedPeriod(period, selection.mapToDomain(), target).collectAndHandle(
+            analyticsInteractor.fetchChangedPeriod(period, selection.mapToDomain(), target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))
@@ -116,7 +100,7 @@ internal interface AnalyticsWorkProcessor :
             anchor: Instant,
             target: AnalyticsTarget?,
         ) = flow {
-            interactor.fetchPeriod(period, anchor, target).collectAndHandle(
+            analyticsInteractor.fetchPeriod(period, anchor, target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))
@@ -132,7 +116,7 @@ internal interface AnalyticsWorkProcessor :
             to: Instant,
             target: AnalyticsTarget?,
         ) = flow {
-            interactor.fetchCustom(from, to, target).collectAndHandle(
+            analyticsInteractor.fetchCustom(from, to, target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))
@@ -148,7 +132,7 @@ internal interface AnalyticsWorkProcessor :
             amount: Int,
             target: AnalyticsTarget?,
         ) = flow {
-            interactor.fetchShifted(selection.mapToDomain(), amount, target).collectAndHandle(
+            analyticsInteractor.fetchShifted(selection.mapToDomain(), amount, target).collectAndHandle(
                 onLeftAction = {
                     emit(ActionResult(AnalyticsAction.UpdateLoading(false, true)))
                     emit(EffectResult(AnalyticsEffect.ShowError(it)))

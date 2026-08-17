@@ -58,3 +58,6 @@ WHERE target_date = ?;
 deleteGoalsById:
 DELETE FROM goalEntity
 WHERE uid IN ?;
+
+deleteAllGoals:
+DELETE FROM goalEntity;

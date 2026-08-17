@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.database
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver.Companion.IN_MEMORY
+import kotlinx.coroutines.runBlocking
 import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkEntity
 import ru.aleshin.studyassistant.sqldelight.tasks.HomeworkQueries
@@ -34,9 +35,11 @@ class CompletedHomeworksQueryTest {
         val driver = JdbcSqliteDriver(IN_MEMORY)
         Database.Schema.create(driver).value
         val queries = HomeworkQueries(driver)
-        queries.addOrUpdateHomework(homework("inside", isDone = true, completeDate = 200L)).value
-        queries.addOrUpdateHomework(homework("outside", isDone = true, completeDate = 400L)).value
-        queries.addOrUpdateHomework(homework("incomplete", isDone = false, completeDate = null)).value
+        runBlocking {
+            queries.addOrUpdateHomework(homework("inside", isDone = true, completeDate = 200L))
+            queries.addOrUpdateHomework(homework("outside", isDone = true, completeDate = 400L))
+            queries.addOrUpdateHomework(homework("incomplete", isDone = false, completeDate = null))
+        }
 
         val result = queries.fetchCompletedHomeworksByTimeRange(100L, 300L).executeAsList()
 

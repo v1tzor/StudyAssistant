@@ -37,14 +37,7 @@ internal class AnalyticsComposeStore(
     stateCommunicator: StateCommunicator<AnalyticsState>,
     effectCommunicator: EffectCommunicator<AnalyticsEffect>,
     coroutineManager: CoroutineManager,
-) : BaseComposeStore<
-    AnalyticsState,
-    AnalyticsEvent,
-    AnalyticsAction,
-    AnalyticsEffect,
-    AnalyticsInput,
-    AnalyticsOutput,
->(
+) : BaseComposeStore<AnalyticsState, AnalyticsEvent, AnalyticsAction, AnalyticsEffect, AnalyticsInput, AnalyticsOutput>(
     stateCommunicator = stateCommunicator,
     effectCommunicator = effectCommunicator,
     coroutineManager = coroutineManager,

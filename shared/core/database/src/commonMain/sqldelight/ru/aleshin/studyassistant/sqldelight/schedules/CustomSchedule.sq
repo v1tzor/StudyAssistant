@@ -37,3 +37,6 @@ WHERE uid IN ?;
 deleteSchedulesByTimeRange:
 DELETE FROM customScheduleEntity
 WHERE date >= ? AND date <= ?;
+
+deleteAllSchedules:
+DELETE FROM customScheduleEntity;

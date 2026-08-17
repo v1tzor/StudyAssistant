@@ -18,15 +18,20 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,13 +40,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.core.ui.views.sheet.MediumDragHandle
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_apply_button
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teacher_label
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_first_name_label
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_patronymic_label
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_second_name_label
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teacher_editor_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.delete_confirm_title as core_delete_confirm_title
+import ru.aleshin.studyassistant.core.ui.resources.ic_employee as core_ic_employee
+import ru.aleshin.studyassistant.core.ui.resources.ic_profile as core_ic_profile
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -50,22 +63,14 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teacher
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun ImportTeacherEditorSheet(
     modifier: Modifier = Modifier,
-    teacherName: String,
-    entries: List<ScheduleImportEntryUi>,
-    employees: List<EmployeeUi>,
+    employee: EmployeeUi,
     onDismiss: () -> Unit,
-    onConfirm: (List<ScheduleImportEntryUi>) -> Unit,
+    onConfirm: (EmployeeUi) -> Unit,
+    onDelete: () -> Unit,
 ) {
-    var name by remember { mutableStateOf(teacherName) }
-    var teacherId by remember {
-        mutableStateOf(
-            employees.firstOrNull { employee ->
-                listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                    .joinToString(" ")
-                    .equals(teacherName, ignoreCase = true)
-            }?.uid,
-        )
-    }
+    var firstName by remember(employee.uid) { mutableStateOf(employee.firstName) }
+    var secondName by remember(employee.uid) { mutableStateOf(employee.secondName.orEmpty()) }
+    var patronymic by remember(employee.uid) { mutableStateOf(employee.patronymic.orEmpty()) }
 
     ModalBottomSheet(
         modifier = modifier,
@@ -75,37 +80,64 @@ internal fun ImportTeacherEditorSheet(
         contentWindowInsets = { WindowInsets.navigationBars },
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = name,
-                onValueChange = { value ->
-                    name = value
-                    teacherId = employees.firstOrNull { employee ->
-                        listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                            .joinToString(" ")
-                            .equals(value, ignoreCase = true)
-                    }?.uid
-                },
-                label = { Text(stringResource(Res.string.schedule_import_teacher_label)) },
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(Res.string.schedule_import_teacher_editor_title),
+                style = MaterialTheme.typography.titleLarge,
             )
-            Button(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                onClick = {
-                    onConfirm(
-                        entries.map { entry ->
-                            if (entry.teacher.equals(teacherName, ignoreCase = true)) {
-                                entry.copy(teacher = name, teacherId = teacherId)
-                            } else {
-                                entry
-                            }
-                        },
-                    )
-                },
+            InfoTextField(
+                modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+                value = firstName,
+                onValueChange = { value -> firstName = value },
+                label = stringResource(Res.string.schedule_import_first_name_label),
+                leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_profile),
+            )
+            InfoTextField(
+                modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+                value = secondName,
+                onValueChange = { value -> secondName = value },
+                label = stringResource(Res.string.schedule_import_second_name_label),
+                leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
+            )
+            InfoTextField(
+                modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+                value = patronymic,
+                onValueChange = { value -> patronymic = value },
+                label = stringResource(Res.string.schedule_import_patronymic_label),
+                leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(stringResource(Res.string.schedule_import_apply_button))
+                TextButton(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text(stringResource(CoreRes.string.core_delete_confirm_title))
+                }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        onConfirm(
+                            employee.copy(
+                                firstName = firstName.trim(),
+                                secondName = secondName.trim().takeIf(String::isNotEmpty),
+                                patronymic = patronymic.trim().takeIf(String::isNotEmpty),
+                            )
+                        )
+                    },
+                ) {
+                    Text(stringResource(Res.string.schedule_import_apply_button))
+                }
             }
         }
     }

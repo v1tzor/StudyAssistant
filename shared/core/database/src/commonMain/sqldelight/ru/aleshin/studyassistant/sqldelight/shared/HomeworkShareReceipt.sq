@@ -11,3 +11,6 @@ WHERE share_code = ?;
 addReceipt:
 INSERT INTO homeworkShareReceiptEntity (share_code, imported_at)
 VALUES (?, ?);
+
+deleteAllReceipts:
+DELETE FROM homeworkShareReceiptEntity;

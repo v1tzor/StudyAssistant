@@ -47,3 +47,6 @@ WHERE name IN ?;
 deleteSubjects:
 DELETE FROM subjectEntity
 WHERE uid IN ?;
+
+deleteAllSubjects:
+DELETE FROM subjectEntity;

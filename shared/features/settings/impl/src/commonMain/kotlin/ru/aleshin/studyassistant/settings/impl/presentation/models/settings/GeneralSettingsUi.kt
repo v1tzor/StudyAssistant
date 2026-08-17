@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 internal data class GeneralSettingsUi(
     val isFirstStart: Boolean = true,
     val isUnfinishedSetup: UID? = null,
+    val isSetup: Boolean = false,
     val languageType: LanguageUiType = LanguageUiType.DEFAULT,
     val themeType: ThemeUiType = ThemeUiType.DEFAULT,
 )

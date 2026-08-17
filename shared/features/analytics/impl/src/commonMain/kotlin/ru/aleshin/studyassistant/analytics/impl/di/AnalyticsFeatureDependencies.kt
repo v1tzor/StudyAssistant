@@ -20,6 +20,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.domain.repositories.AnalyticsSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -35,6 +36,7 @@ public interface AnalyticsFeatureDependencies : BaseFeatureDependencies {
     public val baseScheduleRepository: BaseScheduleRepository
     public val customScheduleRepository: CustomScheduleRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
+    public val analyticsSettingsRepository: AnalyticsSettingsRepository
     public val notificationSettingsRepository: NotificationSettingsRepository
     public val homeworksRepository: HomeworksRepository
     public val todoRepository: TodoRepository

@@ -20,8 +20,8 @@ import androidx.compose.runtime.Immutable
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGranularity
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.

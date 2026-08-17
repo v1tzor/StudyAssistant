@@ -58,7 +58,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsRangeSelectionUi
 import ru.aleshin.studyassistant.analytics.impl.resources.Res
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_month_april
@@ -80,6 +79,7 @@ import ru.aleshin.studyassistant.analytics.impl.resources.analytics_period_week
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_period_year
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_previous_period_desc
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 import ru.aleshin.studyassistant.core.ui.views.shortDayMonthFormat
 

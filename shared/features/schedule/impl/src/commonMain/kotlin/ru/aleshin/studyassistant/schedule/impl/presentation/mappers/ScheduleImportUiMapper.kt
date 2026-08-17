@@ -16,61 +16,70 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.mappers
 
-import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportDraft
-import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportEntry
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportDraftUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToUi
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToDomain
+import ru.aleshin.studyassistant.core.presentation.mappers.users.mapToUi
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportClass
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportSession
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportSessionUi
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 17.08.2026.
  */
-internal fun ScheduleImportDraft.mapToUi() = ScheduleImportDraftUi(
+internal fun ScheduleImportSession.mapToUi() = ScheduleImportSessionUi(
     title = title.orEmpty(),
-    entries = entries.mapIndexed { index, entry -> entry.mapToUi(index) },
+    organizationId = organizationId,
+    classes = classes.map { classModel -> classModel.mapToUi() },
+    subjects = subjects.map { subject -> subject.mapToUi() },
+    employees = employees.map { employee -> employee.mapToUi() },
+    originalSubjectIds = originalSubjectIds,
+    originalEmployeeIds = originalEmployeeIds,
+    dirtySubjectIds = dirtySubjectIds,
+    dirtyEmployeeIds = dirtyEmployeeIds,
     unparsedLines = unparsedLines,
 )
 
-internal fun ScheduleImportDraftUi.mapToDomain() = ScheduleImportDraft(
+internal fun ScheduleImportSessionUi.mapToDomain() = ScheduleImportSession(
     title = title.takeIf(String::isNotBlank),
-    entries = entries.map(ScheduleImportEntryUi::mapToDomain),
+    organizationId = organizationId,
+    classes = classes.map { classModel -> classModel.mapToDomain() },
+    subjects = subjects.map { subject -> subject.mapToDomain() },
+    employees = employees.map { employee -> employee.mapToDomain() },
+    originalSubjectIds = originalSubjectIds,
+    originalEmployeeIds = originalEmployeeIds,
+    dirtySubjectIds = dirtySubjectIds,
+    dirtyEmployeeIds = dirtyEmployeeIds,
     unparsedLines = unparsedLines,
 )
 
-private fun ScheduleImportEntry.mapToUi(index: Int) = ScheduleImportEntryUi(
-    id = index,
+internal fun ScheduleImportClass.mapToUi() = ScheduleImportClassUi(
+    uid = uid,
     repeatWeek = repeatWeek,
     dayOfWeek = dayOfWeek,
-    classNumber = classNumber,
-    startTime = startTime.orEmpty(),
-    endTime = endTime.orEmpty(),
-    subject = subject.orEmpty(),
+    number = number,
+    startTime = startTime,
+    endTime = endTime,
     subjectId = subjectId,
-    eventType = eventType,
-    teacher = teacher.orEmpty(),
     teacherId = teacherId,
-    office = office.orEmpty(),
-    location = location.orEmpty(),
-    organization = organization.orEmpty(),
-    organizationId = organizationId,
-    notes = notes.orEmpty(),
+    office = office,
+    location = location,
+    eventType = eventType,
     included = included,
 )
 
-private fun ScheduleImportEntryUi.mapToDomain() = ScheduleImportEntry(
+internal fun ScheduleImportClassUi.mapToDomain() = ScheduleImportClass(
+    uid = uid,
     repeatWeek = repeatWeek,
     dayOfWeek = dayOfWeek,
-    classNumber = classNumber,
-    startTime = startTime.takeIf(String::isNotBlank),
-    endTime = endTime.takeIf(String::isNotBlank),
-    subject = subject.takeIf(String::isNotBlank),
+    number = number,
+    startTime = startTime,
+    endTime = endTime,
     subjectId = subjectId,
-    eventType = eventType,
-    teacher = teacher.takeIf(String::isNotBlank),
     teacherId = teacherId,
-    office = office.takeIf(String::isNotBlank),
-    location = location.takeIf(String::isNotBlank),
-    organization = organization.takeIf(String::isNotBlank),
-    organizationId = organizationId,
-    notes = notes.takeIf(String::isNotBlank),
+    office = office,
+    location = location,
+    eventType = eventType,
     included = included,
 )

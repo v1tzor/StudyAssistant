@@ -52,3 +52,6 @@ FROM employeeEntity;
 deleteEmployeesById:
 DELETE FROM employeeEntity
 WHERE uid IN ?;
+
+deleteAllEmployees:
+DELETE FROM employeeEntity;

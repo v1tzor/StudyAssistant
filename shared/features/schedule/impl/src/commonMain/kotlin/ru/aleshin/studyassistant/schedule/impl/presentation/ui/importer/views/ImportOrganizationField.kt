@@ -48,7 +48,7 @@ import ru.aleshin.studyassistant.core.ui.resources.ic_organization as core_ic_or
 internal fun ImportOrganizationField(
     modifier: Modifier = Modifier,
     enabled: Boolean,
-    organization: OrganizationShortUi?,
+    selectedOrganization: OrganizationShortUi?,
     organizations: List<OrganizationShortUi>,
     onAddOrganization: () -> Unit,
     onSelected: (OrganizationShortUi?) -> Unit,
@@ -59,7 +59,7 @@ internal fun ImportOrganizationField(
         onClick = { isSelectorOpen = true },
         modifier = modifier,
         enabled = enabled,
-        value = organization?.shortName,
+        value = selectedOrganization?.shortName,
         label = stringResource(Res.string.schedule_import_organization_label),
         placeholder = stringResource(Res.string.schedule_import_organization_placeholder),
         infoIcon = painterResource(CoreRes.drawable.core_ic_organization),
@@ -73,7 +73,7 @@ internal fun ImportOrganizationField(
 
     if (isSelectorOpen) {
         ImportOrganizationSelectorSheet(
-            selected = organization,
+            selected = selectedOrganization,
             organizations = organizations,
             onAddOrganization = onAddOrganization,
             onDismiss = { isSelectorOpen = false },

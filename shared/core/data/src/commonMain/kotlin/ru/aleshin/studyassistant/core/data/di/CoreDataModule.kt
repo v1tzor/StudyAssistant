@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.data.managers.reminders.TodoReminderManage
 import ru.aleshin.studyassistant.core.data.repositories.AdRewardRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AiAssistantRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.AiSettingsRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.AnalyticsSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.BaseScheduleRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CalendarSettingsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.CustomScheduleRepositoryImpl
@@ -43,12 +44,14 @@ import ru.aleshin.studyassistant.core.data.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.data.repositories.ScheduleShareRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.SubjectsRepositoryImpl
 import ru.aleshin.studyassistant.core.data.repositories.TodoRepositoryImpl
+import ru.aleshin.studyassistant.core.data.repositories.UserDataResetRepositoryImpl
 import ru.aleshin.studyassistant.core.database.di.coreDatabaseModule
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiAssistantRepository
 import ru.aleshin.studyassistant.core.domain.repositories.AiSettingsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.AnalyticsSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -64,6 +67,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportReposito
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
+import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
 import ru.aleshin.studyassistant.core.remote.di.coreRemoteModule
 
 /**
@@ -102,6 +106,8 @@ val coreDataModule = DI.Module("CoreData") {
 
     bindSingleton<GeneralSettingsRepository> { GeneralSettingsRepositoryImpl(instance()) }
     bindSingleton<NotificationSettingsRepository> { NotificationSettingsRepositoryImpl(instance()) }
+    bindSingleton<AnalyticsSettingsRepository> { AnalyticsSettingsRepositoryImpl(instance()) }
+    bindSingleton<UserDataResetRepository> { UserDataResetRepositoryImpl(instance()) }
 
     bindProvider<TodoReminderManager> { TodoReminderManagerImpl(instance(), instance()) }
 }

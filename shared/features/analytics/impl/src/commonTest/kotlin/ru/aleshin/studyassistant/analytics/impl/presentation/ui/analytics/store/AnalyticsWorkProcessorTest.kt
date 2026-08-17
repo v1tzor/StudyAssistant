@@ -26,7 +26,6 @@ import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGoalDis
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGranularity
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsLoadDistribution
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsOverview
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsRangeSelection
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsRegularity
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsSummary
@@ -39,6 +38,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -69,7 +69,7 @@ class AnalyticsWorkProcessorTest {
 
         var observedSelection: AnalyticsRangeSelection? = null
 
-        override suspend fun fetchDefault(
+        override suspend fun fetchOverview(
             target: AnalyticsTarget?,
         ): FlowDomainResult<AnalyticsFailures, AnalyticsOverview> = flowOf(Either.Right(report))
 

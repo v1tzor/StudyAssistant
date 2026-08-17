@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.architecture.component.BaseOutput
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAction
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
@@ -38,6 +39,8 @@ internal sealed class GeneralEvent : StoreEvent {
     data object Init : GeneralEvent()
     data class ChangeLanguage(val language: LanguageUiType) : GeneralEvent()
     data class ChangeTheme(val theme: ThemeUiType) : GeneralEvent()
+    data object DeleteCurrentSchedule : GeneralEvent()
+    data object DeleteAllData : GeneralEvent()
 }
 
 internal sealed class GeneralEffect : StoreEffect {
@@ -46,4 +49,8 @@ internal sealed class GeneralEffect : StoreEffect {
 
 internal sealed class GeneralAction : StoreAction {
     data class UpdateSettings(val settings: GeneralSettingsUi?) : GeneralAction()
+}
+
+internal sealed class GeneralOutput : BaseOutput {
+    data object NavigateToOnboarding : GeneralOutput()
 }

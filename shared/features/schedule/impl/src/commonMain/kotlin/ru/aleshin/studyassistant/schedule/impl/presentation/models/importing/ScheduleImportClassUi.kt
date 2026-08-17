@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.analytics.impl.domain.entities
+package ru.aleshin.studyassistant.schedule.impl.presentation.models.importing
 
 import kotlinx.serialization.Serializable
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 
 /**
- * @author Stanislav Aleshin on 09.08.2026.
+ * @author Stanislav Aleshin on 17.08.2026.
  */
 @Serializable
-internal enum class AnalyticsPeriod {
-    WEEK,
-    MONTH,
-    YEAR,
-    CUSTOM,
-}
+internal data class ScheduleImportClassUi(
+    val uid: UID,
+    val repeatWeek: Int,
+    val dayOfWeek: Int,
+    val number: Int?,
+    val startTime: String,
+    val endTime: String,
+    val subjectId: UID?,
+    val teacherId: UID?,
+    val office: String,
+    val location: String?,
+    val eventType: EventType?,
+    val included: Boolean,
+)

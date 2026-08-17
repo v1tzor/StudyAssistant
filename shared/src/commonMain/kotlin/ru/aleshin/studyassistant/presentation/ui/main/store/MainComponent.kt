@@ -304,7 +304,7 @@ abstract class MainComponent(
                     stackNavigation.replaceAll(TabNavigation())
                 }
                 is MainOutput.NavigateToPreview -> {
-                    stackNavigation.replaceAll(Preview())
+                    stackNavigation.replaceAll(Preview(output.startConfig))
                 }
                 is MainOutput.NavigateToDeepLink -> {
                     handleDeepLink(output.deepLinkUrl)
@@ -364,6 +364,9 @@ abstract class MainComponent(
         private fun settingsOutputConsumer() = OutputConsumer<SettingsOutput> { output ->
             when (output) {
                 is SettingsOutput.NavigateToBack -> navigateToBack()
+                is SettingsOutput.NavigateToOnboarding -> {
+                    stackNavigation.replaceAll(Preview(PreviewConfig.Setup))
+                }
             }
         }
 

@@ -44,6 +44,9 @@ import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponentFactory
 import ru.aleshin.studyassistant.widget.presentation.work.WidgetsUpdateScheduler
 
+/**
+ * @author Stanislav Aleshin on 09.08.2026.
+ */
 class MainActivity : FlavorMainActivity() {
 
     private val componentFactory = MainDependenciesGraph.fetchDI().instance<MainComponentFactory>()
@@ -70,6 +73,7 @@ class MainActivity : FlavorMainActivity() {
                     infoOrganizationsBannerId = BuildConfig.YANDEX_INFO_BANNER_ID,
                     aiQuotaRewardedId = BuildConfig.YANDEX_AI_REWARDED_ID,
                     scheduleImportRewardedId = BuildConfig.YANDEX_SCHEDULE_REWARDED_ID,
+                    aiScheduleAnalysisRewardedId = BuildConfig.YANDEX_SCHEDULE_AI_REWARDED_ID,
                 )
             )
 

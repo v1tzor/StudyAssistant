@@ -17,33 +17,38 @@
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.general.store
 
 import kotlinx.coroutines.flow.flow
-import ru.aleshin.studyassistant.core.common.architecture.component.EmptyOutput
 import ru.aleshin.studyassistant.core.common.architecture.store.work.ActionResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
+import ru.aleshin.studyassistant.core.common.architecture.store.work.OutputResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.UserDataInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
 import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.GeneralSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralAction
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralEffect
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.contract.GeneralOutput
 
 /**
  * @author Stanislav Aleshin on 10.07.2024.
  */
 internal interface GeneralWorkProcessor :
-    FlowWorkProcessor<GeneralWorkCommand, GeneralAction, GeneralEffect, EmptyOutput> {
+    FlowWorkProcessor<GeneralWorkCommand, GeneralAction, GeneralEffect, GeneralOutput> {
 
     class Base(
         private val settingsInteractor: GeneralSettingsInteractor,
+        private val userDataInteractor: UserDataInteractor,
     ) : GeneralWorkProcessor {
 
         override suspend fun work(command: GeneralWorkCommand) = when (command) {
             is GeneralWorkCommand.LoadSettings -> loadSettingsWork()
             is GeneralWorkCommand.UpdateSettings -> updateSettingsWork(command.settings)
+            is GeneralWorkCommand.DeleteCurrentSchedule -> deleteCurrentScheduleWork()
+            is GeneralWorkCommand.DeleteAllData -> deleteAllDataWork()
         }
 
         private fun loadSettingsWork() = flow {
@@ -60,10 +65,25 @@ internal interface GeneralWorkProcessor :
                 onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
             )
         }
+
+        private fun deleteCurrentScheduleWork() = flow {
+            userDataInteractor.deleteCurrentSchedule().handle(
+                onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
+            )
+        }
+
+        private fun deleteAllDataWork() = flow {
+            userDataInteractor.deleteAllUserData().handle(
+                onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
+                onRightAction = { emit(OutputResult(GeneralOutput.NavigateToOnboarding)) },
+            )
+        }
     }
 }
 
 internal sealed class GeneralWorkCommand : WorkCommand {
     data object LoadSettings : GeneralWorkCommand()
     data class UpdateSettings(val settings: GeneralSettingsUi) : GeneralWorkCommand()
+    data object DeleteCurrentSchedule : GeneralWorkCommand()
+    data object DeleteAllData : GeneralWorkCommand()
 }

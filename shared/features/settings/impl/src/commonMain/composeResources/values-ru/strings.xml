@@ -24,6 +24,12 @@
     <string name="about_app_tab_header">О приложении</string>
     <string name="language_chooser_view_title">Язык приложения</string>
     <string name="theme_chooser_view_title">Тема</string>
+    <string name="delete_schedule_button">Удалить текущее расписание</string>
+    <string name="delete_schedule_warning_title">Удалить расписание?</string>
+    <string name="delete_schedule_warning_text">Будет удалено только текущее расписание. Организация, учителя и предметы останутся.</string>
+    <string name="delete_all_data_button">Удалить все данные</string>
+    <string name="delete_all_data_warning_title">Удалить все данные?</string>
+    <string name="delete_all_data_warning_text">Будут безвозвратно удалены профиль, организации, учителя, предметы, расписание, задания и история чата. После этого откроется первичная настройка.</string>
     <string name="number_of_repeat_week_view_title">Недель в расписании</string>
     <string name="begging_of_classes_notify_title">Уведомлять о начале занятий</string>
     <string name="begging_of_classes_notify_description">Напоминания о начале занятий для выбранных организаций</string>

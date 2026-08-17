@@ -42,3 +42,6 @@ ORDER BY date_version_to DESC;
 deleteSchedulesByTimeRange:
 DELETE FROM baseScheduleEntity
 WHERE (date_version_to >= ? AND date_version_from <= ?);
+
+deleteAllSchedules:
+DELETE FROM baseScheduleEntity;

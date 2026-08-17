@@ -80,6 +80,9 @@ internal interface SetupWorkProcessor :
         }
 
         private fun fetchAllDataWork() = flow {
+            generalSettingsInteractor.markSetupStarted().handle(
+                onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
+            )
             profileInteractor.fetchProfile().firstHandleAndGet(
                 onLeftAction = { emit(EffectResult(SetupEffect.ShowError(it))) },
                 onRightAction = { profile ->

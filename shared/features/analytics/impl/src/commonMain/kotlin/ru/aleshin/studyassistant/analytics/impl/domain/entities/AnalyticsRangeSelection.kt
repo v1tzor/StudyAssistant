@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.analytics.impl.domain.entities
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.

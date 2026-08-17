@@ -25,7 +25,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGranularity
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

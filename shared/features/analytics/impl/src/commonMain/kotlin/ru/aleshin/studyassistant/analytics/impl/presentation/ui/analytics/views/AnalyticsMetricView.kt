@@ -113,6 +113,7 @@ internal fun AnalyticsDistributionRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
+                modifier = Modifier.weight(1f),
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -123,7 +124,7 @@ internal fun AnalyticsDistributionRow(
                 text = value.toString(),
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Visible
             )
         }
         LinearProgressIndicator(

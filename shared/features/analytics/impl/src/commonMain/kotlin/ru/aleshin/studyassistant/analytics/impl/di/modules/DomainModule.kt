@@ -42,6 +42,7 @@ internal val domainModule = DI.Module("AnalyticsDomain") {
             baseScheduleRepository = instance(),
             customScheduleRepository = instance(),
             calendarSettingsRepository = instance(),
+            analyticsSettingsRepository = instance(),
             notificationSettingsRepository = instance(),
             homeworksRepository = instance(),
             todoRepository = instance(),

@@ -19,6 +19,8 @@ package ru.aleshin.studyassistant.schedule.impl.domain.validation
 import kotlinx.datetime.LocalTime
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportDraft
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportEntry
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportClass
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportSession
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -27,6 +29,7 @@ internal interface ScheduleImportValidator {
 
     fun isNoteValid(note: String): Boolean
     fun isDraftValid(draft: ScheduleImportDraft): Boolean
+    fun isSessionValid(session: ScheduleImportSession): Boolean
     fun parseTime(value: String?): LocalTime?
 
     class Base : ScheduleImportValidator {
@@ -57,6 +60,33 @@ internal interface ScheduleImportValidator {
                     entry.subject?.trim()?.lowercase(),
                 )
             }.size == entries.size
+        }
+
+        override fun isSessionValid(session: ScheduleImportSession): Boolean {
+            val classes = session.classes.filter(ScheduleImportClass::included)
+            if (classes.isEmpty() || classes.size > MAX_ENTRIES) return false
+            val subjectIds = session.subjects.map { subject -> subject.uid }.toSet()
+
+            return classes.all { classModel ->
+                val start = parseTime(classModel.startTime)
+                val end = parseTime(classModel.endTime)
+                val subjectId = classModel.subjectId
+                classModel.repeatWeek in MIN_REPEAT_WEEK..MAX_REPEAT_WEEK &&
+                    classModel.dayOfWeek in MIN_DAY_OF_WEEK..MAX_DAY_OF_WEEK &&
+                    subjectId != null &&
+                    subjectId in subjectIds &&
+                    start != null &&
+                    end != null &&
+                    start < end
+            } && classes.distinctBy { classModel ->
+                listOf(
+                    classModel.repeatWeek.toString(),
+                    classModel.dayOfWeek.toString(),
+                    classModel.startTime,
+                    classModel.endTime,
+                    classModel.subjectId,
+                )
+            }.size == classes.size
         }
 
         override fun parseTime(value: String?): LocalTime? {

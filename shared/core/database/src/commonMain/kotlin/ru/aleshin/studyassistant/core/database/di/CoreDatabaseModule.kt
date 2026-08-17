@@ -33,9 +33,11 @@ import ru.aleshin.studyassistant.core.database.datasource.listOfStringsAdapter
 import ru.aleshin.studyassistant.core.database.datasource.organizations.OrganizationsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.schedules.BaseScheduleLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.schedules.CustomScheduleLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.settings.AnalyticsSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.settings.CalendarSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.settings.GeneralSettingsLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.settings.NotificationSettingsLocalDataSource
+import ru.aleshin.studyassistant.core.database.datasource.settings.UserDataResetLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.shared.HomeworkShareLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.shared.ScheduleShareLocalDataSource
 import ru.aleshin.studyassistant.core.database.datasource.subjects.SubjectsLocalDataSource
@@ -55,6 +57,7 @@ import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.BaseScheduleQueries
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleEntity
 import ru.aleshin.studyassistant.sqldelight.schedules.CustomScheduleQueries
+import ru.aleshin.studyassistant.sqldelight.settings.AnalyticsQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarQueries
 import ru.aleshin.studyassistant.sqldelight.settings.CalendarSettingsEntity
 import ru.aleshin.studyassistant.sqldelight.settings.GeneralQueries
@@ -103,6 +106,9 @@ val coreDatabaseModule = DI.Module("CoreDatabase") {
 
     bindSingleton<GeneralQueries> { instance<Database>().generalQueries }
     bindSingleton<GeneralSettingsLocalDataSource> { GeneralSettingsLocalDataSource.Base(instance(), instance()) }
+    bindSingleton<AnalyticsQueries> { instance<Database>().analyticsQueries }
+    bindSingleton<AnalyticsSettingsLocalDataSource> { AnalyticsSettingsLocalDataSource.Base(instance(), instance()) }
+    bindSingleton<UserDataResetLocalDataSource> { UserDataResetLocalDataSource.Base(instance()) }
 
     bindSingleton<HomeworkShareReceiptQueries> { instance<Database>().homeworkShareReceiptQueries }
     bindSingleton<HomeworkShareLocalDataSource> { HomeworkShareLocalDataSource.Base(instance(), instance()) }

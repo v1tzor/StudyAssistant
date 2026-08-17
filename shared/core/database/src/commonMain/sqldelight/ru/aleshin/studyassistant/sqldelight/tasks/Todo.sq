@@ -58,3 +58,6 @@ ORDER BY deadline DESC;
 deleteTodosById:
 DELETE FROM todoEntity
 WHERE uid IN ?;
+
+deleteAllTodos:
+DELETE FROM todoEntity;

@@ -43,4 +43,5 @@ public sealed class SettingsConfig {
 
 public sealed class SettingsOutput : BaseOutput {
     public data object NavigateToBack : SettingsOutput()
+    public data object NavigateToOnboarding : SettingsOutput()
 }

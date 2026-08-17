@@ -28,26 +28,26 @@ import ru.aleshin.studyassistant.core.presentation.models.organizations.Organiza
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleFailures
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportDraftUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
+import ru.aleshin.studyassistant.schedule.impl.platform.CompressedScheduleImage
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportSessionUi
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
  */
 @Serializable
 internal data class ImportState(
-    val hasPhoto: Boolean = false,
-    val note: String = "",
-    val organization: OrganizationShortUi? = null,
-    val organizations: List<OrganizationShortUi> = emptyList(),
-    val subjects: List<SubjectUi> = emptyList(),
-    val employees: List<EmployeeUi> = emptyList(),
-    val requestId: UID? = null,
-    val draft: ScheduleImportDraftUi? = null,
-    val isLoading: Boolean = false,
-    val isApplied: Boolean = false,
-    val rewardChallengeId: String? = null,
+    val isLoadingPhoto: Boolean = false,
+    val isAnalysisInProgress: Boolean = false,
     val isRewardInProgress: Boolean = false,
+    val isApplied: Boolean = false,
+    var preparedImage: CompressedScheduleImage? = null,
+    val note: String = "",
+    val selectedOrganization: OrganizationShortUi? = null,
+    val organizations: List<OrganizationShortUi> = emptyList(),
+    val requestId: UID? = null,
+    val session: ScheduleImportSessionUi? = null,
+    val rewardChallengeId: String? = null,
 ) : StoreState
 
 internal sealed class ImportEvent : StoreEvent {
@@ -57,14 +57,25 @@ internal sealed class ImportEvent : StoreEvent {
     data class UpdateNote(val note: String) : ImportEvent()
     data class SelectOrganization(val organization: OrganizationShortUi?) : ImportEvent()
     data object ExtractDraft : ImportEvent()
-    data class ToggleEntry(val id: Int) : ImportEvent()
-    data class UpdateEntry(val entry: ScheduleImportEntryUi) : ImportEvent()
-    data class MoveClass(val id: Int, val dayOfWeek: Int) : ImportEvent()
-    data class SwapClasses(val firstId: Int, val secondId: Int) : ImportEvent()
-    data object ApplyDraft : ImportEvent()
+    data class UpdateClass(val classModel: ScheduleImportClassUi) : ImportEvent()
+    data class UpdateSubject(val subject: SubjectUi) : ImportEvent()
+    data class UpdateEmployee(val employee: EmployeeUi) : ImportEvent()
+    data class AssignSubject(val classId: UID, val subjectId: UID?) : ImportEvent()
+    data class AssignTeacher(val classId: UID, val teacherId: UID?) : ImportEvent()
+    data class AddSubject(val name: String) : ImportEvent()
+    data class AddEmployee(val firstName: String) : ImportEvent()
+    data class DeleteClass(val classId: UID) : ImportEvent()
+    data class DeleteSubject(val subjectId: UID) : ImportEvent()
+    data class DeleteEmployee(val employeeId: UID) : ImportEvent()
+    data class ReorderDayClasses(
+        val dayOfWeek: Int,
+        val repeatWeek: Int,
+        val orderedIds: List<UID>,
+    ) : ImportEvent()
+    data object ApplySession : ImportEvent()
     data class RewardedAdGranted(val challengeId: String) : ImportEvent()
     data object RewardedAdUnavailable : ImportEvent()
-    data object ClearStaleReward : ImportEvent()
+    data object ReconcileReward : ImportEvent()
     data object EditSource : ImportEvent()
     data object ClickBack : ImportEvent()
     data object ClickAddOrganization : ImportEvent()
@@ -75,19 +86,16 @@ internal sealed class ImportEffect : StoreEffect {
 }
 
 internal sealed class ImportAction : StoreAction {
-    data class UpdateHasPhoto(val hasPhoto: Boolean) : ImportAction()
+    data class UpdateLoadingPhoto(val isLoading: Boolean) : ImportAction()
+    data class UpdateAnalysisProgress(val isLoading: Boolean) : ImportAction()
+    data class UpdatePhoto(val preparedImage: CompressedScheduleImage?) : ImportAction()
     data class UpdateNote(val note: String) : ImportAction()
-    data class UpdateOrganization(val organization: OrganizationShortUi?) : ImportAction()
+    data class UpdateSelectedOrganization(val organization: OrganizationShortUi?) : ImportAction()
     data class SetupOrganizations(val organizations: List<OrganizationShortUi>) : ImportAction()
-    data class SetupCatalog(
-        val subjects: List<SubjectUi>,
-        val employees: List<EmployeeUi>,
-    ) : ImportAction()
-    data class SetupDraft(
-        val draft: ScheduleImportDraftUi?,
+    data class SetupSession(
+        val session: ScheduleImportSessionUi?,
         val requestId: UID?,
     ) : ImportAction()
-    data class UpdateLoading(val isLoading: Boolean) : ImportAction()
     data class UpdateApplied(val isApplied: Boolean) : ImportAction()
     data class UpdateRewardChallenge(
         val challengeId: String?,

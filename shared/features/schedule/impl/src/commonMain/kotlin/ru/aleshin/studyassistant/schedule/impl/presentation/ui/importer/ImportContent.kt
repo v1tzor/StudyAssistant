@@ -37,6 +37,7 @@ import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberCameraPickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.readBytes
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
@@ -67,9 +68,9 @@ internal fun ImportContent(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val adsConfiguration = LocalAdsConfiguration.current
-    var editingEntryId by rememberSaveable { mutableStateOf<Int?>(null) }
-    var editingSubject by rememberSaveable { mutableStateOf<String?>(null) }
-    var editingTeacher by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingClassId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingSubjectId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingEmployeeId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val galleryLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
@@ -82,14 +83,16 @@ internal fun ImportContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            ImportTopBar(onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) })
+            ImportTopBar(
+                onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) }
+            )
         },
         bottomBar = {
-            if (state.draft != null && !state.isApplied) {
+            if (state.session != null && !state.isApplied) {
                 ImportBottomActionBar(
-                    enabled = !state.isRewardInProgress && !state.isLoading,
-                    isLoadingAccept = state.isRewardInProgress || state.isLoading,
-                    onSaveClick = { store.dispatchEvent(ImportEvent.ApplyDraft) },
+                    enabled = !state.isRewardInProgress && !state.isAnalysisInProgress,
+                    isLoadingAccept = state.isRewardInProgress || state.isAnalysisInProgress,
+                    onSaveClick = { store.dispatchEvent(ImportEvent.ApplySession) },
                     onEditSourceClick = { store.dispatchEvent(ImportEvent.EditSource) },
                 )
             }
@@ -113,63 +116,79 @@ internal fun ImportContent(
             },
             onAddOrganization = { store.dispatchEvent(ImportEvent.ClickAddOrganization) },
             onExtract = { store.dispatchEvent(ImportEvent.ExtractDraft) },
-            onClassClick = { entryId -> editingEntryId = entryId },
-            onMoveClass = { entryId, dayOfWeek ->
-                store.dispatchEvent(ImportEvent.MoveClass(entryId, dayOfWeek))
+            onClassClick = { classId -> editingClassId = classId },
+            onReorderDayClasses = { dayOfWeek, repeatWeek, orderedIds ->
+                store.dispatchEvent(ImportEvent.ReorderDayClasses(dayOfWeek, repeatWeek, orderedIds))
             },
-            onSwapClasses = { firstId, secondId ->
-                store.dispatchEvent(ImportEvent.SwapClasses(firstId, secondId))
-            },
-            onSubjectClick = { subject -> editingSubject = subject },
-            onTeacherClick = { teacher -> editingTeacher = teacher },
+            onSubjectClick = { subjectId -> editingSubjectId = subjectId },
+            onTeacherClick = { employeeId -> editingEmployeeId = employeeId },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
         )
     }
 
-    val editingEntry = state.draft?.entries?.firstOrNull { entry -> entry.id == editingEntryId }
-    if (editingEntry != null) {
+    val editingClass = state.session?.classes?.firstOrNull { classModel -> classModel.uid == editingClassId }
+    if (editingClass != null) {
         ImportClassEditorSheet(
-            entry = editingEntry,
-            subjects = state.subjects,
-            employees = state.employees,
-            onDismiss = { editingEntryId = null },
-            onConfirm = { entry ->
-                store.dispatchEvent(ImportEvent.UpdateEntry(entry))
-                editingEntryId = null
+            classModel = editingClass,
+            subjects = state.session?.subjects.orEmpty(),
+            employees = state.session?.employees.orEmpty(),
+            originalSubjectIds = state.session?.originalSubjectIds.orEmpty(),
+            originalEmployeeIds = state.session?.originalEmployeeIds.orEmpty(),
+            onDismiss = { editingClassId = null },
+            onConfirm = { classModel ->
+                store.dispatchEvent(ImportEvent.UpdateClass(classModel))
+                editingClassId = null
             },
+            onDelete = {
+                store.dispatchEvent(ImportEvent.DeleteClass(editingClass.uid))
+                editingClassId = null
+            },
+            onAddSubject = { name -> store.dispatchEvent(ImportEvent.AddSubject(name)) },
+            onAddEmployee = { name -> store.dispatchEvent(ImportEvent.AddEmployee(name)) },
         )
+    }
+    val editingSubject = state.session?.subjects?.firstOrNull { subject ->
+        subject.uid == editingSubjectId
     }
     if (editingSubject != null) {
         ImportSubjectEditorSheet(
-            subjectName = editingSubject.orEmpty(),
-            entries = state.draft?.entries.orEmpty(),
-            subjects = state.subjects,
-            onDismiss = { editingSubject = null },
-            onConfirm = { updated ->
-                updated.forEach { entry -> store.dispatchEvent(ImportEvent.UpdateEntry(entry)) }
-                editingSubject = null
+            subject = editingSubject,
+            employees = state.session?.employees.orEmpty(),
+            originalEmployeeIds = state.session?.originalEmployeeIds.orEmpty(),
+            onDismiss = { editingSubjectId = null },
+            onConfirm = { subject ->
+                store.dispatchEvent(ImportEvent.UpdateSubject(subject))
+                editingSubjectId = null
             },
+            onDelete = {
+                store.dispatchEvent(ImportEvent.DeleteSubject(editingSubject.uid))
+                editingSubjectId = null
+            },
+            onAddEmployee = { name -> store.dispatchEvent(ImportEvent.AddEmployee(name)) },
         )
     }
-    if (editingTeacher != null) {
+    val editingEmployee = state.session?.employees?.firstOrNull { employee ->
+        employee.uid == editingEmployeeId
+    }
+    if (editingEmployee != null) {
         ImportTeacherEditorSheet(
-            teacherName = editingTeacher.orEmpty(),
-            entries = state.draft?.entries.orEmpty(),
-            employees = state.employees,
-            onDismiss = { editingTeacher = null },
-            onConfirm = { updated ->
-                updated.forEach { entry -> store.dispatchEvent(ImportEvent.UpdateEntry(entry)) }
-                editingTeacher = null
+            employee = editingEmployee,
+            onDismiss = { editingEmployeeId = null },
+            onConfirm = { employee ->
+                store.dispatchEvent(ImportEvent.UpdateEmployee(employee))
+                editingEmployeeId = null
+            },
+            onDelete = {
+                store.dispatchEvent(ImportEvent.DeleteEmployee(editingEmployee.uid))
+                editingEmployeeId = null
             },
         )
     }
 
     YandexRewardedAdHost(
-        adUnitId = adsConfiguration?.scheduleImportRewardedId.orEmpty(),
+        adUnitId = adsConfiguration?.aiScheduleAnalysisRewardedId.orEmpty(),
         requestKey = state.rewardChallengeId,
-        onRewarded = { challengeId ->
-            store.dispatchEvent(ImportEvent.RewardedAdGranted(challengeId))
-        },
+        onRewarded = { challengeId -> store.dispatchEvent(ImportEvent.RewardedAdGranted(challengeId)) },
         onUnavailable = { store.dispatchEvent(ImportEvent.RewardedAdUnavailable) },
     )
 
@@ -185,7 +204,7 @@ internal fun ImportContent(
 
 private fun handlePickedFile(
     file: PlatformFile?,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    coroutineScope: CoroutineScope,
     dispatch: (ImportEvent) -> Unit,
 ) {
     if (file == null) return

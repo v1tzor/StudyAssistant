@@ -34,11 +34,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,9 +53,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.isoDayNumber
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
-import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportEntryUi
+import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
+import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.resources.ic_tooltip
+import ru.aleshin.studyassistant.core.ui.views.InfoTextField
+import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.NumberOfWeekItem
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportCatalogItem
@@ -67,6 +70,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.Im
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSourceActions
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_extract_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_description
@@ -82,8 +86,8 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_subject
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teachers_title
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_unparsed_title
 import ru.aleshin.studyassistant.schedule.impl.resources.shared_schedule_header
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -98,11 +102,10 @@ internal fun ImportLayout(
     onOrganizationSelect: (OrganizationShortUi?) -> Unit,
     onAddOrganization: () -> Unit,
     onExtract: () -> Unit,
-    onClassClick: (Int) -> Unit,
-    onMoveClass: (Int, Int) -> Unit,
-    onSwapClasses: (Int, Int) -> Unit,
-    onSubjectClick: (String) -> Unit,
-    onTeacherClick: (String) -> Unit,
+    onClassClick: (UID) -> Unit,
+    onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
+    onSubjectClick: (UID) -> Unit,
+    onTeacherClick: (UID) -> Unit,
     onDone: () -> Unit,
 ) {
     Box(
@@ -111,9 +114,9 @@ internal fun ImportLayout(
     ) {
         AnimatedContent(
             targetState = when {
-                state.isLoading -> ImportContentState.LOADING
+                state.isAnalysisInProgress -> ImportContentState.LOADING
                 state.isApplied -> ImportContentState.SUCCESS
-                state.draft != null -> ImportContentState.REVIEW
+                state.session != null -> ImportContentState.REVIEW
                 else -> ImportContentState.SOURCE
             },
             transitionSpec = { fadeIn().togetherWith(fadeOut()) },
@@ -123,7 +126,7 @@ internal fun ImportLayout(
                 ImportContentState.SOURCE -> ImportSourceLayout(
                     modifier = Modifier.widthIn(max = 600.dp),
                     state = state,
-                    enabled = !state.isLoading,
+                    enabled = !state.isAnalysisInProgress,
                     onSelectPhoto = onSelectPhoto,
                     onTakePhoto = onTakePhoto,
                     onNoteChanged = onNoteChanged,
@@ -138,8 +141,7 @@ internal fun ImportLayout(
                     modifier = Modifier.widthIn(max = 800.dp),
                     state = state,
                     onClassClick = onClassClick,
-                    onMoveClass = onMoveClass,
-                    onSwapClasses = onSwapClasses,
+                    onReorderDayClasses = onReorderDayClasses,
                     onSubjectClick = onSubjectClick,
                     onTeacherClick = onTeacherClick,
                 )
@@ -187,7 +189,7 @@ private fun ImportSourceLayout(
         item(key = PHOTO_SECTION_KEY) {
             ImportSourceActions(
                 enabled = enabled,
-                hasPhoto = state.hasPhoto,
+                hasPhoto = state.preparedImage != null,
                 onSelectPhoto = onSelectPhoto,
                 onTakePhoto = onTakePhoto,
             )
@@ -195,35 +197,29 @@ private fun ImportSourceLayout(
         item(key = ORGANIZATION_SECTION_KEY) {
             ImportOrganizationField(
                 enabled = enabled,
-                organization = state.organization,
+                selectedOrganization = state.selectedOrganization,
                 organizations = state.organizations,
                 onAddOrganization = onAddOrganization,
                 onSelected = onOrganizationSelect,
             )
         }
         item(key = NOTE_SECTION_KEY) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = state.note,
-                    enabled = enabled,
-                    onValueChange = { value ->
-                        if (value.length <= MAX_NOTE_LENGTH) onNoteChanged(value)
-                    },
-                    label = { Text(stringResource(Res.string.schedule_import_note_label)) },
-                    placeholder = { Text(stringResource(Res.string.schedule_import_note_placeholder)) },
-                    supportingText = {
-                        Text(stringResource(Res.string.schedule_import_note_description))
-                    },
-                    shape = MaterialTheme.shapes.large,
-                )
-            }
+            InfoTextField(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                value = state.note,
+                label = stringResource(Res.string.schedule_import_note_label),
+                leadingInfoIcon = painterResource(CoreRes.drawable.ic_tooltip),
+                onValueChange = { value -> if (value.length <= MAX_NOTE_LENGTH) onNoteChanged(value) },
+                placeholder = { Text(stringResource(Res.string.schedule_import_note_placeholder)) },
+                supportingText = { Text(stringResource(Res.string.schedule_import_note_description)) },
+            )
         }
         item(key = EXTRACT_SECTION_KEY) {
             Button(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                enabled = enabled && state.hasPhoto && state.organization != null,
                 onClick = onExtract,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                enabled = enabled && state.preparedImage != null && state.selectedOrganization != null,
             ) {
                 Text(stringResource(Res.string.schedule_import_extract_button))
             }
@@ -289,28 +285,33 @@ private fun ImportLoadingLayout(
 private fun ImportReviewLayout(
     modifier: Modifier = Modifier,
     state: ImportState,
-    onClassClick: (Int) -> Unit,
-    onMoveClass: (Int, Int) -> Unit,
-    onSwapClasses: (Int, Int) -> Unit,
-    onSubjectClick: (String) -> Unit,
-    onTeacherClick: (String) -> Unit,
+    onClassClick: (UID) -> Unit,
+    onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
+    onSubjectClick: (UID) -> Unit,
+    onTeacherClick: (UID) -> Unit,
 ) {
-    val draft = state.draft ?: return
+    val session = state.session ?: return
     val coroutineScope = rememberCoroutineScope()
     val schedulesRowState = rememberLazyListState()
-    val subjects = remember(draft.entries) {
-        draft.entries
-            .filter(ScheduleImportEntryUi::included)
-            .mapNotNull { entry -> entry.subject.takeIf(String::isNotBlank) }
-            .distinct()
+    val usedSubjectIds = remember(session.classes) {
+        session.classes.mapNotNull(ScheduleImportClassUi::subjectId).toSet()
     }
-    val teachers = remember(draft.entries) {
-        draft.entries
-            .filter(ScheduleImportEntryUi::included)
-            .mapNotNull { entry -> entry.teacher.takeIf(String::isNotBlank) }
-            .distinct()
+    val usedTeacherIds = remember(session.classes) {
+        session.classes.mapNotNull(ScheduleImportClassUi::teacherId).toSet()
     }
-    val maxNumberOfWeek = draft.entries.maxOfOrNull { entry -> entry.repeatWeek } ?: 1
+    val subjects = remember(session.subjects, usedSubjectIds) {
+        session.subjects.sortedWith(
+            compareBy<SubjectUi> { subject -> if (subject.uid in usedSubjectIds) 0 else 1 }
+                .thenBy { subject -> subject.name.lowercase() },
+        )
+    }
+    val teachers = remember(session.employees, usedTeacherIds) {
+        session.employees.sortedWith(
+            compareBy<EmployeeUi> { employee -> if (employee.uid in usedTeacherIds) 0 else 1 }
+                .thenBy { employee -> employee.fullName().lowercase() },
+        )
+    }
+    val maxNumberOfWeek = session.classes.maxOfOrNull { classModel -> classModel.repeatWeek } ?: 1
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -332,40 +333,14 @@ private fun ImportReviewLayout(
                 )
             }
         }
-        if (draft.unparsedLines.isNotEmpty()) {
-            item(key = UNPARSED_SECTION_KEY) {
-                ElevatedCard(
-                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    ),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.schedule_import_unparsed_title),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                        draft.unparsedLines.forEach { line ->
-                            Text(
-                                text = line,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-        }
         item(key = WEEK_SECTION_KEY) {
             ImportWeekSection(
-                entries = draft.entries.filter(ScheduleImportEntryUi::included),
+                classes = session.classes.filter(ScheduleImportClassUi::included),
+                subjects = session.subjects,
+                employees = session.employees,
                 maxNumberOfWeek = maxNumberOfWeek,
                 onClassClick = onClassClick,
-                onMoveClass = onMoveClass,
-                onSwapClasses = onSwapClasses,
+                onReorderDayClasses = onReorderDayClasses,
                 onWeekSelected = {
                     coroutineScope.launch { schedulesRowState.animateScrollToItem(0) }
                 },
@@ -373,26 +348,18 @@ private fun ImportReviewLayout(
             )
         }
         item(key = SUBJECTS_SECTION_KEY) {
-            ImportCatalogSection(
+            ImportSubjectCatalogSection(
                 title = stringResource(Res.string.schedule_import_subjects_title),
-                items = subjects,
-                isNew = { name ->
-                    state.subjects.none { subject -> subject.name.equals(name, ignoreCase = true) }
-                },
+                subjects = subjects,
+                originalSubjectIds = session.originalSubjectIds,
                 onClick = onSubjectClick,
             )
         }
         item(key = TEACHERS_SECTION_KEY) {
-            ImportCatalogSection(
+            ImportTeacherCatalogSection(
                 title = stringResource(Res.string.schedule_import_teachers_title),
-                items = teachers,
-                isNew = { name ->
-                    state.employees.none { employee ->
-                        listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
-                            .joinToString(" ")
-                            .equals(name, ignoreCase = true)
-                    }
-                },
+                employees = teachers,
+                originalEmployeeIds = session.originalEmployeeIds,
                 onClick = onTeacherClick,
             )
         }
@@ -404,11 +371,12 @@ private fun ImportReviewLayout(
 
 @Composable
 private fun ImportWeekSection(
-    entries: List<ScheduleImportEntryUi>,
+    classes: List<ScheduleImportClassUi>,
+    subjects: List<SubjectUi>,
+    employees: List<EmployeeUi>,
     maxNumberOfWeek: Int,
-    onClassClick: (Int) -> Unit,
-    onMoveClass: (Int, Int) -> Unit,
-    onSwapClasses: (Int, Int) -> Unit,
+    onClassClick: (UID) -> Unit,
+    onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onWeekSelected: () -> Unit,
     schedulesRowState: androidx.compose.foundation.lazy.LazyListState,
 ) {
@@ -445,15 +413,18 @@ private fun ImportWeekSection(
                 items = DayOfWeek.entries,
                 key = { dayOfWeek -> dayOfWeek.isoDayNumber },
             ) { dayOfWeek ->
-                val dayEntries = entries.filter { entry ->
-                    entry.dayOfWeek == dayOfWeek.isoDayNumber && entry.repeatWeek == selectedWeek
+                val dayClasses = classes.filter { classModel ->
+                    classModel.dayOfWeek == dayOfWeek.isoDayNumber && classModel.repeatWeek == selectedWeek
                 }
                 ImportDayColumn(
                     dayOfWeek = dayOfWeek,
-                    entries = dayEntries,
+                    classes = dayClasses,
+                    subjects = subjects,
+                    employees = employees,
                     onClassClick = onClassClick,
-                    onMoveClass = onMoveClass,
-                    onSwapClasses = onSwapClasses,
+                    onReorderClasses = { orderedIds ->
+                        onReorderDayClasses(dayOfWeek.isoDayNumber, selectedWeek, orderedIds)
+                    },
                 )
             }
         }
@@ -461,11 +432,11 @@ private fun ImportWeekSection(
 }
 
 @Composable
-private fun ImportCatalogSection(
+private fun ImportSubjectCatalogSection(
     title: String,
-    items: List<String>,
-    isNew: (String) -> Boolean,
-    onClick: (String) -> Unit,
+    subjects: List<SubjectUi>,
+    originalSubjectIds: Set<UID>,
+    onClick: (UID) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -475,11 +446,43 @@ private fun ImportCatalogSection(
             text = title,
             style = MaterialTheme.typography.titleMedium,
         )
-        items.forEach { item ->
+        subjects.forEach { subject ->
             ImportCatalogItem(
-                title = item,
-                isNew = isNew(item),
-                onClick = { onClick(item) },
+                title = subject.name,
+                label = subject.teacher?.fullName(),
+                color = subject.color,
+                isNew = subject.uid !in originalSubjectIds,
+                onClick = { onClick(subject.uid) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImportTeacherCatalogSection(
+    title: String,
+    employees: List<EmployeeUi>,
+    originalEmployeeIds: Set<UID>,
+    onClick: (UID) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        employees.forEach { employee ->
+            ImportCatalogItem(
+                title = employee.fullName(),
+                label = if (employee.uid in originalEmployeeIds) {
+                    stringResource(Res.string.schedule_import_catalog_existing_label)
+                } else {
+                    null
+                },
+                isNew = employee.uid !in originalEmployeeIds,
+                onClick = { onClick(employee.uid) },
             )
         }
     }
@@ -527,7 +530,6 @@ private const val ORGANIZATION_SECTION_KEY = "import_organization_section"
 private const val NOTE_SECTION_KEY = "import_note_section"
 private const val EXTRACT_SECTION_KEY = "import_extract_section"
 private const val REVIEW_HEADER_KEY = "import_review_header"
-private const val UNPARSED_SECTION_KEY = "import_unparsed_section"
 private const val WEEK_SECTION_KEY = "import_week_section"
 private const val SUBJECTS_SECTION_KEY = "import_subjects_section"
 private const val TEACHERS_SECTION_KEY = "import_teachers_section"

@@ -16,24 +16,30 @@
 
 package ru.aleshin.studyassistant.analytics.impl.domain.interactors
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.analytics.impl.domain.calculators.AnalyticsGoalCalculator
 import ru.aleshin.studyassistant.analytics.impl.domain.calculators.AnalyticsRangeCalculator
 import ru.aleshin.studyassistant.analytics.impl.domain.calculators.AnalyticsReportCalculator
 import ru.aleshin.studyassistant.analytics.impl.domain.calculators.AnalyticsScheduleCalculator
 import ru.aleshin.studyassistant.analytics.impl.domain.common.AnalyticsEitherWrapper
+import ru.aleshin.studyassistant.analytics.impl.domain.common.toRangeSelection
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsFailures
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsGoalDistribution
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsOverview
-import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsPeriod
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsRangeSelection
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
+import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsSettings
 import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
+import ru.aleshin.studyassistant.core.domain.repositories.AnalyticsSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -47,7 +53,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
  */
 internal interface AnalyticsInteractor {
 
-    suspend fun fetchDefault(target: AnalyticsTarget?): FlowDomainResult<AnalyticsFailures, AnalyticsOverview>
+    suspend fun fetchOverview(target: AnalyticsTarget?): FlowDomainResult<AnalyticsFailures, AnalyticsOverview>
     suspend fun fetchPeriod(
         period: AnalyticsPeriod,
         anchor: Instant,
@@ -81,6 +87,7 @@ internal interface AnalyticsInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
+        private val analyticsSettingsRepository: AnalyticsSettingsRepository,
         private val notificationSettingsRepository: NotificationSettingsRepository,
         private val homeworksRepository: HomeworksRepository,
         private val todoRepository: TodoRepository,
@@ -93,10 +100,18 @@ internal interface AnalyticsInteractor {
         private val eitherWrapper: AnalyticsEitherWrapper,
     ) : AnalyticsInteractor {
 
-        override suspend fun fetchDefault(target: AnalyticsTarget?) = fetchSelection(
-            selection = rangeCalculator.createDefault(dateManager.fetchCurrentInstant()),
-            target = target,
-        )
+        @OptIn(ExperimentalCoroutinesApi::class)
+        override suspend fun fetchOverview(target: AnalyticsTarget?) = eitherWrapper.wrapFlow {
+            analyticsSettingsRepository.fetchSettings().flatMapLatest { settings ->
+                observeOverview(
+                    selection = settings.toRangeSelection(
+                        calculator = rangeCalculator,
+                        currentTime = dateManager.fetchCurrentInstant(),
+                    ),
+                    target = target,
+                )
+            }
+        }
 
         override suspend fun fetchPeriod(
             period: AnalyticsPeriod,
@@ -115,27 +130,33 @@ internal interface AnalyticsInteractor {
             period: AnalyticsPeriod,
             selection: AnalyticsRangeSelection,
             target: AnalyticsTarget?,
-        ) = fetchSelection(
-            selection = rangeCalculator.changePeriod(
-                period = period,
-                selection = selection,
-                currentTime = dateManager.fetchCurrentInstant(),
-            ),
-            target = target,
-        )
+        ) = eitherWrapper.wrapFlow {
+            persistPeriod(period)
+            observeOverview(
+                selection = rangeCalculator.changePeriod(
+                    period = period,
+                    selection = selection,
+                    currentTime = dateManager.fetchCurrentInstant(),
+                ),
+                target = target,
+            )
+        }
 
         override suspend fun fetchCustom(
             from: Instant,
             to: Instant,
             target: AnalyticsTarget?,
-        ) = fetchSelection(
-            selection = rangeCalculator.selectCustom(
-                from = from,
-                to = to,
-                currentTime = dateManager.fetchCurrentInstant(),
-            ),
-            target = target,
-        )
+        ) = eitherWrapper.wrapFlow {
+            persistPeriod(AnalyticsPeriod.CUSTOM, from, to)
+            observeOverview(
+                selection = rangeCalculator.selectCustom(
+                    from = from,
+                    to = to,
+                    currentTime = dateManager.fetchCurrentInstant(),
+                ),
+                target = target,
+            )
+        }
 
         override suspend fun fetchShifted(
             selection: AnalyticsRangeSelection,
@@ -154,6 +175,27 @@ internal interface AnalyticsInteractor {
             selection: AnalyticsRangeSelection,
             target: AnalyticsTarget?,
         ) = eitherWrapper.wrapFlow {
+            observeOverview(selection, target)
+        }
+
+        private suspend fun persistPeriod(
+            period: AnalyticsPeriod,
+            from: Instant? = null,
+            to: Instant? = null,
+        ) {
+            analyticsSettingsRepository.updateSettings(
+                AnalyticsSettings(
+                    period = period,
+                    customFrom = from?.toEpochMilliseconds(),
+                    customTo = to?.toEpochMilliseconds(),
+                ),
+            )
+        }
+
+        private suspend fun observeOverview(
+            selection: AnalyticsRangeSelection,
+            target: AnalyticsTarget?,
+        ): Flow<AnalyticsOverview> {
             val sourceRange = TimeRange(
                 from = selection.previousRange.from,
                 to = selection.range.to,
@@ -220,7 +262,7 @@ internal interface AnalyticsInteractor {
                     target = target,
                 )
             }.distinctUntilChanged()
-            combine(staticReportFlow, goalsFlow) { report, goalDistribution ->
+            return combine(staticReportFlow, goalsFlow) { report, goalDistribution ->
                 report.copy(
                     goalDistribution = goalDistribution,
                     hasData = report.hasData || goalDistribution.planned > 0,

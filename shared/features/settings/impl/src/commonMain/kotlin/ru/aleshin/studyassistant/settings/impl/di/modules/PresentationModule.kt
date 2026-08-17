@@ -59,7 +59,7 @@ internal val presentationModule = DI.Module("Presentation") {
 
     bindSingleton<TabNavigationComposeStore.Factory> { TabNavigationComposeStore.Factory(instance()) }
 
-    bindSingleton<GeneralWorkProcessor> { GeneralWorkProcessor.Base(instance()) }
+    bindSingleton<GeneralWorkProcessor> { GeneralWorkProcessor.Base(instance(), instance()) }
     bindSingleton<GeneralComposeStore.Factory> { GeneralComposeStore.Factory(instance(), instance()) }
 
     bindSingleton<CalendarWorkProcessor> { CalendarWorkProcessor.Base(instance(), instance()) }
