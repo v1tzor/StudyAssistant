@@ -29,7 +29,6 @@ class ProfileDataMapperTest {
             uid = "local-profile",
             username = "Student",
             avatar = "/avatars/profile/image.jpg",
-            description = "Description",
             city = "City",
             birthday = "2001-02-03",
             gender = Gender.MALE,

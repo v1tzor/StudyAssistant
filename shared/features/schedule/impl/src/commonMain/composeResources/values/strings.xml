@@ -31,6 +31,16 @@
     <string name="tasks_progress_title">Completed tasks</string>
     <string name="complete_schedule_title">There are no upcoming events</string>
     <string name="analysis_day_title">Day analysis</string>
+    <string name="analysis_workload_title">Workload</string>
+    <string name="overview_pane_header">Schedule</string>
+    <string name="overview_today_desc">Go to today</string>
+    <string name="overview_week_view_desc">Week schedule</string>
+    <string name="overview_edit_desc">Edit schedule</string>
+    <string name="previous_date_desc">Previous day</string>
+    <string name="next_date_desc">Next day</string>
+    <string name="choose_date_desc">Choose date</string>
+    <string name="date_picker_confirm">Select</string>
+    <string name="date_picker_cancel">Cancel</string>
     <string name="analysis_homeworks_label">Homeworks</string>
     <string name="analysis_tests_label">Tests</string>
     <string name="analysis_classes_label">Classes</string>
@@ -156,6 +166,7 @@
     <string name="schedule_import_catalog_existing_label">In organization</string>
     <string name="schedule_import_new_subject_name">New subject</string>
     <string name="schedule_import_new_teacher_name">New teacher</string>
+    <string name="schedule_import_add_button">Add</string>
     <string name="schedule_import_class_editor_title">Class</string>
     <string name="schedule_import_subject_editor_title">Subject</string>
     <string name="schedule_import_teacher_editor_title">Teacher</string>

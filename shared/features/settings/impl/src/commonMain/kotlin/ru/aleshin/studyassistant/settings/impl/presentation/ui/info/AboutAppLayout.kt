@@ -1,0 +1,282 @@
+/*
+ * Copyright 2026 Stanislav Aleshin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package ru.aleshin.studyassistant.settings.impl.presentation.ui.info
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Web
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.common.functional.Constants
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
+import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_CODE
+import ru.aleshin.studyassistant.settings.impl.BuildKonfig.VERSION_NAME
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.SettingsLayoutMode
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsExpandedPane
+import ru.aleshin.studyassistant.settings.impl.resources.Res
+import ru.aleshin.studyassistant.settings.impl.resources.about_app_header
+import ru.aleshin.studyassistant.settings.impl.resources.ask_question_title
+import ru.aleshin.studyassistant.settings.impl.resources.developer_title
+import ru.aleshin.studyassistant.settings.impl.resources.github_title
+import ru.aleshin.studyassistant.settings.impl.resources.ic_github
+import ru.aleshin.studyassistant.settings.impl.resources.license_title
+import ru.aleshin.studyassistant.settings.impl.resources.version_code_title
+import ru.aleshin.studyassistant.settings.impl.resources.version_name_title
+import ru.aleshin.studyassistant.settings.impl.resources.website_title
+
+/**
+ * @author Stanislav Aleshin on 17.08.2026.
+ */
+@Composable
+internal fun AboutAppLayout(
+    modifier: Modifier = Modifier,
+    layoutMode: SettingsLayoutMode,
+) {
+    when (layoutMode) {
+        SettingsLayoutMode.COMPACT -> AboutAppCompactLayout(modifier = modifier)
+        SettingsLayoutMode.EXPANDED -> AboutAppExpandedLayout(modifier = modifier)
+    }
+}
+
+@Composable
+private fun AboutAppCompactLayout(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .padding(vertical = 24.dp, horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        AboutAppItems(useExpandedStyle = false)
+    }
+}
+
+@Composable
+private fun AboutAppExpandedLayout(
+    modifier: Modifier = Modifier,
+) {
+    SettingsExpandedPane(modifier = modifier) {
+        AboutAppItems(useExpandedStyle = true)
+    }
+}
+
+@Composable
+private fun AboutAppItems(
+    useExpandedStyle: Boolean,
+) {
+    val uriHandler = LocalUriHandler.current
+    Text(
+        modifier = Modifier.widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth),
+        text = stringResource(Res.string.about_app_header),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.labelMedium,
+    )
+    AboutAppSectionVersion(
+        modifier = Modifier.widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth),
+        useExpandedStyle = useExpandedStyle
+    )
+    AboutAppSectionDevelopment(
+        modifier = Modifier.widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth),
+        useExpandedStyle = useExpandedStyle,
+        onOpenGit = { uriHandler.openUri(Constants.App.GITHUB_URI) },
+        onOpenIssues = { uriHandler.openUri(Constants.App.ISSUES_URI) },
+        onOpenWebsite = { uriHandler.openUri(Constants.App.WEBSITE_URI) },
+    )
+}
+
+@Composable
+private fun AboutAppSectionVersion(
+    modifier: Modifier = Modifier,
+    useExpandedStyle: Boolean = false,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            InfoView(
+                title = stringResource(Res.string.version_name_title),
+                text = VERSION_NAME,
+                useExpandedStyle = useExpandedStyle,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            InfoView(
+                title = stringResource(Res.string.version_code_title),
+                text = VERSION_CODE,
+                useExpandedStyle = useExpandedStyle,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AboutAppSectionDevelopment(
+    modifier: Modifier = Modifier,
+    useExpandedStyle: Boolean = false,
+    onOpenGit: () -> Unit,
+    onOpenIssues: () -> Unit,
+    onOpenWebsite: () -> Unit,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                InfoView(
+                    modifier = Modifier.fillMaxWidth(),
+                    title = stringResource(Res.string.developer_title),
+                    spaceInside = true,
+                    text = Constants.App.DEVELOPER,
+                    useExpandedStyle = useExpandedStyle,
+                )
+                InfoView(
+                    modifier = Modifier.fillMaxWidth(),
+                    title = stringResource(Res.string.license_title),
+                    spaceInside = true,
+                    text = Constants.App.LICENCE,
+                    useExpandedStyle = useExpandedStyle,
+                )
+            }
+            FilterChip(
+                modifier = Modifier.fillMaxWidth(),
+                selected = true,
+                onClick = onOpenWebsite,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Web,
+                        contentDescription = stringResource(Res.string.website_title),
+                    )
+                },
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(Res.string.website_title),
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                colors = FilterChipDefaults.filterChipSurfaceVariantColors(),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    modifier = Modifier.weight(1f),
+                    selected = true,
+                    onClick = onOpenIssues,
+                    label = {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(Res.string.ask_question_title),
+                            textAlign = TextAlign.Center,
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipSurfaceVariantColors(),
+                )
+                FilterChip(
+                    modifier = Modifier.weight(1f),
+                    selected = true,
+                    onClick = onOpenGit,
+                    label = {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(Res.string.github_title),
+                            textAlign = TextAlign.Center,
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_github),
+                            contentDescription = null,
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipSurfaceVariantColors(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoView(
+    modifier: Modifier = Modifier,
+    spaceInside: Boolean = false,
+    title: String,
+    text: String,
+    useExpandedStyle: Boolean = false,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        if (spaceInside) Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun FilterChipDefaults.filterChipSurfaceVariantColors() =
+    FilterChipDefaults.filterChipColors(
+        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        disabledSelectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+        selectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+        selectedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+    )

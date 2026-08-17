@@ -75,6 +75,7 @@ import ru.aleshin.studyassistant.core.ui.resources.warning_dialog_title as core_
 internal fun DetailsEmployeeViewItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     avatar: String?,
     post: EmployeePost,
     firstName: String,
@@ -133,6 +134,7 @@ internal fun DetailsEmployeeViewItem(
     ) {
         DetailsEmployeeView(
             onClick = onOpenProfile,
+            useExpandedStyle = useExpandedStyle,
             avatar = avatar,
             post = post,
             firstName = firstName,
@@ -171,6 +173,7 @@ private fun DetailsEmployeeView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     avatar: String?,
     post: EmployeePost,
     firstName: String,
@@ -181,15 +184,21 @@ private fun DetailsEmployeeView(
     isHaveEmail: Boolean,
     isHaveWebsite: Boolean,
 ) {
+    val shape = if (useExpandedStyle) {
+        MaterialTheme.shapes.extraLarge
+    } else {
+        MaterialTheme.shapes.large
+    }
+
     Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
-        shape = MaterialTheme.shapes.large,
+        shape = shape,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(if (useExpandedStyle) 16.dp else 12.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             AvatarView(
@@ -202,6 +211,7 @@ private fun DetailsEmployeeView(
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 DetailsEmployeeViewContent(
                     modifier = Modifier.weight(1f),
+                    useExpandedStyle = useExpandedStyle,
                     post = post,
                     firstName = firstName,
                     secondName = secondName,
@@ -221,6 +231,7 @@ private fun DetailsEmployeeView(
 @Composable
 private fun DetailsEmployeeViewContent(
     modifier: Modifier = Modifier,
+    useExpandedStyle: Boolean = false,
     post: EmployeePost,
     firstName: String,
     secondName: String?,
@@ -249,7 +260,11 @@ private fun DetailsEmployeeViewContent(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 lineHeight = 22.sp,
-                style = MaterialTheme.typography.titleMedium,
+                style = if (useExpandedStyle) {
+                    MaterialTheme.typography.titleLarge
+                } else {
+                    MaterialTheme.typography.titleMedium
+                },
             )
         }
         LazyRow(

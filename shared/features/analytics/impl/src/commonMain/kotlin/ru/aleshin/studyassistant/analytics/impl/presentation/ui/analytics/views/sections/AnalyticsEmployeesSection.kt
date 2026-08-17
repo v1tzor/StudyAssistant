@@ -25,10 +25,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.HorizontalDivider
@@ -254,6 +254,8 @@ private fun EmployeeFrequentDay(
                     append(day)
                 },
                 style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -276,7 +278,7 @@ private fun EmployeeMetrics(
             modifier = Modifier.weight(1f),
         )
         EmployeeMetric(
-            icon = Icons.Default.MenuBook,
+            icon = Icons.AutoMirrored.Filled.MenuBook,
             value = analytics.subjectsCount,
             label = stringResource(Res.string.analytics_subject_count),
             modifier = Modifier.weight(1f),
@@ -309,7 +311,7 @@ private fun EmployeeMetric(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,

@@ -320,6 +320,12 @@ abstract class MainComponent(
                 is PreviewOutput.NavigateToWeekScheduleEditor -> {
                     stackNavigation.replaceAll(TabNavigation(), Editor(EditorConfig.WeekSchedule()))
                 }
+                is PreviewOutput.NavigateToScheduleImport -> {
+                    stackNavigation.replaceAll(
+                        TabNavigation(),
+                        Schedule(ScheduleConfig.Import),
+                    )
+                }
             }
         }
 

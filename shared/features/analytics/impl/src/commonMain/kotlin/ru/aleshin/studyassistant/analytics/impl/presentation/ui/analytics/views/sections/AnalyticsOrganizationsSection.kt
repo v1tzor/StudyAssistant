@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2026 Stanislav Aleshin
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.sections
 
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.School
@@ -243,7 +227,7 @@ private fun OrganizationMetrics(
         )
         OrganizationMetric(
             modifier = Modifier.weight(1f),
-            icon = Icons.Default.Assignment,
+            icon = Icons.AutoMirrored.Filled.Assignment,
             value = analytics.homeworkCount.toString(),
             label = stringResource(Res.string.analytics_homeworks),
         )
@@ -281,7 +265,7 @@ private fun OrganizationMetric(
             },
         )
 
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,

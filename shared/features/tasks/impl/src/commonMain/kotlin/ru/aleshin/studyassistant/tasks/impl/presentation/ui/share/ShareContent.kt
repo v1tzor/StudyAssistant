@@ -20,10 +20,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
@@ -38,6 +41,8 @@ import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.ShareCodeScannerDialog
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareStatus
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewLayoutMode
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.fetchOverviewLayoutMode
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.store.ShareComponent
@@ -63,11 +68,16 @@ internal fun ShareContent(
     val snackbarHostState = remember { SnackbarHostState() }
     var isScannerOpen by rememberSaveable { mutableStateOf(false) }
     var isLinkerOpen by rememberSaveable { mutableStateOf(false) }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchOverviewLayoutMode()
+    val isExpanded = layoutMode == OverviewLayoutMode.EXPANDED
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            ShareTopBar(onBackClick = { store.dispatchEvent(ShareEvent.BackClick) })
+            ShareTopBar(
+                titleAlign = if (isExpanded) TextAlign.Start else TextAlign.Center,
+                onBackClick = { store.dispatchEvent(ShareEvent.BackClick) },
+            )
         },
         snackbarHost = {
             SnackbarHost(
@@ -80,6 +90,7 @@ internal fun ShareContent(
         ShareLayout(
             modifier = Modifier.padding(contentPadding),
             state = state,
+            contentMaxWidth = if (isExpanded) 720.dp else null,
             onCodeChange = { code -> store.dispatchEvent(ShareEvent.UpdatedCode(code)) },
             onOpenClick = { store.dispatchEvent(ShareEvent.FetchShare) },
             onScanClick = { isScannerOpen = true },

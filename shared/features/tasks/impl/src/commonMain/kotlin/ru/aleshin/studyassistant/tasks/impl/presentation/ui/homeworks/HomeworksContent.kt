@@ -48,6 +48,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -85,6 +87,8 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.Dail
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.DailyHomeworksDetailsViewPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksTopBar
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.views.HomeworksTopSheet
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewLayoutMode
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.fetchOverviewLayoutMode
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.ShareHomeworksBottomSheet
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.copy_share_link_title
@@ -106,6 +110,8 @@ internal fun HomeworksContent(
     val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
     val listState = rememberLazyListState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchOverviewLayoutMode()
+    val isExpanded = layoutMode == OverviewLayoutMode.EXPANDED
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -143,6 +149,12 @@ internal fun HomeworksContent(
         topBar = {
             Column {
                 HomeworksTopBar(
+                    titleAlign = if (isExpanded) TextAlign.Start else TextAlign.Center,
+                    containerColor = if (isExpanded) {
+                        MaterialTheme.colorScheme.background
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerLow
+                    },
                     onCurrentTimeRangeClick = {
                         store.dispatchEvent(HomeworksEvent.ClickCurrentTimeRange)
                     },
@@ -152,6 +164,11 @@ internal fun HomeworksContent(
                 )
                 HomeworksTopSheet(
                     isLoading = state.isLoading,
+                    containerColor = if (isExpanded) {
+                        MaterialTheme.colorScheme.background
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerLow
+                    },
                     selectedTimeRange = state.selectedTimeRange,
                     progressList = remember(state.homeworks) {
                         val allHomeworks =

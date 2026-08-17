@@ -21,8 +21,12 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,18 +47,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Instant
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.epochTimeDuration
-import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.presentation.models.schedules.CustomScheduleUi
-import ru.aleshin.studyassistant.core.ui.views.dayOfWeekNames
-import ru.aleshin.studyassistant.core.ui.views.monthNames
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
 import ru.aleshin.studyassistant.editor.impl.resources.Res
@@ -123,22 +124,55 @@ internal fun DailyScheduleBottomSheet(
 }
 
 @Composable
+internal fun DailyScheduleEditorPane(
+    modifier: Modifier = Modifier,
+    isLoading: Boolean,
+    editMode: Boolean,
+    customSchedule: CustomScheduleUi?,
+    onEditClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onReturnScheduleClick: () -> Unit,
+    onEditStartOfDay: (Instant) -> Unit,
+    onEditClassesDuration: (FastEditDurations) -> Unit,
+    onEditBreaksDuration: (FastEditDurations) -> Unit,
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.SpaceExtraLarge),
+    ) {
+        if (editMode) {
+            DailyScheduleBottomSheetContent(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                enabledFastEdit = !isLoading,
+                editMode = true,
+                customSchedule = customSchedule,
+                contentPadding = PaddingValues(),
+                itemSpacing = AdaptiveLayoutDefaults.SpaceSmall,
+                onEditStartOfDay = onEditStartOfDay,
+                onEditClassesDuration = onEditClassesDuration,
+                onEditBreaksDuration = onEditBreaksDuration,
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f).fillMaxWidth())
+        }
+        DailyScheduleBottomSheetFooter(
+            editMode = editMode,
+            contentPadding = PaddingValues(),
+            onEditClick = onEditClick,
+            onSaveClick = onSaveClick,
+            onReturnScheduleClick = onReturnScheduleClick,
+        )
+    }
+}
+
+@Composable
 internal fun DailyScheduleSheetHeader(
     modifier: Modifier = Modifier,
     targetDate: Instant?,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
 ) {
-    val localizedMonthNames = monthNames()
-    val localizedDayOfWeekNames = dayOfWeekNames()
-    val dateFormat = DateTimeComponents.Format {
-        dayOfMonth()
-        char(' ')
-        monthName(localizedMonthNames)
-        chars(", ")
-        dayOfWeek(localizedDayOfWeekNames)
-    }
-
     Row(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 8.dp),
+        modifier = modifier.padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -155,7 +189,7 @@ internal fun DailyScheduleSheetHeader(
             )
             Text(
                 modifier = Modifier.animateContentSize(),
-                text = targetDate?.formatByTimeZone(dateFormat) ?: " ",
+                text = targetDate?.let { date -> formatDailyScheduleDate(date) } ?: " ",
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 18.sp,
@@ -167,11 +201,13 @@ internal fun DailyScheduleSheetHeader(
 }
 
 @Composable
-private fun DailyScheduleBottomSheetContent(
+internal fun DailyScheduleBottomSheetContent(
     modifier: Modifier = Modifier,
     enabledFastEdit: Boolean,
     editMode: Boolean,
     customSchedule: CustomScheduleUi?,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+    itemSpacing: Dp = 0.dp,
     onEditStartOfDay: (Instant) -> Unit,
     onEditClassesDuration: (FastEditDurations) -> Unit,
     onEditBreaksDuration: (FastEditDurations) -> Unit,
@@ -180,13 +216,14 @@ private fun DailyScheduleBottomSheetContent(
     var classesDurationEditorDialogState by remember { mutableStateOf(false) }
     var breaksDurationEditorDialogState by remember { mutableStateOf(false) }
 
+    Box(modifier = modifier) {
     AnimatedVisibility(
         visible = editMode,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
         Column(
-            modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
@@ -194,7 +231,7 @@ private fun DailyScheduleBottomSheetContent(
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.labelMedium,
             )
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(itemSpacing)) {
                 AssistChip(
                     onClick = { startOfDayEditorDialogState = true },
                     label = { Text(text = stringResource(Res.string.fast_edit_start_of_day_label)) },
@@ -294,18 +331,20 @@ private fun DailyScheduleBottomSheetContent(
             },
         )
     }
+    }
 }
 
 @Composable
-private fun DailyScheduleBottomSheetFooter(
+internal fun DailyScheduleBottomSheetFooter(
     modifier: Modifier = Modifier,
     editMode: Boolean,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
     onEditClick: () -> Unit,
     onSaveClick: () -> Unit,
     onReturnScheduleClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+        modifier = modifier.padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

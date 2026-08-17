@@ -38,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
@@ -61,6 +62,7 @@ internal fun SharedScheduleSection(
     linkedSchedules: List<BaseScheduleUi>,
     maxNumberOfWeek: Int,
     isLoading: Boolean = false,
+    horizontalPadding: Dp = 16.dp,
     schedulesRowState: LazyListState = rememberLazyListState(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -68,7 +70,7 @@ internal fun SharedScheduleSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(

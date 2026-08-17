@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Icon
@@ -49,6 +50,8 @@ import ru.aleshin.studyassistant.core.ui.mappers.mapToIcon
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.topSide
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
+import ru.aleshin.studyassistant.info.impl.presentation.ui.InfoLayoutMode
 import ru.aleshin.studyassistant.info.impl.resources.Res
 import ru.aleshin.studyassistant.info.impl.resources.new_organization_bottom_title
 
@@ -62,27 +65,44 @@ internal fun OrganizationsBottomBar(
     pagerState: PagerState,
     organizationData: OrganizationUi?,
     onChangeOrganization: (OrganizationShortUi?) -> Unit,
+    layoutMode: InfoLayoutMode = InfoLayoutMode.COMPACT,
 ) {
+    val isExpanded = layoutMode == InfoLayoutMode.EXPANDED
+    val pagerContentPadding = if (isExpanded) {
+        PaddingValues(horizontal = AdaptiveLayoutDefaults.SpaceExtraLarge)
+    } else {
+        PaddingValues(horizontal = 12.dp)
+    }
+    val pagerSpacing = if (isExpanded) 12.dp else 8.dp
+
     Surface(
         modifier = modifier.animateContentSize(tween()),
         shape = MaterialTheme.shapes.extraLarge.topSide,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            pageSpacing = 8.dp,
-        ) { page ->
-            if (allOrganizations != null) {
-                val organization = allOrganizations.getOrNull(page)
-                if (organization != null) {
-                    OrganizationBottomItem(
-                        type = organization.type,
-                        name = organization.shortName,
-                    )
-                } else {
-                    NewOrganizationBottomItem()
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp),
+                contentPadding = pagerContentPadding,
+                pageSpacing = pagerSpacing,
+            ) { page ->
+                if (allOrganizations != null) {
+                    val organization = allOrganizations.getOrNull(page)
+                    if (organization != null) {
+                        OrganizationBottomItem(
+                            type = organization.type,
+                            name = organization.shortName,
+                        )
+                    } else {
+                        NewOrganizationBottomItem()
+                    }
                 }
             }
         }

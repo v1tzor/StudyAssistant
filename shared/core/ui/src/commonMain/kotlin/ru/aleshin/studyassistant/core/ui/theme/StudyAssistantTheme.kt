@@ -61,6 +61,7 @@ fun StudyAssistantTheme(
     val typography = baseTypography
     val colorScheme = themeType.toColorScheme()
     val shapes = baseShapes
+    val isDark = themeType.isDarkTheme()
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -68,36 +69,37 @@ fun StudyAssistantTheme(
         typography = typography,
     ) {
         val appElevations = remember { fetchAppElevations() }
-        val isDark = themeType.isDarkTheme()
         val colorAccents = themeType.toColorAccents()
         val coreColors = remember(isDark, colorAccents) {
             StudyAssistantColors(isDark, colorAccents)
         }
-        CompositionLocalProvider(
-            LocalStudyAssistantLanguage provides appLanguage,
-            LocalStudyAssistantElevations provides appElevations,
-            LocalStudyAssistantColors provides coreColors,
-        ) {
-            KoalaPlotTheme(
-                sizes = Sizes(),
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                axis = Axis(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    majorTickSize = 7.dp,
-                    minorTickSize = 3.dp,
-                    lineThickness = 0.dp,
-                    xyGraphTickPosition = TickPosition.Outside,
-                    majorGridlineStyle = LineStyle(
-                        brush = SolidColor(MaterialTheme.colorScheme.outlineVariant),
-                        strokeWidth = 1.dp,
-                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f)),
+        ProvideApplicationResourceTheme(isDark = isDark) {
+            CompositionLocalProvider(
+                LocalStudyAssistantLanguage provides appLanguage,
+                LocalStudyAssistantElevations provides appElevations,
+                LocalStudyAssistantColors provides coreColors,
+            ) {
+                KoalaPlotTheme(
+                    sizes = Sizes(),
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                    axis = Axis(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        majorTickSize = 7.dp,
+                        minorTickSize = 3.dp,
+                        lineThickness = 0.dp,
+                        xyGraphTickPosition = TickPosition.Outside,
+                        majorGridlineStyle = LineStyle(
+                            brush = SolidColor(MaterialTheme.colorScheme.outlineVariant),
+                            strokeWidth = 1.dp,
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f)),
+                        ),
+                        minorGridlineStyle = null,
                     ),
-                    minorGridlineStyle = null,
-                ),
-                legendLocation = LegendLocation.BOTTOM,
-                content = content,
-            )
+                    legendLocation = LegendLocation.BOTTOM,
+                    content = content,
+                )
+            }
         }
     }
-    NavigationBarColor(themeType.isDarkTheme())
+    NavigationBarColor(isDark)
 }

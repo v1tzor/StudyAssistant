@@ -62,6 +62,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -117,6 +118,7 @@ internal fun DailyGoalsView(
     selectedGoalsDate: Instant,
     dailyGoals: List<GoalDetailsUi>,
     goalsProgress: Map<Instant, DailyGoalsProgressUi>,
+    dateHeaderStyle: TextStyle = MaterialTheme.typography.titleMedium,
     onSelectDate: (Instant) -> Unit,
     onChangeGoalNumbers: (List<GoalDetailsUi>) -> Unit,
     onEditHomeworkClick: (HomeworkUi) -> Unit,
@@ -139,6 +141,7 @@ internal fun DailyGoalsView(
                 enabled = !isLoadingGoals,
                 currentDate = currentDate,
                 selectedDate = selectedGoalsDate,
+                dateHeaderStyle = dateHeaderStyle,
                 onSelectDay = onSelectDate,
                 onNextDay = { onSelectDate(selectedGoalsDate.shiftDay(1)) },
                 onPreviousDay = { onSelectDate(selectedGoalsDate.shiftDay(-1)) },
@@ -187,6 +190,7 @@ private fun DailyGoalsViewHeader(
     onNextDay: () -> Unit,
     onPreviousDay: () -> Unit,
     onSelectDay: (Instant) -> Unit,
+    dateHeaderStyle: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
     var datePickerDialogState by rememberSaveable { mutableStateOf(false) }
 
@@ -222,7 +226,7 @@ private fun DailyGoalsViewHeader(
             },
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
-            style = MaterialTheme.typography.titleMedium,
+            style = dateHeaderStyle,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )

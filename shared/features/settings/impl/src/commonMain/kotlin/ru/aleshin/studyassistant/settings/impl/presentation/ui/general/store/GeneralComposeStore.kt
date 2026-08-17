@@ -56,6 +56,10 @@ internal class GeneralComposeStore(
                     val command = GeneralWorkCommand.LoadSettings
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATIONS) {
+                    val command = GeneralWorkCommand.LoadOrganizations
+                    workProcessor.work(command).collectAndHandleWork()
+                }
             }
             is GeneralEvent.ChangeLanguage -> with(state()) {
                 val settings = checkNotNull(settings)
@@ -77,7 +81,7 @@ internal class GeneralComposeStore(
             }
             is GeneralEvent.DeleteCurrentSchedule -> {
                 launchBackgroundWork(BackgroundKey.DATA_ACTION) {
-                    val command = GeneralWorkCommand.DeleteCurrentSchedule
+                    val command = GeneralWorkCommand.DeleteCurrentSchedule(event.organizationIds)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -97,10 +101,13 @@ internal class GeneralComposeStore(
         is GeneralAction.UpdateSettings -> currentState.copy(
             settings = action.settings,
         )
+        is GeneralAction.UpdateOrganizations -> currentState.copy(
+            organizations = action.organizations,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SETTINGS, SETTINGS_ACTION, DATA_ACTION,
+        LOAD_SETTINGS, LOAD_ORGANIZATIONS, SETTINGS_ACTION, DATA_ACTION,
     }
 
     class Factory(

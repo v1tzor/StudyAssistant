@@ -16,20 +16,11 @@
 
 package ru.aleshin.studyassistant.info.impl.presentation.ui.employee
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -38,32 +29,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.common.extensions.floatSpring
-import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
-import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
-import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.info.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.info.impl.presentation.ui.InfoLayoutMode
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEffect
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeEvent
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.contract.EmployeeState
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.store.EmployeeComponent
-import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.DetailsEmployeeViewItem
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.EmployeeFiltersView
 import ru.aleshin.studyassistant.info.impl.presentation.ui.employee.views.EmployeeSearchTopBar
-import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.no_result_title as core_no_result_title
+import ru.aleshin.studyassistant.info.impl.presentation.ui.fetchInfoLayoutMode
 
 /**
  * @author Stanislav Aleshin on 19.06.2024.
@@ -76,13 +59,20 @@ internal fun EmployeeContent(
     val store = employeeComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchInfoLayoutMode()
+    val chromePadding = if (layoutMode == InfoLayoutMode.EXPANDED) {
+        AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+    } else {
+        16.dp
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseEmployeeContent(
-                state = state,
+            EmployeeLayout(
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
+                state = state,
                 onOpenEmployeeProfile = {
                     store.dispatchEvent(EmployeeEvent.ClickEmployeeProfile(it))
                 },
@@ -103,7 +93,8 @@ internal fun EmployeeContent(
                     },
                     onSearch = {
                         store.dispatchEvent(EmployeeEvent.SearchEmployee(it))
-                    }
+                    },
+                    horizontalPadding = chromePadding,
                 )
                 EmployeeFiltersView(
                     isLoading = state.isLoading,
@@ -112,6 +103,7 @@ internal fun EmployeeContent(
                     onSelectOrganization = {
                         store.dispatchEvent(EmployeeEvent.SelectedOrganization(it.uid))
                     },
+                    horizontalPadding = chromePadding,
                 )
             }
         },
@@ -147,86 +139,6 @@ internal fun EmployeeContent(
                     withDismissAction = true,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun BaseEmployeeContent(
-    state: EmployeeState,
-    modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
-    onOpenEmployeeProfile: (UID) -> Unit,
-    onEditEmployee: (UID) -> Unit,
-    onDeleteEmployee: (UID) -> Unit,
-) {
-    Crossfade(
-        modifier = modifier.padding(start = 12.dp, end = 16.dp, top = 16.dp),
-        targetState = state.isLoading,
-        animationSpec = floatSpring(),
-    ) { loading ->
-        if (loading) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-            ) {
-                items(Placeholder.EMPLOYEES_OR_SUBJECTS) {
-                    PlaceholderBox(
-                        modifier = Modifier.fillMaxWidth().height(90.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = MaterialTheme.shapes.large,
-                    )
-                }
-            }
-        } else if (state.employees.isNotEmpty()) {
-            val employeesList = remember(state.employees) {
-                state.employees.toList()
-            }
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-            ) {
-                items(employeesList, key = { it.first }) { alphabeticEmployees ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Text(
-                            modifier = Modifier.padding(top = 16.dp),
-                            text = alphabeticEmployees.first.toString(),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.headlineSmall,
-                        )
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            alphabeticEmployees.second.forEach { employee ->
-                                DetailsEmployeeViewItem(
-                                    avatar = employee.data.avatar,
-                                    post = employee.data.post,
-                                    firstName = employee.data.firstName,
-                                    secondName = employee.data.secondName,
-                                    patronymic = employee.data.patronymic,
-                                    subjects = employee.subjects,
-                                    isHavePhone = employee.data.phones.isNotEmpty(),
-                                    isHaveEmail = employee.data.emails.isNotEmpty(),
-                                    isHaveWebsite = employee.data.webs.isNotEmpty(),
-                                    onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
-                                    onEdit = { onEditEmployee(employee.data.uid) },
-                                    onDelete = { onDeleteEmployee(employee.data.uid) }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            Text(
-                modifier = Modifier.fillMaxSize(),
-                text = stringResource(CoreRes.string.core_no_result_title),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge,
-            )
         }
     }
 }

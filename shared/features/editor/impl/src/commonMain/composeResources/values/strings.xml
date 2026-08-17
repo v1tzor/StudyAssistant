@@ -154,8 +154,6 @@
     <string name="todo_notify_params_before_one_week">A week before</string>
     <string name="username_field_label">Display name *</string>
     <string name="username_field_placeholder">First and last name</string>
-    <string name="user_description_field_label">Profile description</string>
-    <string name="user_description_field_placeholder">Enter a profile description</string>
     <string name="user_gender_field_label">Gender</string>
     <string name="user_gender_field_placeholder">Specify your gender</string>
     <string name="city_field_label">City</string>

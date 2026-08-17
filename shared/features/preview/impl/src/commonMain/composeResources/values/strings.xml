@@ -36,9 +36,10 @@
     <string name="calendar_button_label">Continue</string>
     <string name="schedule_step_title">Fill out the schedules and start using the app!</string>
     <string name="schedule_fill_out_button_label">Fill out</string>
+    <string name="schedule_import_ai_button_label">Snap &amp; done</string>
     <string name="schedule_start_button_label">Start using</string>
     <string name="username_label">Display Name *</string>
-    <string name="profile_description_label">Profile Description</string>
+
     <string name="email_label">Email</string>
     <string name="birthday_label">Birthday</string>
     <string name="birthday_placeholder">Select a date</string>

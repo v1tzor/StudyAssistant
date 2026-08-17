@@ -18,17 +18,23 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 /**
@@ -40,6 +46,7 @@ internal fun NavigationPageButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     navigationLabel: String,
+    leadingIcon: ImageVector? = null,
     shape: Shape = MaterialTheme.shapes.large,
     isTonal: Boolean = false,
     elevation: ButtonElevation? = null,
@@ -65,9 +72,21 @@ internal fun NavigationPageButton(
         contentPadding = contentPadding,
         interactionSource = interactionSource,
     ) {
-        Text(
-            text = navigationLabel,
-            style = MaterialTheme.typography.labelLarge,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (leadingIcon != null) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                )
+            }
+            Text(
+                text = navigationLabel,
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
     }
 }

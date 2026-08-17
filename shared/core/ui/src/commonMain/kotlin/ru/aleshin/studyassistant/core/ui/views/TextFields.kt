@@ -73,6 +73,21 @@ import ru.aleshin.studyassistant.core.common.functional.Constants
  * @author Stanislav Aleshin on 27.04.2024.
  */
 @Composable
+fun infoTextFieldColors(
+    containerColor: Color = Color.Transparent,
+): TextFieldColors = OutlinedTextFieldDefaults.colors(
+    disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+    disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+    disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+    focusedBorderColor = MaterialTheme.colorScheme.outline,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedContainerColor = containerColor,
+    unfocusedContainerColor = containerColor,
+    disabledContainerColor = containerColor,
+    errorContainerColor = containerColor,
+)
+
+@Composable
 fun InfoTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -96,13 +111,8 @@ fun InfoTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-        focusedBorderColor = MaterialTheme.colorScheme.outline,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    )
+    containerColor: Color = Color.Transparent,
+    colors: TextFieldColors = infoTextFieldColors(containerColor),
 ) {
     Row(
         modifier = modifier,
@@ -176,13 +186,8 @@ fun InfoTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource?? = remember { MutableInteractionSource() },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-        focusedBorderColor = MaterialTheme.colorScheme.outline,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    )
+    containerColor: Color = Color.Transparent,
+    colors: TextFieldColors = infoTextFieldColors(containerColor),
 ) {
     Row(
         modifier = modifier,
@@ -256,13 +261,8 @@ fun InfoTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-        focusedBorderColor = MaterialTheme.colorScheme.outline,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    )
+    containerColor: Color = Color.Transparent,
+    colors: TextFieldColors = infoTextFieldColors(containerColor),
 ) {
     Row(
         modifier = modifier,
@@ -337,13 +337,8 @@ fun VerticalInfoTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-        focusedBorderColor = MaterialTheme.colorScheme.outline,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    )
+    containerColor: Color = Color.Transparent,
+    colors: TextFieldColors = infoTextFieldColors(containerColor),
 ) {
     Column(
         modifier = modifier,
@@ -423,13 +418,8 @@ fun VerticalInfoTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource? = remember { MutableInteractionSource() },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-        focusedBorderColor = MaterialTheme.colorScheme.outline,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-    )
+    containerColor: Color = Color.Transparent,
+    colors: TextFieldColors = infoTextFieldColors(containerColor),
 ) {
     Column(
         modifier = modifier,

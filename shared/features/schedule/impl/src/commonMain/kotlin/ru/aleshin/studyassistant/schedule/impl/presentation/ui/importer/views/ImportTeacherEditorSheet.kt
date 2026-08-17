@@ -71,11 +71,13 @@ internal fun ImportTeacherEditorSheet(
     var firstName by remember(employee.uid) { mutableStateOf(employee.firstName) }
     var secondName by remember(employee.uid) { mutableStateOf(employee.secondName.orEmpty()) }
     var patronymic by remember(employee.uid) { mutableStateOf(employee.patronymic.orEmpty()) }
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = sheetContainerColor,
         dragHandle = { MediumDragHandle() },
         contentWindowInsets = { WindowInsets.navigationBars },
     ) {
@@ -97,6 +99,7 @@ internal fun ImportTeacherEditorSheet(
                 onValueChange = { value -> firstName = value },
                 label = stringResource(Res.string.schedule_import_first_name_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_profile),
+                containerColor = sheetContainerColor,
             )
             InfoTextField(
                 modifier = Modifier.padding(start = 16.dp, end = 24.dp),
@@ -104,6 +107,7 @@ internal fun ImportTeacherEditorSheet(
                 onValueChange = { value -> secondName = value },
                 label = stringResource(Res.string.schedule_import_second_name_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
+                containerColor = sheetContainerColor,
             )
             InfoTextField(
                 modifier = Modifier.padding(start = 16.dp, end = 24.dp),
@@ -111,6 +115,7 @@ internal fun ImportTeacherEditorSheet(
                 onValueChange = { value -> patronymic = value },
                 label = stringResource(Res.string.schedule_import_patronymic_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
+                containerColor = sheetContainerColor,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),

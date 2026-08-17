@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.Sch
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportOutput
+import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -106,9 +107,23 @@ internal interface ImportWorkProcessor :
                 },
             )
         }.onStart {
-            emit(ActionResult(ImportAction.UpdateAnalysisProgress(true)))
+            emit(
+                ActionResult(
+                    ImportAction.UpdateAnalysisProgress(
+                        isLoading = true,
+                        startedAt = Clock.System.now().toEpochMilliseconds(),
+                    )
+                )
+            )
         }.onCompletion {
-            emit(ActionResult(ImportAction.UpdateAnalysisProgress(false)))
+            emit(
+                ActionResult(
+                    ImportAction.UpdateAnalysisProgress(
+                        isLoading = false,
+                        startedAt = null,
+                    )
+                )
+            )
         }
 
         private fun prepareImportRewardWork(

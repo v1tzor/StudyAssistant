@@ -43,5 +43,13 @@ deleteSchedulesByTimeRange:
 DELETE FROM baseScheduleEntity
 WHERE (date_version_to >= ? AND date_version_from <= ?);
 
+fetchAllSchedules:
+SELECT *
+FROM baseScheduleEntity;
+
+deleteSchedulesById:
+DELETE FROM baseScheduleEntity
+WHERE uid IN ?;
+
 deleteAllSchedules:
 DELETE FROM baseScheduleEntity;

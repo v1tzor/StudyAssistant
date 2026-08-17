@@ -16,49 +16,26 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.notification
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.common.functional.UID
-import ru.aleshin.studyassistant.core.domain.entities.settings.NotificationSettings
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSwitchView
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.fetchSettingsLayoutMode
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationEvent
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.contract.NotificationState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.store.NotificationComponent
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.BeforeTimeChip
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.ExceptionOrganizationsChip
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.ReminderTimeChip
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.views.WorkloadRateChip
-import ru.aleshin.studyassistant.settings.impl.resources.Res
-import ru.aleshin.studyassistant.settings.impl.resources.begging_of_classes_notify_description
-import ru.aleshin.studyassistant.settings.impl.resources.begging_of_classes_notify_title
-import ru.aleshin.studyassistant.settings.impl.resources.end_of_classes_notify_description
-import ru.aleshin.studyassistant.settings.impl.resources.end_of_classes_notify_title
-import ru.aleshin.studyassistant.settings.impl.resources.high_workload_warning_notify_description
-import ru.aleshin.studyassistant.settings.impl.resources.high_workload_warning_notify_title
-import ru.aleshin.studyassistant.settings.impl.resources.unfinished_homeworks_notify_description
-import ru.aleshin.studyassistant.settings.impl.resources.unfinished_homeworks_notify_title
 
 /**
  * @author Stanislav Aleshin on 25.08.2024
@@ -71,13 +48,15 @@ internal fun NotificationContent(
     val store = notificationComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchSettingsLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            NotificationContent(
-                state = state,
+            NotificationLayout(
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
+                state = state,
                 onUpdateBeggingOfClassesNotify = {
                     store.dispatchEvent(NotificationEvent.UpdateBeggingOfClassesNotify(it))
                 },
@@ -113,101 +92,6 @@ internal fun NotificationContent(
                 snackbarState.showSnackbar(
                     message = effect.failures.mapToMessage(),
                     withDismissAction = true,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun NotificationContent(
-    state: NotificationState,
-    modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(),
-    onUpdateBeggingOfClassesNotify: (Long?) -> Unit,
-    onUpdateBeggingOfClassesExceptions: (List<UID>) -> Unit,
-    onUpdateEndOfClassesNotify: (Boolean) -> Unit,
-    onUpdateEndOfClassesExceptions: (List<UID>) -> Unit,
-    onUpdateUnfinishedHomeworksNotify: (Long?) -> Unit,
-    onUpdateWorkloadWarningNotify: (Int?) -> Unit,
-) = with(state) {
-    Column(
-        modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        SettingsSwitchView(
-            enabled = settings != null,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            checked = settings?.beginningOfClasses != null,
-            onCheckedChange = { isChecked ->
-                val result = if (isChecked) NotificationSettings.BEFORE_BEGINNING_CLASSES_NOTIFY_TIME else null
-                onUpdateBeggingOfClassesNotify(result)
-            },
-            title = stringResource(Res.string.begging_of_classes_notify_title),
-            description = stringResource(Res.string.begging_of_classes_notify_description),
-        ) {
-            if (settings?.beginningOfClasses != null) {
-                ExceptionOrganizationsChip(
-                    exceptions = settings.exceptionsForBeginningOfClasses,
-                    allOrganizations = allOrganizations,
-                    onUpdateExceptions = onUpdateBeggingOfClassesExceptions,
-                )
-                BeforeTimeChip(
-                    selectedTime = settings.beginningOfClasses,
-                    onTimeChange = onUpdateBeggingOfClassesNotify,
-                )
-            }
-        }
-        SettingsSwitchView(
-            enabled = settings != null,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            checked = settings?.endOfClasses == true,
-            onCheckedChange = { isChecked -> onUpdateEndOfClassesNotify(isChecked) },
-            title = stringResource(Res.string.end_of_classes_notify_title),
-            description = stringResource(Res.string.end_of_classes_notify_description),
-        ) {
-            if (settings?.endOfClasses == true) {
-                ExceptionOrganizationsChip(
-                    exceptions = settings.exceptionsForEndOfClasses,
-                    allOrganizations = allOrganizations,
-                    onUpdateExceptions = onUpdateEndOfClassesExceptions,
-                )
-            }
-        }
-        HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
-        SettingsSwitchView(
-            enabled = settings != null,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            checked = settings?.unfinishedHomeworks != null,
-            onCheckedChange = { isChecked ->
-                val result = if (isChecked) NotificationSettings.UNFINISHED_HOMEWORKS_NOTIFY_TIME else null
-                onUpdateUnfinishedHomeworksNotify(result)
-            },
-            title = stringResource(Res.string.unfinished_homeworks_notify_title),
-            description = stringResource(Res.string.unfinished_homeworks_notify_description),
-        ) {
-            if (settings?.unfinishedHomeworks != null) {
-                ReminderTimeChip(
-                    selectedTime = settings.unfinishedHomeworks,
-                    onTimeChange = onUpdateUnfinishedHomeworksNotify,
-                )
-            }
-        }
-        SettingsSwitchView(
-            enabled = settings != null,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            checked = settings?.highWorkload != null,
-            onCheckedChange = { isChecked ->
-                val result = if (isChecked) NotificationSettings.WORKLOAD_HIGH_VALUE else null
-                onUpdateWorkloadWarningNotify(result)
-            },
-            title = stringResource(Res.string.high_workload_warning_notify_title),
-            description = stringResource(Res.string.high_workload_warning_notify_description),
-        ) {
-            if (settings?.highWorkload != null) {
-                WorkloadRateChip(
-                    maxRate = settings.highWorkload,
-                    onRateChange = onUpdateWorkloadWarningNotify,
                 )
             }
         }

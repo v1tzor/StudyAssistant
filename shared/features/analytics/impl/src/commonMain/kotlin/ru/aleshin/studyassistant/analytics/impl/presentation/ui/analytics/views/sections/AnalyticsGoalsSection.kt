@@ -75,121 +75,142 @@ internal fun AnalyticsGoalsSection(
             modifier = Modifier.padding(horizontal = 4.dp),
             style = MaterialTheme.typography.titleLarge,
         )
-        AnalyticsSectionCard {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        AnalyticsGoalsProgressCard(distribution = distribution)
+        AnalyticsGoalsDurationCard(distribution = distribution)
+    }
+}
+
+@Composable
+internal fun AnalyticsGoalsProgressCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsGoalDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier.size(104.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
+                CircularProgressIndicator(
+                    progress = {
+                        distribution.completionRate
+                            ?.takeIf { it.isFinite() }
+                            ?.coerceIn(0f, 1f)
+                            ?: 0f
+                    },
                     modifier = Modifier.size(104.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(
-                        progress = {
-                            distribution.completionRate
-                                ?.takeIf { it.isFinite() }
-                                ?.coerceIn(0f, 1f)
-                                ?: 0f
-                        },
-                        modifier = Modifier.size(104.dp),
-                        strokeWidth = 10.dp,
-                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    strokeWidth = 10.dp,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = formatAnalyticsRate(distribution.completionRate),
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = formatAnalyticsRate(distribution.completionRate),
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                        Text(
-                            text = stringResource(Res.string.analytics_completed),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    GoalCount(
-                        label = stringResource(Res.string.analytics_planned),
-                        value = distribution.planned,
-                    )
-                    GoalCount(
-                        label = stringResource(Res.string.analytics_completed),
-                        value = distribution.completed,
-                    )
-                    GoalCount(
-                        label = stringResource(Res.string.analytics_overdue),
-                        value = distribution.overdue,
+                    Text(
+                        text = stringResource(Res.string.analytics_completed),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                AnalyticsIconMetric(
-                    icon = Icons.Default.AssignmentTurnedIn,
-                    label = stringResource(Res.string.analytics_goal_homeworks),
-                    value = distribution.homeworkGoals.toString(),
-                    modifier = Modifier.weight(1f),
+                GoalCount(
+                    label = stringResource(Res.string.analytics_planned),
+                    value = distribution.planned,
                 )
-                AnalyticsIconMetric(
-                    icon = Icons.Default.Flag,
-                    label = stringResource(Res.string.analytics_goal_todos),
-                    value = distribution.todoGoals.toString(),
-                    modifier = Modifier.weight(1f),
+                GoalCount(
+                    label = stringResource(Res.string.analytics_completed),
+                    value = distribution.completed,
+                )
+                GoalCount(
+                    label = stringResource(Res.string.analytics_overdue),
+                    value = distribution.overdue,
                 )
             }
         }
-        AnalyticsSectionCard {
-            SectionLabel(
-                title = stringResource(Res.string.analytics_goals_duration),
-                icon = Icons.Default.Timelapse,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            AnalyticsIconMetric(
+                icon = Icons.Default.AssignmentTurnedIn,
+                label = stringResource(Res.string.analytics_goal_homeworks),
+                value = distribution.homeworkGoals.toString(),
+                modifier = Modifier.weight(1f),
             )
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    AnalyticsIconMetric(
-                        icon = Icons.Default.Schedule,
-                        label = stringResource(Res.string.analytics_desired_time),
-                        value = formatAnalyticsDuration(distribution.desiredDuration),
-                        modifier = Modifier.weight(1f),
-                    )
-                    AnalyticsIconMetric(
-                        icon = Icons.Default.Timer,
-                        label = stringResource(Res.string.analytics_actual_time),
-                        value = formatAnalyticsDuration(distribution.actualDuration),
-                        supportingText = stringResource(Res.string.analytics_active_timer).takeIf { distribution.hasActiveTimer },
-                        modifier = Modifier.weight(1f),
-                    )
+            AnalyticsIconMetric(
+                icon = Icons.Default.Flag,
+                label = stringResource(Res.string.analytics_goal_todos),
+                value = distribution.todoGoals.toString(),
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsGoalsDurationCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsGoalDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        SectionLabel(
+            title = stringResource(Res.string.analytics_goals_duration),
+            icon = Icons.Default.Timelapse,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                AnalyticsIconMetric(
+                    icon = Icons.Default.Schedule,
+                    label = stringResource(Res.string.analytics_desired_time),
+                    value = formatAnalyticsDuration(distribution.desiredDuration),
+                    modifier = Modifier.weight(1f),
+                )
+                AnalyticsIconMetric(
+                    icon = Icons.Default.Timer,
+                    label = stringResource(Res.string.analytics_actual_time),
+                    value = formatAnalyticsDuration(distribution.actualDuration),
+                    supportingText = stringResource(Res.string.analytics_active_timer)
+                        .takeIf { distribution.hasActiveTimer },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val progress = remember(distribution) {
+                    (distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L))
+                        .coerceIn(0f, 1f)
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val progress = remember(distribution) {
-                        (distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L))
-                            .coerceIn(0f, 1f)
-                    }
-                    LinearProgressIndicator(
-                        modifier = Modifier.weight(1f),
-                        progress = { progress },
-                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    )
-                    Text(
-                        text = formatAnalyticsRate(progress),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
-                    )
-                }
+                LinearProgressIndicator(
+                    modifier = Modifier.weight(1f),
+                    progress = { progress },
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                )
+                Text(
+                    text = formatAnalyticsRate(progress),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
             }
         }
     }
@@ -203,17 +224,17 @@ private fun GoalCount(label: String, value: Int) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
+            modifier = Modifier.weight(1f),
             text = label,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = value.toString(),
             style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
         )
     }
 }

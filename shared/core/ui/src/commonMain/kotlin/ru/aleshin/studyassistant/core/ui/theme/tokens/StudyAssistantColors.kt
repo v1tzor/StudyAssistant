@@ -55,6 +55,7 @@ import ru.aleshin.studyassistant.core.ui.theme.material.yellowContainerDark
 import ru.aleshin.studyassistant.core.ui.theme.material.yellowContainerLight
 import ru.aleshin.studyassistant.core.ui.theme.material.yellowDark
 import ru.aleshin.studyassistant.core.ui.theme.material.yellowLight
+import kotlin.random.Random
 
 /**
  * @author Stanislav Aleshin on 27.01.2024.
@@ -172,7 +173,25 @@ enum class CustomColors(val dark: Long, val light: Long) {
     LAVENDER(0xFFAA2CF6, 0xFFD58FFF),
     LIGHT_PINK(0xFFF22CF6, 0xFFF179F4),
     PINK(0xFFF118B4, 0xFFF77DD4),
-    FUCHSIA(0xFFEC1C80, 0xFFF876B4),
+    FUCHSIA(0xFFEC1C80, 0xFFF876B4);
+
+    companion object {
+
+        fun argbVariants(): List<Int> {
+            return entries.flatMap { color ->
+                listOf(color.dark.toInt(), color.light.toInt())
+            }
+        }
+
+        fun randomUnusedArgb(
+            used: Collection<Int>,
+            random: Random = Random.Default,
+        ): Int {
+            val palette = argbVariants()
+            val unused = palette.filterNot(used::contains)
+            return unused.ifEmpty { palette }.random(random)
+        }
+    }
 }
 
 @Stable

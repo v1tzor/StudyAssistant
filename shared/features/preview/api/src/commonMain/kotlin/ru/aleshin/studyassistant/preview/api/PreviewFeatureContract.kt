@@ -35,4 +35,5 @@ public sealed class PreviewConfig {
 public sealed class PreviewOutput : BaseOutput {
     public data object NavigateToApp : PreviewOutput()
     public data object NavigateToWeekScheduleEditor : PreviewOutput()
+    public data object NavigateToScheduleImport : PreviewOutput()
 }

@@ -110,7 +110,7 @@ internal fun ClassesDurationEditorDialog(
         classesDurations.groupBy { it.second }
     }
     val baseDuration = remember(classesDurationsMap) {
-        classesDurationsMap.maxBy { it.value.size }.key
+        classesDurationsMap.maxByOrNull { it.value.size }?.key
     }
     val specificDurations = remember(classesDurations, baseDuration) {
         classesDurations.filter { it.second != baseDuration }.map {
@@ -171,7 +171,7 @@ internal fun BreaksDurationEditorDialog(
         breaksDurations.groupBy { it.second }
     }
     val baseDuration = remember(breaksDurationsMap) {
-        breaksDurationsMap.maxBy { it.value.size }.key
+        breaksDurationsMap.maxByOrNull { it.value.size }?.key
     }
     val specificDurations = remember(breaksDurations, baseDuration) {
         breaksDurations.filter { it.second != baseDuration }.map {

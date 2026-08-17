@@ -37,10 +37,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
@@ -91,171 +91,222 @@ internal fun AnalyticsTasksSection(
             modifier = Modifier.padding(horizontal = 4.dp),
             style = MaterialTheme.typography.titleLarge,
         )
-        AnalyticsSectionCard {
-            SectionLabel(
-                title = stringResource(Res.string.analytics_status_distribution),
-                icon = Icons.Default.PieChart,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AnalyticsTaskDonutChart(
-                    summary = distribution.summary,
-                    modifier = Modifier.weight(0.8f),
-                )
-                Column(
-                    modifier = Modifier.weight(1.2f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    StatusLegend(
-                        label = stringResource(Res.string.analytics_on_time),
-                        value = distribution.summary.completedOnTime,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    StatusLegend(
-                        label = stringResource(Res.string.analytics_late),
-                        value = distribution.summary.completedLate,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                    StatusLegend(
-                        label = stringResource(Res.string.analytics_overdue),
-                        value = distribution.summary.overdue,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    StatusLegend(
-                        label = stringResource(Res.string.analytics_upcoming),
-                        value = distribution.summary.upcoming,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-            }
-        }
-        AnalyticsSectionCard {
-            SectionLabel(
-                title = stringResource(Res.string.analytics_completion_dynamics),
-                icon = Icons.AutoMirrored.Filled.ShowChart,
-            )
-            val completionDescriptions = distribution.buckets.associateWith {
-                stringResource(
-                    Res.string.analytics_chart_completion_desc,
-                    it.from.formatByTimeZone(DateTimeComponents.Formats.shortDayMonthFormat()),
-                    it.completedHomeworks,
-                    it.completedTodos,
-                )
-            }
-            AnalyticsCompletionChart(
-                buckets = distribution.buckets,
-                description = { completionDescriptions[it].orEmpty() },
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                LineLegend(
-                    label = stringResource(Res.string.analytics_homeworks),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                LineLegend(
-                    label = stringResource(Res.string.analytics_todos),
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
-        }
+        AnalyticsTaskStatusCard(distribution = distribution)
+        AnalyticsTaskDynamicsCard(distribution = distribution)
         Row(
-            modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            AnalyticsSectionCard(
-                modifier = Modifier.fillMaxHeight().weight(1f)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SectionLabel(
-                        title = stringResource(Res.string.analytics_task_structure),
-                        icon = Icons.Default.Checklist,
-                    )
-                    DistributionGroup(
-                        entries = listOf(
-                            Triple(
-                                stringResource(Res.string.analytics_tests),
-                                distribution.testsCount,
-                                MaterialTheme.colorScheme.primary
-                            ),
-                            Triple(
-                                stringResource(Res.string.analytics_theory),
-                                distribution.theoreticalPartsCount,
-                                MaterialTheme.colorScheme.secondary
-                            ),
-                            Triple(
-                                stringResource(Res.string.analytics_practice),
-                                distribution.practicalPartsCount,
-                                MaterialTheme.colorScheme.tertiary
-                            ),
-                            Triple(
-                                stringResource(Res.string.analytics_presentations),
-                                distribution.presentationPartsCount,
-                                MaterialTheme.colorScheme.outline
-                            ),
-                        ),
-                    )
-                }
-            }
-            AnalyticsSectionCard(
-                modifier = Modifier.fillMaxHeight().weight(1f)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SectionLabel(
-                        title = stringResource(Res.string.analytics_todo_priorities),
-                        icon = Icons.Default.Flag,
-                    )
-                    DistributionGroup(
-                        entries = listOf(
-                            Triple(
-                                stringResource(Res.string.analytics_standard_priority),
-                                distribution.standardTodos,
-                                MaterialTheme.colorScheme.primary
-                            ),
-                            Triple(
-                                stringResource(Res.string.analytics_medium_priority),
-                                distribution.mediumPriorityTodos,
-                                MaterialTheme.colorScheme.tertiary
-                            ),
-                            Triple(
-                                stringResource(Res.string.analytics_high_priority),
-                                distribution.highPriorityTodos,
-                                MaterialTheme.colorScheme.error
-                            ),
-                        ),
-                    )
-                }
-            }
+            AnalyticsTaskStructureCard(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                distribution = distribution,
+            )
+            AnalyticsTodoPrioritiesCard(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                distribution = distribution,
+            )
             if (distribution.summary.missingCompleteDate > 0) {
-                AnalyticsSectionCard {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ErrorOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.error,
-                        )
-                        Text(
-                            text = buildString {
-                                append(stringResource(Res.string.analytics_invalid_completion))
-                                append(" · ")
-                                append(distribution.summary.missingCompleteDate)
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                AnalyticsInvalidCompletionCard(distribution = distribution)
             }
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsTaskStatusCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsTaskDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        SectionLabel(
+            title = stringResource(Res.string.analytics_status_distribution),
+            icon = Icons.Default.PieChart,
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AnalyticsTaskDonutChart(
+                summary = distribution.summary,
+                modifier = Modifier.weight(0.8f),
+            )
+            Column(
+                modifier = Modifier.weight(1.2f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                StatusLegend(
+                    label = stringResource(Res.string.analytics_on_time),
+                    value = distribution.summary.completedOnTime,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                StatusLegend(
+                    label = stringResource(Res.string.analytics_late),
+                    value = distribution.summary.completedLate,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+                StatusLegend(
+                    label = stringResource(Res.string.analytics_overdue),
+                    value = distribution.summary.overdue,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                StatusLegend(
+                    label = stringResource(Res.string.analytics_upcoming),
+                    value = distribution.summary.upcoming,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsTaskDynamicsCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsTaskDistributionUi,
+) {
+    val completionDescriptions = distribution.buckets.associateWith {
+        stringResource(
+            Res.string.analytics_chart_completion_desc,
+            it.from.formatByTimeZone(DateTimeComponents.Formats.shortDayMonthFormat()),
+            it.completedHomeworks,
+            it.completedTodos,
+        )
+    }
+    AnalyticsSectionCard(modifier = modifier) {
+        SectionLabel(
+            title = stringResource(Res.string.analytics_completion_dynamics),
+            icon = Icons.AutoMirrored.Filled.ShowChart,
+        )
+        AnalyticsCompletionChart(
+            buckets = distribution.buckets,
+            description = { completionDescriptions[it].orEmpty() },
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            LineLegend(
+                label = stringResource(Res.string.analytics_homeworks),
+                color = MaterialTheme.colorScheme.primary,
+            )
+            LineLegend(
+                label = stringResource(Res.string.analytics_todos),
+                color = MaterialTheme.colorScheme.tertiary,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsTaskStructureCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsTaskDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionLabel(
+                title = stringResource(Res.string.analytics_task_structure),
+                icon = Icons.Default.Checklist,
+            )
+            DistributionGroup(
+                entries = listOf(
+                    Triple(
+                        stringResource(Res.string.analytics_tests),
+                        distribution.testsCount,
+                        MaterialTheme.colorScheme.primary,
+                    ),
+                    Triple(
+                        stringResource(Res.string.analytics_theory),
+                        distribution.theoreticalPartsCount,
+                        MaterialTheme.colorScheme.secondary,
+                    ),
+                    Triple(
+                        stringResource(Res.string.analytics_practice),
+                        distribution.practicalPartsCount,
+                        MaterialTheme.colorScheme.tertiary,
+                    ),
+                    Triple(
+                        stringResource(Res.string.analytics_presentations),
+                        distribution.presentationPartsCount,
+                        MaterialTheme.colorScheme.outline,
+                    ),
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsTodoPrioritiesCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsTaskDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionLabel(
+                title = stringResource(Res.string.analytics_todo_priorities),
+                icon = Icons.Default.Flag,
+            )
+            DistributionGroup(
+                entries = listOf(
+                    Triple(
+                        stringResource(Res.string.analytics_standard_priority),
+                        distribution.standardTodos,
+                        MaterialTheme.colorScheme.primary,
+                    ),
+                    Triple(
+                        stringResource(Res.string.analytics_medium_priority),
+                        distribution.mediumPriorityTodos,
+                        MaterialTheme.colorScheme.tertiary,
+                    ),
+                    Triple(
+                        stringResource(Res.string.analytics_high_priority),
+                        distribution.highPriorityTodos,
+                        MaterialTheme.colorScheme.error,
+                    ),
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AnalyticsInvalidCompletionCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsTaskDistributionUi,
+) {
+    AnalyticsSectionCard(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.error,
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = buildString {
+                    append(stringResource(Res.string.analytics_invalid_completion))
+                    append(" · ")
+                    append(distribution.summary.missingCompleteDate)
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -269,9 +320,7 @@ private fun DistributionGroup(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        val total = remember(entries.sumOf { it.second }) {
-            entries.sumOf { it.second }
-        }
+        val total = entries.sumOf { it.second }
         entries.forEach { (label, value, color) ->
             AnalyticsDistributionRow(
                 label = label,
@@ -295,7 +344,12 @@ private fun LineLegend(label: String, color: Color) {
             color = color,
             content = {}
         )
-        Text(label, style = MaterialTheme.typography.labelSmall)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -307,6 +361,7 @@ private fun StatusLegend(label: String, value: Int, color: Color) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
+            modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -314,14 +369,21 @@ private fun StatusLegend(label: String, value: Int, color: Color) {
                 modifier = Modifier.size(8.dp),
                 shape = CircleShape,
                 color = color,
-                content = {}
+                content = {},
             )
             Text(
+                modifier = Modifier.weight(1f),
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
-        Text(value.toString(), style = MaterialTheme.typography.labelLarge)
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+        )
     }
 }

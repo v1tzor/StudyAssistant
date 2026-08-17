@@ -32,9 +32,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -63,6 +65,9 @@ import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.sheet.BottomSheetScaffold
 import ru.aleshin.studyassistant.editor.api.DayOfNumberedWeekUi
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.contract.WeekScheduleState
@@ -70,6 +75,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.store.Week
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.ScheduleViewPlaceholder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.WeekScheduleBottomSheet
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.WeekScheduleEditorPane
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.WeekScheduleTopBar
 
 /**
@@ -84,12 +90,15 @@ internal fun WeekScheduleContent(
     val store = weekScheduleComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
-    val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
-    val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
-    var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
-    val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
-    Box(modifier = modifier.onGloballyPositioned { layoutHeight = it.size.height - navBar }) {
+    if (layoutMode == EditorLayoutMode.COMPACT) {
+        val sheetState = rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
+        val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
+        var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
+        val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
+
+        Box(modifier = modifier.onGloballyPositioned { layoutHeight = it.size.height - navBar }) {
         BottomSheetScaffold(
             modifier = Modifier.fillMaxSize(),
             sheetContent = {
@@ -146,6 +155,61 @@ internal fun WeekScheduleContent(
             sheetTonalElevation = StudyAssistantRes.elevations.levelZero,
             sheetPeekHeight = 150.dp + WindowInsets.navigationBarsInDp(),
         )
+        }
+    } else {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                WeekScheduleTopBar(
+                    isExpanded = true,
+                    onImportClick = { store.dispatchEvent(WeekScheduleEvent.ImportClick) },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        ) { paddingValues ->
+            EditorSplitPanes(
+                modifier = Modifier.padding(paddingValues),
+                startWeight = 1.4f,
+                endWeight = 1f,
+                startPane = {
+                    BaseWeekScheduleContent(
+                        state = state,
+                        onRefresh = { store.dispatchEvent(WeekScheduleEvent.Refresh) },
+                        onCreateClass = { weekDay, schedule ->
+                            store.dispatchEvent(WeekScheduleEvent.CreateClassInEditor(weekDay, schedule))
+                        },
+                        onEditClass = { editClass, weekDay ->
+                            store.dispatchEvent(WeekScheduleEvent.EditClassInEditor(editClass, weekDay))
+                        },
+                        onDeleteClass = { uid, schedule ->
+                            store.dispatchEvent(WeekScheduleEvent.DeleteClass(uid, schedule))
+                        },
+                    )
+                },
+                endPane = {
+                    WeekScheduleEditorPane(
+                        isLoading = state.isLoading,
+                        weekSchedule = state.weekSchedule,
+                        maxNumberOfWeek = state.calendarSettings?.numberOfWeek,
+                        selectedWeek = state.selectedWeek,
+                        organizations = state.organizations,
+                        onSelectedWeek = { store.dispatchEvent(WeekScheduleEvent.ChangeWeek(it)) },
+                        onUpdateOrganization = {
+                            store.dispatchEvent(WeekScheduleEvent.UpdateOrganization(it))
+                        },
+                        onAddOrganization = {
+                            store.dispatchEvent(WeekScheduleEvent.NavigateToOrganizationEditor)
+                        },
+                        onSaveClick = { store.dispatchEvent(WeekScheduleEvent.NavigateToBack) },
+                    )
+                },
+            )
+        }
     }
 
     store.handleEffects { effect ->

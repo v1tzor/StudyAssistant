@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -72,6 +73,7 @@ internal fun ComingHomeworksExecutionAnalysisView(
     comingHomeworksProgress: Float,
     weekHomeworksExecution: List<Boolean>,
     weekHomeworksProgress: Float,
+    titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
 ) {
     Column(
         modifier = modifier,
@@ -81,7 +83,7 @@ internal fun ComingHomeworksExecutionAnalysisView(
             text = stringResource(Res.string.coming_homeworks_execution_analysis_title),
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleSmall,
+            style = titleStyle,
         )
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             InfoProgressView(

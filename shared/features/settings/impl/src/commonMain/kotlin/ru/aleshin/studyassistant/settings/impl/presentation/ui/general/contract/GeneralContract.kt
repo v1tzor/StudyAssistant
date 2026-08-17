@@ -22,6 +22,8 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.common.functional.UID
+import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.ui.models.ThemeUiType
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
@@ -33,13 +35,14 @@ import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.Gene
 @Serializable
 internal data class GeneralState(
     val settings: GeneralSettingsUi? = null,
+    val organizations: List<OrganizationShortUi> = emptyList(),
 ) : StoreState
 
 internal sealed class GeneralEvent : StoreEvent {
     data object Init : GeneralEvent()
     data class ChangeLanguage(val language: LanguageUiType) : GeneralEvent()
     data class ChangeTheme(val theme: ThemeUiType) : GeneralEvent()
-    data object DeleteCurrentSchedule : GeneralEvent()
+    data class DeleteCurrentSchedule(val organizationIds: Set<UID>) : GeneralEvent()
     data object DeleteAllData : GeneralEvent()
 }
 
@@ -49,6 +52,7 @@ internal sealed class GeneralEffect : StoreEffect {
 
 internal sealed class GeneralAction : StoreAction {
     data class UpdateSettings(val settings: GeneralSettingsUi?) : GeneralAction()
+    data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : GeneralAction()
 }
 
 internal sealed class GeneralOutput : BaseOutput {

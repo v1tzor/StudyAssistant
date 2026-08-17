@@ -43,6 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.info.impl.resources.Res
@@ -61,6 +62,7 @@ internal fun SubjectsSearchTopBar(
     isLoading: Boolean,
     onBackPress: () -> Unit,
     onSearch: (String) -> Unit,
+    horizontalPadding: Dp = 16.dp,
     searchInteractionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val focusManager = LocalFocusManager.current
@@ -79,7 +81,7 @@ internal fun SubjectsSearchTopBar(
         },
         active = false,
         onActiveChange = {},
-        modifier = modifier.fillMaxWidth().padding(top = 8.dp, start = 16.dp, end = 16.dp),
+        modifier = modifier.fillMaxWidth().padding(top = 8.dp, start = horizontalPadding, end = horizontalPadding),
         placeholder = {
             Text(text = stringResource(Res.string.subjects_search_bar_placeholder))
         },

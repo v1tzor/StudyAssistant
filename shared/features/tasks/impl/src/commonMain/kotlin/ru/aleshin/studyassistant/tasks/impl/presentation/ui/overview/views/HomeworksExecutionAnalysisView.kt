@@ -84,12 +84,11 @@ internal fun HomeworksExecutionAnalysisView(
             ) {
                 ComingHomeworksExecutionAnalysisView(
                     isLoading = isLoading,
-                    comingHomeworksExecution = completeProgress?.comingHomeworksExecution
-                        ?: emptyList(),
+                    comingHomeworksExecution = completeProgress?.comingHomeworksExecution ?: emptyList(),
                     comingHomeworksProgress = completeProgress?.comingHomeworksProgress ?: 0f,
-                    weekHomeworksExecution = completeProgress?.weekHomeworksExecution
-                        ?: emptyList(),
+                    weekHomeworksExecution = completeProgress?.weekHomeworksExecution ?: emptyList(),
                     weekHomeworksProgress = completeProgress?.weekHomeworksProgress ?: 0f,
+                    titleStyle = MaterialTheme.typography.titleSmall,
                 )
                 AllHomeworksExecutionAnalysisView(
                     modifier = Modifier.weight(1f),
@@ -98,6 +97,7 @@ internal fun HomeworksExecutionAnalysisView(
                     detachedActiveTasks = completeProgress?.detachedActiveTasks ?: emptyList(),
                     completedHomeworksCount = completeProgress?.completedHomeworksCount ?: 0,
                     onShowErrors = { taskErrorsSheetState = true },
+                    titleStyle = MaterialTheme.typography.titleSmall,
                 )
             }
 

@@ -17,7 +17,10 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -33,10 +36,11 @@ import ru.aleshin.studyassistant.preview.impl.resources.il_schedule
 internal fun SchedulePageInfo(
     modifier: Modifier = Modifier,
 ) {
-    Image(
-        modifier = modifier,
-        painter = painterResource(Res.drawable.il_schedule),
-        contentDescription = null,
-        contentScale = ContentScale.FillWidth,
-    )
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Image(
+            painter = painterResource(Res.drawable.il_schedule),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+        )
+    }
 }

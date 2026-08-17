@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
@@ -62,6 +63,24 @@ internal fun AnalyticsWorkloadSection(
     distribution: AnalyticsLoadDistributionUi,
     modifier: Modifier = Modifier,
 ) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.analytics_workload_title),
+            modifier = Modifier.padding(horizontal = 4.dp),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        AnalyticsWorkloadCard(distribution = distribution)
+    }
+}
+
+@Composable
+internal fun AnalyticsWorkloadCard(
+    modifier: Modifier = Modifier,
+    distribution: AnalyticsLoadDistributionUi,
+) {
     val descriptions = distribution.buckets.associateWith { bucket ->
         stringResource(
             Res.string.analytics_chart_workload_desc,
@@ -72,44 +91,29 @@ internal fun AnalyticsWorkloadSection(
         )
     }
 
-    Column(
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
-        Text(
-            text = stringResource(Res.string.analytics_workload_title),
-            modifier = Modifier.padding(horizontal = 4.dp),
-            style = MaterialTheme.typography.titleLarge,
-        )
-
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.surfaceContainer,
+        Column(
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = 16.dp,
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Column(
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 16.dp,
-                ),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                AnalyticsWorkloadChart(
-                    buckets = distribution.buckets,
-                    description = {
-                        descriptions[it].orEmpty()
-                    },
-                )
-
-                WorkloadHighlights(
-                    distribution = distribution,
-                )
-
-                WorkloadStatus(
-                    daysAboveThreshold = distribution.daysAboveThreshold,
-                    threshold = distribution.threshold,
-                )
-            }
+            AnalyticsWorkloadChart(
+                buckets = distribution.buckets,
+                description = {
+                    descriptions[it].orEmpty()
+                },
+            )
+            WorkloadHighlights(distribution = distribution)
+            WorkloadStatus(
+                daysAboveThreshold = distribution.daysAboveThreshold,
+                threshold = distribution.threshold,
+            )
         }
     }
 }
@@ -175,27 +179,30 @@ private fun WorkloadHighlight(
         )
 
         Column(
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
-
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
-
             supportingText?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -234,23 +241,29 @@ private fun WorkloadStatus(
                 text = daysAboveThreshold.toString(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.error,
+                maxLines = 1,
             )
-
             Text(
+                modifier = Modifier.weight(1f),
                 text = stringResource(
                     Res.string.analytics_overload_days,
                     threshold,
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         } else {
             Text(
+                modifier = Modifier.weight(1f),
                 text = stringResource(
                     Res.string.analytics_no_overloads,
                 ),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

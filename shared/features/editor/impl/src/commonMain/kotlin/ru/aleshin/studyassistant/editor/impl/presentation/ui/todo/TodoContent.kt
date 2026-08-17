@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,9 +37,13 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEf
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.domain.entities.tasks.TaskPriority
 import ru.aleshin.studyassistant.core.presentation.models.tasks.TodoNotificationsUi
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TaskPriorityInfoView
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.todo.contract.TodoState
@@ -60,13 +65,16 @@ internal fun TodoContent(
     val store = todoComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
+    val isExpanded = layoutMode == EditorLayoutMode.EXPANDED
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseTodoContent(
+            TodoLayout(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
                 onTodoNameChange = { store.dispatchEvent(TodoEvent.UpdateTodoName(it)) },
                 onTodoDescriptionChange = { store.dispatchEvent(TodoEvent.UpdateTodoDescription(it)) },
                 onChangeDeadline = { store.dispatchEvent(TodoEvent.UpdateDeadline(it)) },
@@ -76,6 +84,7 @@ internal fun TodoContent(
         },
         topBar = {
             TodoTopBar(
+                isExpanded = isExpanded,
                 onBackClick = { store.dispatchEvent(TodoEvent.NavigateToBack) },
             )
         },
@@ -84,6 +93,12 @@ internal fun TodoContent(
                 isLoadingSave = state.isLoadingSave,
                 saveEnabled = state.editableTodo?.isValid() == true,
                 showDeleteAction = state.editableTodo?.uid?.isNotBlank() == true,
+                contentMaxWidth = if (isExpanded) AdaptiveLayoutDefaults.MediumContentMaxWidth else null,
+                horizontalPadding = if (isExpanded) {
+                    AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+                } else {
+                    AdaptiveLayoutDefaults.CompactHorizontalPadding
+                },
                 onCancelClick = { store.dispatchEvent(TodoEvent.NavigateToBack) },
                 onSaveClick = { store.dispatchEvent(TodoEvent.SaveTodo) },
                 onDeleteClick = { store.dispatchEvent(TodoEvent.DeleteTodo) },
@@ -107,6 +122,95 @@ internal fun TodoContent(
             }
         }
     }
+}
+
+@Composable
+private fun TodoLayout(
+    state: TodoState,
+    modifier: Modifier = Modifier,
+    layoutMode: EditorLayoutMode,
+    onTodoNameChange: (String) -> Unit,
+    onTodoDescriptionChange: (String) -> Unit,
+    onChangeDeadline: (Instant?) -> Unit,
+    onChangePriority: (TaskPriority) -> Unit,
+    onChangeNotifications: (TodoNotificationsUi) -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseTodoContent(
+            state = state,
+            modifier = modifier,
+            onTodoNameChange = onTodoNameChange,
+            onTodoDescriptionChange = onTodoDescriptionChange,
+            onChangeDeadline = onChangeDeadline,
+            onChangePriority = onChangePriority,
+            onChangeNotifications = onChangeNotifications,
+        )
+        EditorLayoutMode.EXPANDED -> TodoExpandedLayout(
+            state = state,
+            modifier = modifier,
+            onTodoNameChange = onTodoNameChange,
+            onTodoDescriptionChange = onTodoDescriptionChange,
+            onChangeDeadline = onChangeDeadline,
+            onChangePriority = onChangePriority,
+            onChangeNotifications = onChangeNotifications,
+        )
+    }
+}
+
+@Composable
+private fun TodoExpandedLayout(
+    state: TodoState,
+    modifier: Modifier = Modifier,
+    onTodoNameChange: (String) -> Unit,
+    onTodoDescriptionChange: (String) -> Unit,
+    onChangeDeadline: (Instant?) -> Unit,
+    onChangePriority: (TaskPriority) -> Unit,
+    onChangeNotifications: (TodoNotificationsUi) -> Unit,
+) {
+    EditorSplitPanes(
+        modifier = modifier,
+        startPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                TodoInfoFields(
+                    isLoading = state.isLoading,
+                    todoName = state.editableTodo?.name ?: "",
+                    todoDescription = state.editableTodo?.description,
+                    onTodoNameChange = onTodoNameChange,
+                    onTodoDescriptionChange = onTodoDescriptionChange,
+                )
+            }
+        },
+        endPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                TodoDeadlineInfoFields(
+                    isLoading = state.isLoading,
+                    deadline = state.editableTodo?.deadline,
+                    onChangeDeadline = onChangeDeadline,
+                )
+                TaskPriorityInfoView(
+                    isLoading = state.isLoading,
+                    priority = state.editableTodo?.priority,
+                    onChangePriority = onChangePriority,
+                )
+                TodoNotificationSelector(
+                    notifications = state.editableTodo?.notifications,
+                    onChangeNotifications = onChangeNotifications,
+                )
+            }
+        },
+    )
 }
 
 @Composable

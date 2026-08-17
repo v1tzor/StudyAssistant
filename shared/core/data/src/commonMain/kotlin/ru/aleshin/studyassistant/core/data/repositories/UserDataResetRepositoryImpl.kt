@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.data.repositories
 
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.database.datasource.settings.UserDataResetLocalDataSource
 import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
 
@@ -28,6 +29,10 @@ class UserDataResetRepositoryImpl(
 
     override suspend fun deleteAllSchedules() {
         localDataSource.deleteAllSchedules()
+    }
+
+    override suspend fun deleteSchedulesByOrganizations(organizationIds: Set<UID>) {
+        localDataSource.deleteSchedulesByOrganizations(organizationIds)
     }
 
     override suspend fun deleteAllUserData() {

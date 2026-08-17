@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
@@ -61,10 +64,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsS
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.MediumInfoBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.users.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.users.impl.presentation.ui.UsersLayoutMode
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEffect
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileEvent
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.contract.EmployeeProfileState
@@ -77,6 +82,7 @@ import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.Emplo
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewItem
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeSubjectViewPlaceholder
 import ru.aleshin.studyassistant.users.impl.presentation.ui.employee.views.EmployeeTopSheet
+import ru.aleshin.studyassistant.users.impl.presentation.ui.fetchUsersLayoutMode
 import ru.aleshin.studyassistant.users.impl.resources.Res
 import ru.aleshin.studyassistant.users.impl.resources.employee_contact_info_header
 import ru.aleshin.studyassistant.users.impl.resources.employee_email_title
@@ -96,19 +102,22 @@ internal fun EmployeeProfileContent(
     val store = employeeProfileComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchUsersLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseEmployeeProfileContent(
+            EmployeeProfileLayout(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
             )
         },
         topBar = {
             Column {
                 EmployeeProfileTopBar(
                     enabledEdit = !state.employee?.uid.isNullOrBlank(),
+                    isExpanded = layoutMode == UsersLayoutMode.EXPANDED,
                     onBackClick = { store.dispatchEvent(EmployeeProfileEvent.ClickBack) },
                     onEditClick = { store.dispatchEvent(EmployeeProfileEvent.ClickEdit) },
                 )
@@ -135,6 +144,56 @@ internal fun EmployeeProfileContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun EmployeeProfileLayout(
+    state: EmployeeProfileState,
+    modifier: Modifier = Modifier,
+    layoutMode: UsersLayoutMode,
+) {
+    when (layoutMode) {
+        UsersLayoutMode.COMPACT -> BaseEmployeeProfileContent(
+            state = state,
+            modifier = modifier,
+        )
+        UsersLayoutMode.EXPANDED -> EmployeeProfileExpandedLayout(
+            state = state,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun EmployeeProfileExpandedLayout(
+    state: EmployeeProfileState,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(
+                horizontal = AdaptiveLayoutDefaults.ExpandedHorizontalPadding,
+                vertical = AdaptiveLayoutDefaults.SpaceExtraLarge,
+            ),
+        horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.PaneSpacing),
+    ) {
+        EmployeeProfileSubjectsSection(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            isLoading = state.isLoading,
+            subjects = state.employee?.subjects ?: emptyList(),
+            horizontalPadding = 0.dp,
+        )
+        EmployeeProfileContactInfoSection(
+            modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+            isLoading = state.isLoading,
+            emails = state.employee?.emails ?: emptyList(),
+            phones = state.employee?.phones ?: emptyList(),
+            webs = state.employee?.webs ?: emptyList(),
+            locations = state.employee?.locations ?: emptyList(),
+            horizontalPadding = 0.dp,
+        )
     }
 }
 
@@ -169,9 +228,10 @@ private fun EmployeeProfileSubjectsSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     subjects: List<SubjectUi>,
+    horizontalPadding: Dp = 16.dp,
 ) {
     Column(
-        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -249,9 +309,10 @@ private fun EmployeeProfileContactInfoSection(
     phones: List<ContactInfoUi>,
     locations: List<ContactInfoUi>,
     webs: List<ContactInfoUi>,
+    horizontalPadding: Dp = 16.dp,
 ) {
     Column(
-        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

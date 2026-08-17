@@ -27,9 +27,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,14 +54,17 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
+import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsOverviewUi
 import ru.aleshin.studyassistant.analytics.impl.presentation.models.AnalyticsRenderState
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.contract.AnalyticsEffect
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.contract.AnalyticsEvent
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.store.AnalyticsComponent
-import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsErrorView
+import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsExpandedTopAppBar
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsPeriodPicker
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.AnalyticsTopAppBar
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.analyticsCalendarLocale
+import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.layouts.ANALYTICS_CONTENT_MAX_WIDTH
+import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.layouts.ANALYTICS_EXPANDED_HORIZONTAL_PADDING
 import ru.aleshin.studyassistant.analytics.impl.resources.Res
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_cancel
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_confirm
@@ -75,6 +80,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsS
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.domain.entities.settings.AnalyticsPeriod
 import ru.aleshin.studyassistant.core.ui.theme.tokens.LocalStudyAssistantLanguage
+import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 
 /**
@@ -83,35 +89,51 @@ import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun AnalyticsContent(
+    modifier: Modifier = Modifier,
     component: AnalyticsComponent,
     isDetails: Boolean,
-    modifier: Modifier = Modifier,
 ) {
     val store = component.store
     val state by store.stateAsState()
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val useExpandedLayout = adaptiveInfo.useAnalyticsExpandedLayout()
     val snackbarState = remember { SnackbarHostState() }
     val language = LocalStudyAssistantLanguage.current
     val errorMessage = stringResource(Res.string.analytics_error_message)
-    var showDatePicker by remember { mutableStateOf(false) }
-    var showRangePicker by remember { mutableStateOf(false) }
-    val title = when (state.target) {
-        null -> stringResource(Res.string.analytics_header)
-        is AnalyticsTarget.Organization -> state.data?.targetDetails?.organization?.shortName ?: stringResource(Res.string.analytics_detail_organization)
-        is AnalyticsTarget.Subject -> state.data?.targetDetails?.subject?.name ?: stringResource(Res.string.analytics_detail_subject)
-        is AnalyticsTarget.Employee -> state.data?.targetDetails?.employee?.fullName() ?: stringResource(Res.string.analytics_detail_employee)
-    }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    var showRangePicker by rememberSaveable { mutableStateOf(false) }
+    val renderState = analyticsRenderState(
+        isLoading = state.isLoading,
+        isError = state.isError,
+        data = state.data,
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AnalyticsTopAppBar(
-                title = title,
-                onBackClick = { store.dispatchEvent(AnalyticsEvent.ClickBack) },
+            val title = analyticsScreenTitle(
+                target = state.target,
+                data = state.data,
+            )
+            if (useExpandedLayout) {
+                AnalyticsExpandedTopAppBar(
+                    title = title,
+                    onBackClick = { store.dispatchEvent(AnalyticsEvent.ClickBack) },
+                )
+            } else {
+                AnalyticsTopAppBar(
+                    title = title,
+                    onBackClick = { store.dispatchEvent(AnalyticsEvent.ClickBack) },
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarState,
+                snackbar = { ErrorSnackbar(it) },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarState) },
-        contentWindowInsets = WindowInsets(0.dp),
+        contentWindowInsets = WindowInsets(),
     ) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -119,10 +141,16 @@ internal fun AnalyticsContent(
         ) {
             state.data?.selection?.let { selection ->
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = if (useExpandedLayout) ANALYTICS_EXPANDED_HORIZONTAL_PADDING else 16.dp,
+                            vertical = 8.dp,
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     AnalyticsPeriodPicker(
+                        modifier = Modifier.widthIn(max = ANALYTICS_CONTENT_MAX_WIDTH),
                         selection = selection,
                         onPeriodChange = { period ->
                             if (period == AnalyticsPeriod.CUSTOM) {
@@ -144,50 +172,22 @@ internal fun AnalyticsContent(
                         onNextClick = {
                             store.dispatchEvent(AnalyticsEvent.ClickNextPeriod)
                         },
-                        modifier = Modifier.widthIn(max = PICKER_MAX_WIDTH),
                     )
                 }
-            }
-            if (state.isLoading && state.data != null) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
             Crossfade(
-                targetState = when {
-                    state.isLoading && state.data == null -> AnalyticsRenderState.LOADING
-                    state.isError && state.data == null -> AnalyticsRenderState.ERROR
-                    state.data == null -> AnalyticsRenderState.LOADING
-                    state.data?.hasData == false -> AnalyticsRenderState.EMPTY
-                    else -> AnalyticsRenderState.CONTENT
-                },
+                targetState = renderState,
                 modifier = Modifier.weight(1f),
-            ) { renderState ->
-                when (renderState) {
-                    AnalyticsRenderState.LOADING -> AnalyticsLoadingLayout()
-                    AnalyticsRenderState.ERROR -> AnalyticsErrorView(
-                        onRetry = { store.dispatchEvent(AnalyticsEvent.Retry) },
-                        modifier = Modifier.padding(16.dp),
-                    )
-                    AnalyticsRenderState.EMPTY -> AnalyticsEmptyLayout(Modifier.padding(16.dp))
-                    AnalyticsRenderState.CONTENT -> state.data?.let { data ->
-                        if (isDetails) {
-                            AnalyticsDetailsLayout(
-                                data = data,
-                                adaptiveInfo = adaptiveInfo,
-                                onTargetClick = {
-                                    store.dispatchEvent(AnalyticsEvent.ClickTarget(it))
-                                },
-                            )
-                        } else {
-                            AnalyticsOverviewLayout(
-                                data = data,
-                                adaptiveInfo = adaptiveInfo,
-                                onTargetClick = {
-                                    store.dispatchEvent(AnalyticsEvent.ClickTarget(it))
-                                },
-                            )
-                        }
-                    }
-                }
+            ) { currentRenderState ->
+                AnalyticsLayout(
+                    modifier = Modifier.fillMaxSize(),
+                    renderState = currentRenderState,
+                    data = state.data,
+                    isDetails = isDetails,
+                    adaptiveInfo = adaptiveInfo,
+                    onRetry = { store.dispatchEvent(AnalyticsEvent.Retry) },
+                    onTargetClick = { store.dispatchEvent(AnalyticsEvent.ClickTarget(it)) },
+                )
             }
         }
     }
@@ -196,7 +196,7 @@ internal fun AnalyticsContent(
         val selection = state.data?.selection
         val initialDate = selection?.range?.from?.toPickerMillis()
         val pickerState = remember(initialDate, language) {
-            androidx.compose.material3.DatePickerState(
+            DatePickerState(
                 locale = analyticsCalendarLocale(language.code),
                 initialSelectedDateMillis = initialDate,
             )
@@ -248,7 +248,7 @@ internal fun AnalyticsContent(
         val initialFrom = selection?.range?.from?.toPickerMillis()
         val initialTo = selection?.range?.to?.toPickerMillis()
         val pickerState = remember(initialFrom, initialTo, language) {
-            androidx.compose.material3.DateRangePickerState(
+            DateRangePickerState(
                 locale = analyticsCalendarLocale(language.code),
                 initialSelectedStartDateMillis = initialFrom,
                 initialSelectedEndDateMillis = initialTo,
@@ -262,12 +262,7 @@ internal fun AnalyticsContent(
                         val from = pickerState.selectedStartDateMillis
                         val to = pickerState.selectedEndDateMillis
                         if (from != null && to != null) {
-                            store.dispatchEvent(
-                                AnalyticsEvent.SelectCustomRange(
-                                    from.fromPickerMillis(),
-                                    to.fromPickerMillis(),
-                                ),
-                            )
+                            store.dispatchEvent(AnalyticsEvent.SelectCustomRange(from.fromPickerMillis(), to.fromPickerMillis()))
                         }
                         showRangePicker = false
                     },
@@ -312,9 +307,43 @@ internal fun AnalyticsContent(
     store.handleEffects { effect ->
         when (effect) {
             is AnalyticsEffect.ShowError -> snackbarState.showSnackbar(
-                errorMessage,
+                message = errorMessage,
+                withDismissAction = true,
             )
         }
+    }
+}
+
+@Composable
+private fun analyticsScreenTitle(
+    target: AnalyticsTarget?,
+    data: AnalyticsOverviewUi?,
+): String {
+    return when (target) {
+        null -> stringResource(Res.string.analytics_header)
+        is AnalyticsTarget.Organization -> {
+            data?.targetDetails?.organization?.shortName ?: stringResource(Res.string.analytics_detail_organization)
+        }
+        is AnalyticsTarget.Subject -> {
+            data?.targetDetails?.subject?.name ?: stringResource(Res.string.analytics_detail_subject)
+        }
+        is AnalyticsTarget.Employee -> {
+            data?.targetDetails?.employee?.fullName() ?: stringResource(Res.string.analytics_detail_employee)
+        }
+    }
+}
+
+private fun analyticsRenderState(
+    isLoading: Boolean,
+    isError: Boolean,
+    data: AnalyticsOverviewUi?,
+): AnalyticsRenderState {
+    return when {
+        isLoading && data == null -> AnalyticsRenderState.LOADING
+        isError && data == null -> AnalyticsRenderState.ERROR
+        data == null -> AnalyticsRenderState.LOADING
+        !data.hasData -> AnalyticsRenderState.EMPTY
+        else -> AnalyticsRenderState.CONTENT
     }
 }
 
@@ -334,5 +363,3 @@ private fun Long.fromPickerMillis(): Instant {
 private fun Long.toPickerTitle(): String {
     return fromPickerMillis().formatByTimeZone(DateTimeComponents.Formats.dayMonthYearFormat())
 }
-
-private val PICKER_MAX_WIDTH = 1120.dp

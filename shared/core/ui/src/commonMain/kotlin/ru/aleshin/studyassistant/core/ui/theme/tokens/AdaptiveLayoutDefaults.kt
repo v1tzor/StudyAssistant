@@ -46,4 +46,8 @@ object AdaptiveLayoutDefaults {
     val SupportingPanePreferredWidth = 360.dp
     val ListPanePreferredWidth = 344.dp
     val FeedCardMinWidth = 228.dp
+
+    val OverviewMainPaneMinWidth = 344.dp
+    val OverviewSupportingPaneMinWidth = 280.dp
+    val OverviewSupportingPaneMaxWidth = 520.dp
 }

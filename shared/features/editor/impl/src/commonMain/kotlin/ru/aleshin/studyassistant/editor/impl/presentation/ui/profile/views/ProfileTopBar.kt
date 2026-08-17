@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,12 +46,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.editor.impl.resources.Res
 import ru.aleshin.studyassistant.editor.impl.resources.change_password_action_label
 import ru.aleshin.studyassistant.editor.impl.resources.old_password_field_label
@@ -68,23 +71,40 @@ import ru.aleshin.studyassistant.core.ui.resources.save_confirm_title as core_sa
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun ProfileTopBar(
     modifier: Modifier = Modifier,
+    isExpanded: Boolean = false,
     onBackClick: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = { Text(text = stringResource(Res.string.profile_editor_header)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        )
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
+            )
+        }
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     )
+    if (isExpanded) {
+        TopAppBar(
+            modifier = modifier,
+            title = {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.profile_editor_header),
+                    textAlign = TextAlign.Start,
+                )
+            },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    } else {
+        CenterAlignedTopAppBar(
+            modifier = modifier,
+            title = { Text(text = stringResource(Res.string.profile_editor_header)) },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    }
 }
 
 @Composable

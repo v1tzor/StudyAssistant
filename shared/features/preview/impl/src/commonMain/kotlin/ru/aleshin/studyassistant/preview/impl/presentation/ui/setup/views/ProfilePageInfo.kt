@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.PlatformFile
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
@@ -63,11 +62,9 @@ import ru.aleshin.studyassistant.preview.impl.resources.birthday_placeholder
 import ru.aleshin.studyassistant.preview.impl.resources.gender_label
 import ru.aleshin.studyassistant.preview.impl.resources.gender_placeholder
 import ru.aleshin.studyassistant.preview.impl.resources.ic_textbox
-import ru.aleshin.studyassistant.preview.impl.resources.profile_description_label
 import ru.aleshin.studyassistant.preview.impl.resources.username_label
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 import ru.aleshin.studyassistant.core.ui.resources.ic_birthday as core_ic_birthday
-import ru.aleshin.studyassistant.core.ui.resources.ic_description as core_ic_description
 import ru.aleshin.studyassistant.core.ui.resources.ic_gender as core_ic_gender
 import ru.aleshin.studyassistant.core.ui.resources.ic_select_date as core_ic_select_date
 
@@ -109,15 +106,7 @@ internal fun ProfilePageInfo(
             var isExpandedGenderMenu by remember { mutableStateOf(false) }
             var datePickerDialogState by remember { mutableStateOf(false) }
             var editableUsername by remember { mutableStateOf(TextFieldValue(username)) }
-            var editableDescription by remember {
-                mutableStateOf(
-                    TextFieldValue(
-                        description ?: ""
-                    )
-                )
-            }
             val usernameInteraction = remember { MutableInteractionSource() }
-            val descriptionInteraction = remember { MutableInteractionSource() }
 
             InfoTextField(
                 value = editableUsername,
@@ -141,32 +130,6 @@ internal fun ProfilePageInfo(
                     null
                 },
                 interactionSource = usernameInteraction,
-            )
-            InfoTextField(
-                value = editableDescription,
-                onValueChange = {
-                    editableDescription = it
-                    onUpdateProfile(profile.copy(description = it.text.ifEmpty { null }))
-                },
-                maxLength = Constants.Text.MAX_PROFILE_DESC_LENGTH,
-                label = stringResource(Res.string.profile_description_label),
-                leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_description),
-                trailingIcon = if (descriptionInteraction.collectIsFocusedAsState().value) {
-                    {
-                        IconButton(onClick = { focusManager.clearFocus() }) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                tint = StudyAssistantRes.colors.accents.green,
-                            )
-                        }
-                    }
-                } else {
-                    null
-                },
-                singleLine = false,
-                maxLines = 4,
-                interactionSource = descriptionInteraction,
             )
             ClickableInfoTextField(
                 value = profile.birthday,

@@ -48,6 +48,7 @@ internal fun <T> SettingsSelectorView(
     onSelect: (T) -> Unit,
     modifier: Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     selected: T?,
     allItems: List<T>,
     icon: Painter?,

@@ -101,7 +101,6 @@ internal object AiToolResultMapper {
         buildJsonObject {
             put("profileId", value.uid)
             put("name", value.username)
-            put("description", value.description)
             put("city", value.city)
             put("birthday", value.birthday)
         }.toString()

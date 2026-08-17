@@ -37,10 +37,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
@@ -52,6 +54,8 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItem
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewItemPlaceholder
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.TodoViewNoneItem
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.OverviewLayoutMode
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.fetchOverviewLayoutMode
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoEvent
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.todos.contract.TodoState
@@ -69,6 +73,7 @@ internal fun TodoContent(
     val store = todoComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchOverviewLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -86,6 +91,11 @@ internal fun TodoContent(
         },
         topBar = {
             TodoTopBar(
+                titleAlign = if (layoutMode == OverviewLayoutMode.EXPANDED) {
+                    TextAlign.Start
+                } else {
+                    TextAlign.Center
+                },
                 onBackClick = { store.dispatchEvent(TodoEvent.ClickBack) },
             )
         },

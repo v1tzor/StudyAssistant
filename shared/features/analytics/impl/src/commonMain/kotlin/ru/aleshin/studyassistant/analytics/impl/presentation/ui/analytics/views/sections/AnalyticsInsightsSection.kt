@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -62,6 +63,19 @@ internal fun AnalyticsInsightsSection(
         title = stringResource(Res.string.analytics_insights_title),
         modifier = modifier,
     ) {
+        AnalyticsInsightsList(insights = insights)
+    }
+}
+
+@Composable
+internal fun AnalyticsInsightsList(
+    modifier: Modifier = Modifier,
+    insights: List<AnalyticsInsightUi>,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
         insights.forEach { insight ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -92,7 +106,7 @@ internal fun AnalyticsInsightsSection(
                     text = insightTitle(insight),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

@@ -30,6 +30,10 @@ FROM customScheduleEntity
 WHERE date >= ? AND date <= ?
 ORDER BY date DESC;
 
+fetchAllSchedules:
+SELECT *
+FROM customScheduleEntity;
+
 deleteSchedulesById:
 DELETE FROM customScheduleEntity
 WHERE uid IN ?;

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
 import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.ShareCodeScannerDialog
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
@@ -64,17 +67,32 @@ internal fun ShareContent(
     val adsConfiguration = LocalAdsConfiguration.current
     val snackbarHostState = remember { SnackbarHostState() }
     var isScannerOpen by rememberSaveable { mutableStateOf(false) }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchShareLayoutMode()
+    val isExpanded = layoutMode == ShareLayoutMode.EXPANDED
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            ShareTopBar(onBackClick = { store.dispatchEvent(ShareEvent.ClickBack) })
+            ShareTopBar(
+                titleAlign = if (isExpanded) TextAlign.Start else TextAlign.Center,
+                onBackClick = { store.dispatchEvent(ShareEvent.ClickBack) },
+            )
         },
         bottomBar = {
             if (state.status == ShareStatus.PREVIEW) {
                 ShareBottomActionBar(
                     enabled = !state.isRewardInProgress,
                     isLoadingAccept = state.isRewardInProgress,
+                    contentMaxWidth = if (isExpanded) {
+                        AdaptiveLayoutDefaults.MediumContentMaxWidth
+                    } else {
+                        null
+                    },
+                    horizontalPadding = if (isExpanded) {
+                        AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+                    } else {
+                        AdaptiveLayoutDefaults.CompactHorizontalPadding
+                    },
                     onAcceptSharedSchedule = {
                         store.dispatchEvent(ShareEvent.AcceptedSharedSchedule)
                     },
@@ -94,6 +112,7 @@ internal fun ShareContent(
         ShareLayout(
             modifier = Modifier.padding(contentPadding),
             state = state,
+            layoutMode = layoutMode,
             onCodeChange = { code -> store.dispatchEvent(ShareEvent.UpdatedCode(code)) },
             onCreateClick = { store.dispatchEvent(ShareEvent.CreateShare) },
             onClaimClick = { store.dispatchEvent(ShareEvent.ClaimShare) },

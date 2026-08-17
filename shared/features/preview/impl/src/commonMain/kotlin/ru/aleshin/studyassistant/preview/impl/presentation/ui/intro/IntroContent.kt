@@ -37,10 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.utils.isCompactHeight
-import ru.aleshin.studyassistant.core.ui.utils.useExpandedLayout
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.PreviewLayoutMode
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.fetchPreviewLayoutMode
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.contract.IntroEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.store.IntroComponent
@@ -60,13 +62,15 @@ internal fun IntroContent(
 ) {
     val store = introComponent.store
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val layoutMode = adaptiveInfo.fetchPreviewLayoutMode()
     val pagerState = rememberPagerState { IntroPage.entries.size }
     val snackbarState = remember { SnackbarHostState() }
 
     IntroScaffold(
         modifier = modifier,
         pagerState = pagerState,
-        useHorizontalPageLayout = adaptiveInfo.useExpandedLayout || adaptiveInfo.isCompactHeight,
+        layoutMode = layoutMode,
+        useHorizontalPageLayout = layoutMode == PreviewLayoutMode.EXPANDED || adaptiveInfo.isCompactHeight,
         snackbarState = snackbarState,
         onBackClick = {
             store.dispatchEvent(IntroEvent.SelectedPreviousPage(pagerState.currentPage))
@@ -94,6 +98,7 @@ internal fun IntroContent(
 @OptIn(ExperimentalFoundationApi::class)
 private fun IntroScaffold(
     pagerState: PagerState,
+    layoutMode: PreviewLayoutMode,
     useHorizontalPageLayout: Boolean,
     snackbarState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -114,6 +119,7 @@ private fun IntroScaffold(
         IntroLayout(
             modifier = Modifier.padding(paddingValues),
             pagerState = pagerState,
+            layoutMode = layoutMode,
             useHorizontalPageLayout = useHorizontalPageLayout,
             onBackClick = onBackClick,
             onContinueClick = onContinueClick,
@@ -126,19 +132,31 @@ private fun IntroScaffold(
 @OptIn(ExperimentalFoundationApi::class)
 private fun IntroLayout(
     pagerState: PagerState,
+    layoutMode: PreviewLayoutMode,
     useHorizontalPageLayout: Boolean,
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSetupClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val contentAlignment = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+        Alignment.TopStart
+    } else {
+        Alignment.TopCenter
+    }
+    val contentModifier = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+        Modifier
+            .fillMaxSize()
+            .widthIn(max = AdaptiveLayoutDefaults.ExpandedContentMaxWidth)
+            .padding(horizontal = AdaptiveLayoutDefaults.ExpandedHorizontalPadding)
+    } else {
+        Modifier.fillMaxSize().widthIn(max = 1200.dp)
+    }
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
+        contentAlignment = contentAlignment,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().widthIn(max = 1200.dp),
-        ) {
+        Column(modifier = contentModifier) {
             HorizontalPager(
                 modifier = Modifier.weight(1f),
                 state = pagerState,
@@ -147,6 +165,11 @@ private fun IntroLayout(
                 IntroPageSection(
                     page = IntroPage.entries[pageIndex],
                     useHorizontalLayout = useHorizontalPageLayout,
+                    horizontalPadding = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+                        AdaptiveLayoutDefaults.SpaceLarge
+                    } else {
+                        null
+                    },
                 )
             }
             IntroStepsSection(

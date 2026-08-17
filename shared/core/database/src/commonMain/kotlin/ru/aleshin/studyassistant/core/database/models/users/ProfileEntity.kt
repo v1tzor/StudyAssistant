@@ -23,7 +23,6 @@ data class ProfileEntity(
     val uid: String,
     val username: String,
     val avatar: String?,
-    val description: String?,
     val city: String?,
     val birthday: String?,
     val sex: String?,

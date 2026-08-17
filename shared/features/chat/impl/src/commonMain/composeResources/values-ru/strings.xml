@@ -17,6 +17,10 @@
 
 <resources>
     <string name="assistant_top_bar_title">Ассистент (Beta)</string>
+    <string name="assistant_expanded_header">Ассистент</string>
+    <string name="assistant_quota_remaining">Осталось %1$d из %2$d сообщений сегодня</string>
+    <string name="assistant_send_action_description">Отправить сообщение</string>
+    <string name="assistant_clear_history_description">Очистить историю чата</string>
     <string name="assistant_sender_badge">Ассистент</string>
     <string name="chat_assistant_error_message">Ошибка при работе ассистента</string>
     <string name="functional_chat_suggestion">Что ты умеешь?</string>

@@ -26,7 +26,11 @@
     <string name="theme_chooser_view_title">Тема</string>
     <string name="delete_schedule_button">Удалить текущее расписание</string>
     <string name="delete_schedule_warning_title">Удалить расписание?</string>
-    <string name="delete_schedule_warning_text">Будет удалено только текущее расписание. Организация, учителя и предметы останутся.</string>
+    <string name="delete_schedule_warning_text">Будет удалено расписание только выбранных организаций. Сами организации, учителя и предметы останутся.</string>
+    <string name="delete_schedule_organizations_title">Организации</string>
+    <string name="delete_schedule_main_label">Главная</string>
+    <string name="delete_schedule_select_all">Выбрать все</string>
+    <string name="delete_schedule_empty_organizations">Сначала создайте организацию.</string>
     <string name="delete_all_data_button">Удалить все данные</string>
     <string name="delete_all_data_warning_title">Удалить все данные?</string>
     <string name="delete_all_data_warning_text">Будут безвозвратно удалены профиль, организации, учителя, предметы, расписание, задания и история чата. После этого откроется первичная настройка.</string>

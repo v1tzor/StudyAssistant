@@ -16,41 +16,26 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
-import ru.aleshin.studyassistant.core.presentation.models.settings.HolidaysUi
-import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarEvent
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.contract.CalendarState
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.store.CalendarComponent
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.views.HolidaysView
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.common.SettingsSelectorView
-import ru.aleshin.studyassistant.settings.impl.resources.Res
-import ru.aleshin.studyassistant.settings.impl.resources.ic_calendar_week
-import ru.aleshin.studyassistant.settings.impl.resources.number_of_repeat_week_view_title
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.fetchSettingsLayoutMode
 
 /**
  * @author Stanislav Aleshin on 10.07.2024
@@ -63,13 +48,15 @@ internal fun CalendarContent(
     val store = calendarComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchSettingsLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseCalendarContent(
-                state = state,
+            CalendarLayout(
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
+                state = state,
                 onSelectedNumberOfWeek = {
                     store.dispatchEvent(CalendarEvent.ChangeNumberOfRepeatWeek(it))
                 },
@@ -96,36 +83,5 @@ internal fun CalendarContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun BaseCalendarContent(
-    state: CalendarState,
-    modifier: Modifier,
-    scrollState: ScrollState = rememberScrollState(),
-    onSelectedNumberOfWeek: (NumberOfRepeatWeek) -> Unit,
-    onUpdateHolidays: (List<HolidaysUi>) -> Unit,
-) {
-    Column(
-        modifier = modifier.padding(vertical = 24.dp).verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        SettingsSelectorView(
-            onSelect = onSelectedNumberOfWeek,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            enabled = state.settings != null,
-            selected = state.settings?.numberOfWeek,
-            allItems = remember { NumberOfRepeatWeek.entries.toList() },
-            icon = painterResource(Res.drawable.ic_calendar_week),
-            title = stringResource(Res.string.number_of_repeat_week_view_title),
-            itemName = { it.mapToSting() },
-        )
-        HolidaysView(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            allOrganizations = state.allOrganizations,
-            holidays = state.settings?.holidays ?: emptyList(),
-            onUpdateHolidays = onUpdateHolidays,
-        )
     }
 }

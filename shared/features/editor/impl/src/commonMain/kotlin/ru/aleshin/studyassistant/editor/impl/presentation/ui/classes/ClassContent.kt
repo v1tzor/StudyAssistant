@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,16 +42,19 @@ import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.contract.ClassState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.store.ClassComponent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.ClassTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.classes.views.TimeInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.OrganizationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.SubjectAndEventTypeInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TeacherInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 
 /**
  * @author Stanislav Aleshin on 02.06.2024
@@ -63,13 +67,15 @@ internal fun ClassContent(
     val store = classComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseClassContent(
+            ClassLayout(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
                 onAddOrganization = {
                     store.dispatchEvent(ClassEvent.NavigateToOrganizationEditor(null))
                 },
@@ -133,6 +139,152 @@ internal fun ClassContent(
             }
         }
     }
+}
+
+@Composable
+private fun ClassLayout(
+    state: ClassState,
+    modifier: Modifier,
+    layoutMode: EditorLayoutMode,
+    onAddOrganization: () -> Unit,
+    onAddSubject: () -> Unit,
+    onAddTeacher: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
+    onEditEmployee: (EmployeeDetailsUi) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onUpdateOffices: (List<String>) -> Unit,
+    onSelectOrganization: (OrganizationShortUi?) -> Unit,
+    onSelectSubject: (EventType?, SubjectUi?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
+    onSelectLocation: (ContactInfoUi?, String?) -> Unit,
+    onSelectTime: (Instant?, Instant?) -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseClassContent(
+            state = state,
+            modifier = modifier,
+            onAddOrganization = onAddOrganization,
+            onAddSubject = onAddSubject,
+            onAddTeacher = onAddTeacher,
+            onEditSubject = onEditSubject,
+            onEditEmployee = onEditEmployee,
+            onUpdateLocations = onUpdateLocations,
+            onUpdateOffices = onUpdateOffices,
+            onSelectOrganization = onSelectOrganization,
+            onSelectSubject = onSelectSubject,
+            onSelectTeacher = onSelectTeacher,
+            onSelectLocation = onSelectLocation,
+            onSelectTime = onSelectTime,
+        )
+        EditorLayoutMode.EXPANDED -> ClassExpandedLayout(
+            state = state,
+            modifier = modifier,
+            onAddOrganization = onAddOrganization,
+            onAddSubject = onAddSubject,
+            onAddTeacher = onAddTeacher,
+            onEditSubject = onEditSubject,
+            onEditEmployee = onEditEmployee,
+            onUpdateLocations = onUpdateLocations,
+            onUpdateOffices = onUpdateOffices,
+            onSelectOrganization = onSelectOrganization,
+            onSelectSubject = onSelectSubject,
+            onSelectTeacher = onSelectTeacher,
+            onSelectLocation = onSelectLocation,
+            onSelectTime = onSelectTime,
+        )
+    }
+}
+
+@Composable
+private fun ClassExpandedLayout(
+    state: ClassState,
+    modifier: Modifier,
+    onAddOrganization: () -> Unit,
+    onAddSubject: () -> Unit,
+    onAddTeacher: () -> Unit,
+    onEditSubject: (SubjectUi) -> Unit,
+    onEditEmployee: (EmployeeDetailsUi) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onUpdateOffices: (List<String>) -> Unit,
+    onSelectOrganization: (OrganizationShortUi?) -> Unit,
+    onSelectSubject: (EventType?, SubjectUi?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
+    onSelectLocation: (ContactInfoUi?, String?) -> Unit,
+    onSelectTime: (Instant?, Instant?) -> Unit,
+) {
+    val selectedOrganization = remember(state.organizations, state.editableClass?.organization) {
+        state.organizations.find { it.uid == state.editableClass?.organization?.uid }
+    }
+    EditorSplitPanes(
+        modifier = modifier,
+        startPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 20.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                OrganizationInfoField(
+                    required = true,
+                    isLoading = state.isLoading,
+                    organization = selectedOrganization,
+                    allOrganization = state.organizations,
+                    onAddOrganization = onAddOrganization,
+                    onSelected = onSelectOrganization,
+                )
+                SubjectAndEventTypeInfoField(
+                    enabledAddSubject = state.editableClass?.organization != null,
+                    isLoading = state.isLoading,
+                    subject = state.editableClass?.subject,
+                    eventType = state.editableClass?.eventType,
+                    allSubjects = state.subjects,
+                    onAddSubject = onAddSubject,
+                    onEditSubject = onEditSubject,
+                    onSelectedEventType = { onSelectSubject(it, state.editableClass?.subject) },
+                    onSelectedSubject = { onSelectSubject(it?.eventType, it) },
+                )
+                TeacherInfoField(
+                    enabledAddTeacher = state.editableClass?.organization != null,
+                    isLoading = state.isLoading,
+                    teacher = state.editableClass?.teacher,
+                    allEmployee = state.employees,
+                    onAddTeacher = onAddTeacher,
+                    onEditTeacher = onEditEmployee,
+                    onSelected = onSelectTeacher,
+                )
+            }
+        },
+        endPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 20.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                LocationInfoField(
+                    enabledAdd = state.editableClass?.organization != null,
+                    isLoading = state.isLoading,
+                    location = state.editableClass?.location,
+                    office = state.editableClass?.office,
+                    allLocations = selectedOrganization?.locations ?: emptyList(),
+                    allOffices = selectedOrganization?.offices ?: emptyList(),
+                    onUpdateOffices = onUpdateOffices,
+                    onUpdateLocations = onUpdateLocations,
+                    onSelectedLocation = { onSelectLocation(it, state.editableClass?.office) },
+                    onSelectedOffice = { onSelectLocation(state.editableClass?.location, it) },
+                )
+                TimeInfoField(
+                    isLoading = state.isLoading,
+                    startTime = state.editableClass?.startTime,
+                    endTime = state.editableClass?.endTime,
+                    freeClassTimeRanges = state.freeClassTimeRanges,
+                    onSelectedTime = onSelectTime,
+                )
+            }
+        },
+    )
 }
 
 @Composable

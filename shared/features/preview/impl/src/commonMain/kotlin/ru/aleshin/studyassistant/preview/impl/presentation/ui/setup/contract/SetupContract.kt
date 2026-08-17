@@ -57,6 +57,7 @@ internal sealed class SetupEvent : StoreEvent {
     data object ClickSaveOrganizationInfo : SetupEvent()
     data object ClickSaveCalendarInfo : SetupEvent()
     data object ClickEditWeekSchedule : SetupEvent()
+    data object ClickImportSchedule : SetupEvent()
     data object ClickGoToApp : SetupEvent()
     data object ClickBack : SetupEvent()
 }
@@ -84,4 +85,5 @@ internal sealed class SetupOutput : BaseOutput {
     data object NavigateToBack : SetupOutput()
     data object NavigateToApp : SetupOutput()
     data object NavigateToWeekScheduleEditor : SetupOutput()
+    data object NavigateToScheduleImport : SetupOutput()
 }

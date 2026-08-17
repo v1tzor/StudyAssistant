@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -50,12 +51,42 @@ internal fun SettingsSwitchView(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     isPaidUser: Boolean = true,
+    useExpandedStyle: Boolean = false,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     title: String,
     description: String,
     onBuyContent: () -> Unit = {},
     actions: @Composable (ColumnScope.() -> Unit)? = null,
+) {
+    SettingsSwitchContent(
+        modifier = modifier,
+        enabled = enabled,
+        isPaidUser = isPaidUser,
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        title = title,
+        description = description,
+        titleStyle = MaterialTheme.typography.titleMedium,
+        descriptionStyle = MaterialTheme.typography.labelMedium,
+        onBuyContent = onBuyContent,
+        actions = actions,
+    )
+}
+
+@Composable
+private fun SettingsSwitchContent(
+    modifier: Modifier,
+    enabled: Boolean,
+    isPaidUser: Boolean,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    title: String,
+    description: String,
+    titleStyle: TextStyle,
+    descriptionStyle: TextStyle,
+    onBuyContent: () -> Unit,
+    actions: @Composable (ColumnScope.() -> Unit)?,
 ) {
     Column(
         modifier = modifier,
@@ -103,14 +134,14 @@ internal fun SettingsSwitchView(
                     color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = titleStyle,
                 )
                 Text(
                     text = description,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 5,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = descriptionStyle,
                 )
             }
         }

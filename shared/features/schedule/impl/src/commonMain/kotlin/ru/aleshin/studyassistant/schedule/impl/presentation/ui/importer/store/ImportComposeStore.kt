@@ -21,7 +21,6 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.Ef
 import ru.aleshin.studyassistant.core.common.architecture.store.communicators.StateCommunicator
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
-import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
@@ -129,13 +128,13 @@ internal class ImportComposeStore(
             is ImportEvent.AddSubject -> with(state) {
                 val current = session ?: return
                 val subject = Subject(
-                    uid = randomUUID(),
+                    uid = event.uid,
                     organizationId = current.organizationId,
                     eventType = EventType.LESSON,
                     name = event.name,
                     teacher = null,
                     office = "",
-                    color = CustomColors.entries.random().light.toInt(),
+                    color = CustomColors.randomUnusedArgb(current.subjects.map { subject -> subject.color }),
                     location = null,
                     updatedAt = 0L,
                 )
@@ -145,7 +144,7 @@ internal class ImportComposeStore(
             is ImportEvent.AddEmployee -> with(state) {
                 val current = session ?: return
                 val employee = Employee(
-                    uid = randomUUID(),
+                    uid = event.uid,
                     organizationId = current.organizationId,
                     firstName = event.firstName,
                     secondName = null,
@@ -263,7 +262,8 @@ internal class ImportComposeStore(
             isLoadingPhoto = action.isLoading
         )
         is ImportAction.UpdateAnalysisProgress -> currentState.copy(
-            isAnalysisInProgress = action.isLoading
+            isAnalysisInProgress = action.isLoading,
+            analysisStartedAt = action.startedAt,
         )
         is ImportAction.SetupOrganizations -> currentState.copy(
             organizations = action.organizations

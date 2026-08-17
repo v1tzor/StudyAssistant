@@ -25,13 +25,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.analytics.impl.resources.Res
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_back_desc
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.
@@ -45,7 +49,43 @@ internal fun AnalyticsTopAppBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = { Text(title) },
+        title = {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(Res.string.analytics_back_desc),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun AnalyticsExpandedTopAppBar(
+    title: String,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        modifier = modifier,
+        title = {
+            TopAppBarTitle(
+                header = title,
+                textAlign = TextAlign.Start,
+            )
+        },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(

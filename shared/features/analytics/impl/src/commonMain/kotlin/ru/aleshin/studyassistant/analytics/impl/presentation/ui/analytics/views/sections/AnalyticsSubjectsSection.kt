@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Quiz
@@ -69,6 +69,9 @@ import ru.aleshin.studyassistant.analytics.impl.resources.analytics_show_less
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_subjects_title
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_tests
 
+/**
+ * @author Stanislav Aleshin on 09.08.2026.
+ */
 @Composable
 internal fun AnalyticsSubjectsSection(
     subjects: List<SubjectAnalyticsUi>,
@@ -94,8 +97,10 @@ internal fun AnalyticsSubjectsSection(
                 SubjectAnalyticsItem(
                     analytics = analytics,
                     onClick = {
-                        analytics.subject?.let { subject -> onTargetClick(AnalyticsTarget.Subject(subject.uid)) }
-                    }
+                        analytics.subject?.let { subject ->
+                            onTargetClick(AnalyticsTarget.Subject(subject.uid))
+                        }
+                    },
                 )
             }
         }
@@ -126,6 +131,7 @@ private fun SubjectAnalyticsItem(
 
     Surface(
         onClick = onClick,
+        enabled = analytics.subject != null,
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -143,7 +149,7 @@ private fun SubjectAnalyticsItem(
                     SubjectHeader(
                         analytics = analytics,
                         subjectColor = subjectColor,
-                        onClickAvailable = onClick != null,
+                        isClickEnabled = analytics.subject != null,
                     )
                     WorkloadIndicator(
                         progress = analytics.workloadProgress,
@@ -160,6 +166,7 @@ private fun SubjectAnalyticsItem(
                     ) {
                         if (analytics.completedOnTime > 0) {
                             StatusMetric(
+                                modifier = Modifier.weight(1f, fill = false),
                                 icon = Icons.Default.CheckCircle,
                                 value = analytics.completedOnTime,
                                 label = stringResource(Res.string.analytics_on_time),
@@ -168,6 +175,7 @@ private fun SubjectAnalyticsItem(
                         }
                         if (analytics.overdue > 0) {
                             StatusMetric(
+                                modifier = Modifier.weight(1f, fill = false),
                                 icon = Icons.Default.WarningAmber,
                                 value = analytics.overdue,
                                 label = stringResource(Res.string.analytics_overdue),
@@ -187,7 +195,7 @@ private fun SubjectAnalyticsItem(
 private fun SubjectHeader(
     analytics: SubjectAnalyticsUi,
     subjectColor: Color,
-    onClickAvailable: Boolean,
+    isClickEnabled: Boolean,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -230,7 +238,7 @@ private fun SubjectHeader(
             )
         }
 
-        if (onClickAvailable) {
+        if (isClickEnabled) {
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
@@ -271,7 +279,7 @@ private fun SubjectMetrics(
             modifier = Modifier.weight(1f),
         )
         SubjectMetric(
-            icon = Icons.Default.Assignment,
+            icon = Icons.AutoMirrored.Filled.Assignment,
             value = analytics.homeworkCount,
             label = stringResource(Res.string.analytics_homeworks),
             modifier = Modifier.weight(1f),
@@ -303,19 +311,19 @@ private fun SubjectMetric(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp),
         )
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = value.toString(),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1
+                maxLines = 1,
             )
         }
     }
@@ -323,12 +331,14 @@ private fun SubjectMetric(
 
 @Composable
 private fun StatusMetric(
+    modifier: Modifier = Modifier,
     icon: ImageVector,
     value: Int,
     label: String,
     color: Color,
 ) {
     Surface(
+        modifier = modifier,
         shape = CircleShape,
         color = color.copy(alpha = 0.10f),
     ) {
@@ -346,11 +356,12 @@ private fun StatusMetric(
                 tint = color,
                 modifier = Modifier.size(16.dp),
             )
-
             Text(
                 text = "$value $label",
                 style = MaterialTheme.typography.labelMedium,
                 color = color,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

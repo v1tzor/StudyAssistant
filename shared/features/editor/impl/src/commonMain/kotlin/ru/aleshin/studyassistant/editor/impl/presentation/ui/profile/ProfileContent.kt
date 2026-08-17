@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,13 +43,15 @@ import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsS
 import ru.aleshin.studyassistant.core.domain.entities.users.Gender
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorConstrainedPane
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.contract.ProfileState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.store.ProfileComponent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.CityInfoField
-import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.DescriptionInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.GenderInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.profile.views.ProfileTopSheet
@@ -68,15 +72,17 @@ internal fun ProfileContent(
     val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
+    val isExpanded = layoutMode == EditorLayoutMode.EXPANDED
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseProfileContent(
+            ProfileLayout(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
                 onUpdateName = { store.dispatchEvent(ProfileEvent.UpdateUsername(it)) },
-                onUpdateDescription = { store.dispatchEvent(ProfileEvent.UpdateDescription(it)) },
                 onUpdateBirthday = { store.dispatchEvent(ProfileEvent.UpdateBirthday(it)) },
                 onUpdateGender = { store.dispatchEvent(ProfileEvent.UpdateGender(it)) },
                 onUpdateCity = { store.dispatchEvent(ProfileEvent.UpdateCity(it)) },
@@ -85,6 +91,7 @@ internal fun ProfileContent(
         topBar = {
             Column {
                 ProfileTopBar(
+                    isExpanded = isExpanded,
                     onBackClick = { store.dispatchEvent(ProfileEvent.NavigateToBack) },
                 )
                 ProfileTopSheet(
@@ -124,12 +131,43 @@ internal fun ProfileContent(
 }
 
 @Composable
+private fun ProfileLayout(
+    state: ProfileState,
+    modifier: Modifier = Modifier,
+    layoutMode: EditorLayoutMode,
+    onUpdateName: (String) -> Unit,
+    onUpdateBirthday: (String?) -> Unit,
+    onUpdateGender: (Gender?) -> Unit,
+    onUpdateCity: (String?) -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseProfileContent(
+            state = state,
+            modifier = modifier,
+            onUpdateName = onUpdateName,
+            onUpdateBirthday = onUpdateBirthday,
+            onUpdateGender = onUpdateGender,
+            onUpdateCity = onUpdateCity,
+        )
+        EditorLayoutMode.EXPANDED -> EditorConstrainedPane(modifier = modifier) {
+            BaseProfileContent(
+                state = state,
+                modifier = Modifier.fillMaxWidth(),
+                onUpdateName = onUpdateName,
+                onUpdateBirthday = onUpdateBirthday,
+                onUpdateGender = onUpdateGender,
+                onUpdateCity = onUpdateCity,
+            )
+        }
+    }
+}
+
+@Composable
 private fun BaseProfileContent(
     state: ProfileState,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onUpdateName: (String) -> Unit,
-    onUpdateDescription: (String?) -> Unit,
     onUpdateBirthday: (String?) -> Unit,
     onUpdateGender: (Gender?) -> Unit,
     onUpdateCity: (String?) -> Unit,
@@ -142,11 +180,6 @@ private fun BaseProfileContent(
             isLoading = state.isLoading,
             username = state.profile?.username ?: "",
             onUpdateName = onUpdateName,
-        )
-        DescriptionInfoField(
-            isLoading = state.isLoading,
-            description = state.profile?.description,
-            onUpdateDescription = onUpdateDescription,
         )
         BirthdayInfoField(
             isLoading = state.isLoading,

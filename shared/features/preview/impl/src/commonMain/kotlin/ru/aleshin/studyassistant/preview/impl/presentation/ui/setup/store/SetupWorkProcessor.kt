@@ -213,6 +213,7 @@ internal interface SetupWorkProcessor :
                     val output = when (destination) {
                         SetupDestination.APP -> SetupOutput.NavigateToApp
                         SetupDestination.WEEK_SCHEDULE -> SetupOutput.NavigateToWeekScheduleEditor
+                        SetupDestination.SCHEDULE_IMPORT -> SetupOutput.NavigateToScheduleImport
                     }
                     emit(OutputResult(output))
                 },
@@ -238,4 +239,5 @@ internal sealed class SetupWorkCommand : WorkCommand {
 internal enum class SetupDestination {
     APP,
     WEEK_SCHEDULE,
+    SCHEDULE_IMPORT,
 }

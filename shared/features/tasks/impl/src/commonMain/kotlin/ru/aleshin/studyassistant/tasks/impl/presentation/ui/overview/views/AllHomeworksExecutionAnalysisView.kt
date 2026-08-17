@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,7 @@ internal fun AllHomeworksExecutionAnalysisView(
     overdueTasks: List<HomeworkUi>,
     detachedActiveTasks: List<HomeworkUi>,
     completedHomeworksCount: Int,
+    titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     onShowErrors: () -> Unit,
 ) {
     Column(
@@ -71,7 +73,7 @@ internal fun AllHomeworksExecutionAnalysisView(
             text = stringResource(Res.string.all_homeworks_execution_analysis_title),
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleSmall,
+            style = titleStyle,
         )
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Surface(

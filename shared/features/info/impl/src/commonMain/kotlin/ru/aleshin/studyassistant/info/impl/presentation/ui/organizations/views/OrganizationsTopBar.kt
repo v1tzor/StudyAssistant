@@ -20,10 +20,13 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.info.impl.resources.Res
 import ru.aleshin.studyassistant.info.impl.resources.organizations_header
 
@@ -38,6 +41,25 @@ internal fun OrganizationsTopBar(
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = { Text(text = stringResource(Res.string.organizations_header)) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun OrganizationsExpandedTopBar(
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        modifier = modifier,
+        title = {
+            TopAppBarTitle(
+                header = stringResource(Res.string.organizations_header),
+                textAlign = TextAlign.Start,
+            )
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         ),

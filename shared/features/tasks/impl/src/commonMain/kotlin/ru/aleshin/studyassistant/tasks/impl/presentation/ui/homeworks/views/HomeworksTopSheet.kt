@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -69,13 +70,14 @@ internal fun HomeworksTopSheet(
     isLoading: Boolean,
     selectedTimeRange: TimeRange?,
     progressList: List<Boolean>,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     onNextTimeRangeClick: () -> Unit,
     onPreviousTimeRangeClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge.bottomSide,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        color = containerColor,
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),

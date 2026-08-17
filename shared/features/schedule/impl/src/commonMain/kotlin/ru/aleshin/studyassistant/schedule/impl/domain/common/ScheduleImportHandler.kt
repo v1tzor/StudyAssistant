@@ -26,6 +26,7 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.Schedu
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportEventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.ui.theme.tokens.CustomColors
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportClass
 import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportSession
 import ru.aleshin.studyassistant.schedule.impl.domain.validation.ScheduleImportValidator
@@ -327,7 +328,7 @@ internal interface ScheduleImportHandler {
                 name = subjectName?.trim().orEmpty().capitalized(),
                 teacher = teacher,
                 office = office.orEmpty(),
-                color = subjectColor(subjectName.orEmpty()),
+                color = nextSubjectColor(subjects),
                 location = location?.trim()?.takeIf(String::isNotEmpty)?.let { value -> ContactInfo(value = value) },
                 updatedAt = 0L,
             )
@@ -381,16 +382,8 @@ internal interface ScheduleImportHandler {
             }
         }
 
-        private fun subjectColor(name: String): Int {
-            val palette = intArrayOf(
-                0xFF1565C0.toInt(),
-                0xFF2E7D32.toInt(),
-                0xFF6A1B9A.toInt(),
-                0xFFEF6C00.toInt(),
-                0xFF00838F.toInt(),
-                0xFFC62828.toInt(),
-            )
-            return palette[name.normalized().hashCode().mod(palette.size)]
+        private fun nextSubjectColor(subjects: List<Subject>): Int {
+            return CustomColors.randomUnusedArgb(subjects.map(Subject::color))
         }
 
         private fun Employee.officialName(): String {

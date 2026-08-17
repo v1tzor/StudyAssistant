@@ -22,9 +22,12 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResul
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.OutputResult
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.GeneralSettingsInteractor
+import ru.aleshin.studyassistant.settings.impl.domain.interactors.OrganizationInteractor
 import ru.aleshin.studyassistant.settings.impl.domain.interactors.UserDataInteractor
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToDomain
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToUi
@@ -41,13 +44,15 @@ internal interface GeneralWorkProcessor :
 
     class Base(
         private val settingsInteractor: GeneralSettingsInteractor,
+        private val organizationInteractor: OrganizationInteractor,
         private val userDataInteractor: UserDataInteractor,
     ) : GeneralWorkProcessor {
 
         override suspend fun work(command: GeneralWorkCommand) = when (command) {
             is GeneralWorkCommand.LoadSettings -> loadSettingsWork()
+            is GeneralWorkCommand.LoadOrganizations -> loadOrganizationsWork()
             is GeneralWorkCommand.UpdateSettings -> updateSettingsWork(command.settings)
-            is GeneralWorkCommand.DeleteCurrentSchedule -> deleteCurrentScheduleWork()
+            is GeneralWorkCommand.DeleteCurrentSchedule -> deleteCurrentScheduleWork(command.organizationIds)
             is GeneralWorkCommand.DeleteAllData -> deleteAllDataWork()
         }
 
@@ -60,14 +65,23 @@ internal interface GeneralWorkProcessor :
             )
         }
 
+        private fun loadOrganizationsWork() = flow {
+            organizationInteractor.fetchAllShortOrganizations().collectAndHandle(
+                onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
+                onRightAction = { organizations ->
+                    emit(ActionResult(GeneralAction.UpdateOrganizations(organizations.map { it.mapToUi() })))
+                },
+            )
+        }
+
         private fun updateSettingsWork(settings: GeneralSettingsUi) = flow {
             settingsInteractor.updateSettings(settings.mapToDomain()).handle(
                 onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
             )
         }
 
-        private fun deleteCurrentScheduleWork() = flow {
-            userDataInteractor.deleteCurrentSchedule().handle(
+        private fun deleteCurrentScheduleWork(organizationIds: Set<UID>) = flow {
+            userDataInteractor.deleteCurrentSchedule(organizationIds).handle(
                 onLeftAction = { emit(EffectResult(GeneralEffect.ShowError(it))) },
             )
         }
@@ -83,7 +97,8 @@ internal interface GeneralWorkProcessor :
 
 internal sealed class GeneralWorkCommand : WorkCommand {
     data object LoadSettings : GeneralWorkCommand()
+    data object LoadOrganizations : GeneralWorkCommand()
     data class UpdateSettings(val settings: GeneralSettingsUi) : GeneralWorkCommand()
-    data object DeleteCurrentSchedule : GeneralWorkCommand()
+    data class DeleteCurrentSchedule(val organizationIds: Set<UID>) : GeneralWorkCommand()
     data object DeleteAllData : GeneralWorkCommand()
 }

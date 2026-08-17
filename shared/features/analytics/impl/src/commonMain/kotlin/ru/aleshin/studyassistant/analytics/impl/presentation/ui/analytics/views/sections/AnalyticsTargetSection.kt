@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.analytics.impl.domain.entities.AnalyticsTarget
@@ -86,6 +87,8 @@ internal fun AnalyticsTargetSection(
                 Text(
                     text = targetName(details),
                     style = MaterialTheme.typography.titleLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 if (details.target !is AnalyticsTarget.Employee) {
                     Text(
@@ -96,6 +99,8 @@ internal fun AnalyticsTargetSection(
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

@@ -24,11 +24,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.current_time_range_desc
 import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_header
@@ -43,32 +48,51 @@ import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun HomeworksTopBar(
     modifier: Modifier = Modifier,
+    titleAlign: TextAlign = TextAlign.Center,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     onCurrentTimeRangeClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = {
-            Text(text = stringResource(Res.string.homeworks_header))
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = onCurrentTimeRangeClick) {
-                Icon(
-                    painter = painterResource(CoreRes.drawable.core_ic_calendar_today),
-                    contentDescription = stringResource(Res.string.current_time_range_desc),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
+            )
+        }
+    }
+    val actions: @Composable () -> Unit = {
+        TopAppBarButton(
+            imagePainter = painterResource(CoreRes.drawable.core_ic_calendar_today),
+            imageDescription = stringResource(Res.string.current_time_range_desc),
+            onButtonClick = onCurrentTimeRangeClick,
         )
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = containerColor,
     )
+    if (titleAlign == TextAlign.Start) {
+        TopAppBar(
+            modifier = modifier,
+            title = {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.homeworks_header),
+                    textAlign = TextAlign.Start,
+                )
+            },
+            navigationIcon = navigationIcon,
+            actions = { actions() },
+            colors = colors,
+        )
+    } else {
+        CenterAlignedTopAppBar(
+            modifier = modifier,
+            title = {
+                Text(text = stringResource(Res.string.homeworks_header))
+            },
+            navigationIcon = navigationIcon,
+            actions = { actions() },
+            colors = colors,
+        )
+    }
 }

@@ -27,7 +27,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_back_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_title
@@ -39,11 +41,21 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_title
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun ImportTopBar(
     modifier: Modifier = Modifier,
+    isExpanded: Boolean = false,
     onBackClick: () -> Unit,
 ) {
     TopAppBar(
         modifier = modifier,
-        title = { Text(stringResource(Res.string.schedule_import_title)) },
+        title = {
+            if (isExpanded) {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.schedule_import_title),
+                    textAlign = TextAlign.Start,
+                )
+            } else {
+                Text(stringResource(Res.string.schedule_import_title))
+            }
+        },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(

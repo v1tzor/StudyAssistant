@@ -52,7 +52,6 @@ object Constants {
     }
 
     object Text {
-        const val MAX_PROFILE_DESC_LENGTH = 120
         const val SUBJECT_TEXT_LENGTH = 56
         const val DEFAULT_MAX_TEXT_LENGTH = 32
         const val FULL_ORG_NAME_LENGTH = 80

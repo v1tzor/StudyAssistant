@@ -36,9 +36,10 @@
     <string name="calendar_button_label">Продолжить</string>
     <string name="schedule_step_title">Заполните расписания и начните пользоваться приложением!</string>
     <string name="schedule_fill_out_button_label">Заполнить</string>
+    <string name="schedule_import_ai_button_label">Сфоткай — готово</string>
     <string name="schedule_start_button_label">Начать пользоваться</string>
     <string name="username_label">Отображаемое имя *</string>
-    <string name="profile_description_label">Описание профиля</string>
+
     <string name="email_label">Email</string>
     <string name="birthday_label">День рождения</string>
     <string name="birthday_placeholder">Выберите дату</string>

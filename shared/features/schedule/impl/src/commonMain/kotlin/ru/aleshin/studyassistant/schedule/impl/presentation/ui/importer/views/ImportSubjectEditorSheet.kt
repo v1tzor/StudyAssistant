@@ -93,11 +93,13 @@ internal fun ImportSubjectEditorSheet(
     var isTeacherSelectorOpen by remember { mutableStateOf(false) }
     var isEventTypeSelectorOpen by remember { mutableStateOf(false) }
     val newTeacherName = stringResource(Res.string.schedule_import_new_teacher_name)
+    val sheetContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = sheetContainerColor,
         dragHandle = { MediumDragHandle() },
         contentWindowInsets = { WindowInsets.navigationBars },
     ) {
@@ -119,6 +121,7 @@ internal fun ImportSubjectEditorSheet(
                 onValueChange = { value -> editable = editable.copy(name = value) },
                 label = stringResource(Res.string.schedule_import_subject_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_class),
+                containerColor = sheetContainerColor,
             )
             ClickableInfoTextField(
                 onClick = { isEventTypeSelectorOpen = true },
@@ -127,6 +130,7 @@ internal fun ImportSubjectEditorSheet(
                 label = stringResource(Res.string.schedule_import_event_type_label),
                 placeholder = stringResource(Res.string.schedule_import_event_type_placeholder),
                 infoIcon = painterResource(CoreRes.drawable.core_ic_class),
+                backgroundColor = sheetContainerColor,
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isEventTypeSelectorOpen,
@@ -141,6 +145,7 @@ internal fun ImportSubjectEditorSheet(
                 label = stringResource(Res.string.schedule_import_teacher_label),
                 placeholder = stringResource(Res.string.schedule_import_teacher_placeholder),
                 infoIcon = painterResource(CoreRes.drawable.core_ic_employee),
+                backgroundColor = sheetContainerColor,
                 trailingIcon = {
                     ExpandedIcon(
                         isExpanded = isTeacherSelectorOpen,
@@ -154,6 +159,7 @@ internal fun ImportSubjectEditorSheet(
                 onValueChange = { value -> editable = editable.copy(office = value) },
                 label = stringResource(Res.string.schedule_import_office_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_organization),
+                containerColor = sheetContainerColor,
             )
             InfoTextField(
                 modifier = Modifier.padding(start = 16.dp, end = 24.dp),
@@ -163,6 +169,7 @@ internal fun ImportSubjectEditorSheet(
                 },
                 label = stringResource(Res.string.schedule_import_location_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_map_marker),
+                containerColor = sheetContainerColor,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),

@@ -43,8 +43,8 @@ import ru.aleshin.studyassistant.analytics.impl.resources.analytics_retry
  */
 @Composable
 internal fun AnalyticsErrorView(
-    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    onRetry: () -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(

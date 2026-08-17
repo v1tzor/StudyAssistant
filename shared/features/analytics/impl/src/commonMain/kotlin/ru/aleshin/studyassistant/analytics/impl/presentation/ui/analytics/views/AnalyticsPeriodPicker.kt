@@ -124,7 +124,9 @@ internal fun AnalyticsPeriodPicker(
     }
 
     Surface(
-        modifier = modifier.fillMaxWidth().height(40.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(40.dp),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.background,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -134,15 +136,15 @@ internal fun AnalyticsPeriodPicker(
                 selectedPeriod = selection.period,
                 onSelectPeriod = onPeriodChange,
             )
-            Spacer(modifier = Modifier.weight(1f))
             Box(
                 modifier = Modifier
+                    .weight(1f)
                     .height(36.dp)
                     .widthIn(min = 48.dp)
                     .clip(MaterialTheme.shapes.large)
                     .clickable(role = Role.Button, onClick = onRangeClick)
                     .padding(horizontal = 4.dp),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 Text(
                     text = rangeTitle,

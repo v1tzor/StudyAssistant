@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,8 +39,11 @@ import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeDetailsUi
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.TeacherInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.subject.contract.SubjectState
@@ -60,13 +64,15 @@ internal fun SubjectContent(
     val store = subjectComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseSubjectContent(
+            SubjectLayout(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
                 onAddTeacher = {
                     store.dispatchEvent(SubjectEvent.NavigateToEmployeeEditor(null))
                 },
@@ -121,6 +127,126 @@ internal fun SubjectContent(
             }
         }
     }
+}
+
+@Composable
+private fun SubjectLayout(
+    state: SubjectState,
+    modifier: Modifier = Modifier,
+    layoutMode: EditorLayoutMode,
+    onAddTeacher: () -> Unit,
+    onEditTeacher: (EmployeeDetailsUi) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onUpdateOffices: (List<String>) -> Unit,
+    onSelectEventType: (EventType?) -> Unit,
+    onEditName: (String) -> Unit,
+    onPickColor: (Int?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
+    onSelectLocation: (ContactInfoUi?, String?) -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseSubjectContent(
+            state = state,
+            modifier = modifier,
+            onAddTeacher = onAddTeacher,
+            onEditTeacher = onEditTeacher,
+            onUpdateLocations = onUpdateLocations,
+            onUpdateOffices = onUpdateOffices,
+            onSelectEventType = onSelectEventType,
+            onEditName = onEditName,
+            onPickColor = onPickColor,
+            onSelectTeacher = onSelectTeacher,
+            onSelectLocation = onSelectLocation,
+        )
+        EditorLayoutMode.EXPANDED -> SubjectExpandedLayout(
+            state = state,
+            modifier = modifier,
+            onAddTeacher = onAddTeacher,
+            onEditTeacher = onEditTeacher,
+            onUpdateLocations = onUpdateLocations,
+            onUpdateOffices = onUpdateOffices,
+            onSelectEventType = onSelectEventType,
+            onEditName = onEditName,
+            onPickColor = onPickColor,
+            onSelectTeacher = onSelectTeacher,
+            onSelectLocation = onSelectLocation,
+        )
+    }
+}
+
+@Composable
+private fun SubjectExpandedLayout(
+    state: SubjectState,
+    modifier: Modifier = Modifier,
+    onAddTeacher: () -> Unit,
+    onEditTeacher: (EmployeeDetailsUi) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onUpdateOffices: (List<String>) -> Unit,
+    onSelectEventType: (EventType?) -> Unit,
+    onEditName: (String) -> Unit,
+    onPickColor: (Int?) -> Unit,
+    onSelectTeacher: (EmployeeDetailsUi?) -> Unit,
+    onSelectLocation: (ContactInfoUi?, String?) -> Unit,
+) {
+    EditorSplitPanes(
+        modifier = modifier,
+        startPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 20.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                EventTypeInfoField(
+                    isLoading = state.isLoading,
+                    eventType = state.editableSubject?.eventType,
+                    onSelected = onSelectEventType,
+                )
+                SubjectNameInfoField(
+                    isLoading = state.isLoading,
+                    name = state.editableSubject?.name,
+                    onNameChange = onEditName,
+                )
+                ColorInfoField(
+                    isLoading = state.isLoading,
+                    color = state.editableSubject?.color,
+                    onSelected = onPickColor,
+                )
+            }
+        },
+        endPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 20.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                TeacherInfoField(
+                    enabledAddTeacher = state.editableSubject?.organizationId != null,
+                    isLoading = state.isLoading,
+                    teacher = state.editableSubject?.teacher,
+                    allEmployee = state.employees,
+                    onAddTeacher = onAddTeacher,
+                    onEditTeacher = onEditTeacher,
+                    onSelected = onSelectTeacher,
+                )
+                LocationInfoField(
+                    enabledAdd = state.editableSubject?.organizationId != null,
+                    isLoading = state.isLoading,
+                    location = state.editableSubject?.location,
+                    office = state.editableSubject?.office,
+                    allLocations = state.organization?.locations ?: emptyList(),
+                    allOffices = state.organization?.offices ?: emptyList(),
+                    onUpdateOffices = onUpdateOffices,
+                    onUpdateLocations = onUpdateLocations,
+                    onSelectedLocation = { onSelectLocation(it, state.editableSubject?.office) },
+                    onSelectedOffice = { onSelectLocation(state.editableSubject?.location, it) },
+                )
+            }
+        },
+    )
 }
 
 @Composable

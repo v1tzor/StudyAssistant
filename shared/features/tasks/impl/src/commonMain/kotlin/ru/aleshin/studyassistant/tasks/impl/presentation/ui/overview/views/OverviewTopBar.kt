@@ -23,12 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.open_analytics_desc
 import ru.aleshin.studyassistant.tasks.impl.resources.overview_header
@@ -55,6 +59,33 @@ internal fun OverviewTopBar(
                     modifier = Modifier.size(24.dp),
                 )
             }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun OverviewExpandedTopBar(
+    modifier: Modifier = Modifier,
+    onAnalyticsClick: () -> Unit,
+) {
+    TopAppBar(
+        modifier = modifier,
+        title = {
+            TopAppBarTitle(
+                header = stringResource(Res.string.overview_header),
+                textAlign = TextAlign.Start,
+            )
+        },
+        actions = {
+            TopAppBarButton(
+                imagePainter = painterResource(CoreRes.drawable.core_ic_analytics_details),
+                imageDescription = stringResource(Res.string.open_analytics_desc),
+                onButtonClick = onAnalyticsClick,
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,

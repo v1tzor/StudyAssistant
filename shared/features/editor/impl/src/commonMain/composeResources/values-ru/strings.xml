@@ -154,8 +154,6 @@
     <string name="todo_notify_params_before_one_week">За 1 неделю</string>
     <string name="username_field_label">Отображаемое имя *</string>
     <string name="username_field_placeholder">Имя Фамилия</string>
-    <string name="user_description_field_label">Описание профиля</string>
-    <string name="user_description_field_placeholder">Введите описание профиля</string>
     <string name="user_gender_field_label">Пол</string>
     <string name="user_gender_field_placeholder">Укажите ваш пол</string>
     <string name="city_field_label">Город</string>

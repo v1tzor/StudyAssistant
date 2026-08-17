@@ -40,11 +40,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -71,16 +73,20 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.sheet.BottomSheetScaffold
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.contract.DailyScheduleState
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.store.DailyScheduleComponent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.AddClassView
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DailyScheduleBottomSheet
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DailyScheduleEditorPane
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DailyScheduleTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DetailsClassViewItem
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.DetailsClassViewPlaceholder
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.daily.views.SwapClassesDropdownMenu
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.resources.Res
 import ru.aleshin.studyassistant.editor.impl.resources.ic_clear_circular
 import ru.aleshin.studyassistant.editor.impl.resources.none_classes_title
@@ -99,13 +105,16 @@ internal fun DailyScheduleContent(
     val store = dailyScheduleComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
-    val sheetState =
-        rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
-    val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
-    var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
-    val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
-    Box(modifier = modifier.onGloballyPositioned { layoutHeight = it.size.height - navBar }) {
+    if (layoutMode == EditorLayoutMode.COMPACT) {
+        val sheetState =
+            rememberStandardBottomSheetState(confirmValueChange = { it != SheetValue.Hidden })
+        val scaffoldState = rememberBottomSheetScaffoldState(sheetState, snackbarState)
+        var layoutHeight by rememberSaveable { mutableIntStateOf(0) }
+        val navBar = WindowInsets.safeNavigationBarsInPx(LocalDensity.current)
+
+        Box(modifier = modifier.onGloballyPositioned { layoutHeight = it.size.height - navBar }) {
         BottomSheetScaffold(
             modifier = Modifier.fillMaxSize(),
             sheetContent = {
@@ -177,6 +186,62 @@ internal fun DailyScheduleContent(
             sheetTonalElevation = StudyAssistantRes.elevations.levelZero,
             sheetPeekHeight = 150.dp + WindowInsets.navigationBarsInDp(),
         )
+        }
+    } else {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                DailyScheduleTopBar(
+                    isExpanded = true,
+                    selectedDate = state.targetDate,
+                    onBackClick = { store.dispatchEvent(DailyScheduleEvent.NavigateToBack) },
+                )
+            },
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarState,
+                    snackbar = { ErrorSnackbar(it) },
+                )
+            },
+        ) { paddingValues ->
+            EditorSplitPanes(
+                modifier = Modifier.padding(paddingValues),
+                startWeight = 1.4f,
+                endWeight = 1f,
+                startPane = {
+                    BaseDailyScheduleContent(
+                        state = state,
+                        onEditClass = { store.dispatchEvent(DailyScheduleEvent.EditClassInEditor(it)) },
+                        onCreateClass = { store.dispatchEvent(DailyScheduleEvent.CreateClassInEditor) },
+                        onDeleteClass = { store.dispatchEvent(DailyScheduleEvent.DeleteClass(it.uid)) },
+                        onSwapClasses = { from, to ->
+                            store.dispatchEvent(DailyScheduleEvent.SwapClasses(from, to))
+                        },
+                    )
+                },
+                endPane = {
+                    DailyScheduleEditorPane(
+                        isLoading = state.isLoading,
+                        editMode = state.customSchedule != null,
+                        customSchedule = state.customSchedule,
+                        onEditClick = { store.dispatchEvent(DailyScheduleEvent.CreateCustomSchedule) },
+                        onSaveClick = { store.dispatchEvent(DailyScheduleEvent.NavigateToBack) },
+                        onReturnScheduleClick = {
+                            store.dispatchEvent(DailyScheduleEvent.DeleteCustomSchedule)
+                        },
+                        onEditStartOfDay = {
+                            store.dispatchEvent(DailyScheduleEvent.FastEditStartOfDay(it))
+                        },
+                        onEditClassesDuration = {
+                            store.dispatchEvent(DailyScheduleEvent.FastEditClassesDuration(it))
+                        },
+                        onEditBreaksDuration = {
+                            store.dispatchEvent(DailyScheduleEvent.FastEditBreaksDuration(it))
+                        },
+                    )
+                },
+            )
+        }
     }
 
     store.handleEffects { effect ->

@@ -89,7 +89,7 @@ fun TabsContent(
 
     if (useNavigationRail) {
         Row(modifier = modifier.fillMaxSize()) {
-            NavigationRail(containerColor = selectedItem.containerColor) {
+            NavigationRail(containerColor = MaterialTheme.colorScheme.background) {
                 TabsBottomNavBarItems.entries.forEach { destination ->
                     val selected = selectedItem == destination
                     NavigationRailItem(

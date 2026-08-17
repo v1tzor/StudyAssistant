@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
@@ -61,6 +62,7 @@ internal fun OrganizationDataLinker(
     isLoadingLinkedOrganization: Boolean,
     allOrganizations: List<OrganizationShortUi>,
     organizationsLinkData: List<OrganizationLinkData>,
+    horizontalPadding: Dp = 16.dp,
     onLinkOrganization: (sharedOrganization: UID, linkedOrganization: UID?) -> Unit,
     onLinkSubjects: (sharedOrganization: UID, subjects: Map<UID, SubjectUi>) -> Unit,
     onLinkTeachers: (sharedOrganization: UID, teachers: Map<UID, EmployeeUi>) -> Unit,
@@ -78,16 +80,19 @@ internal fun OrganizationDataLinker(
             allOrganizations = allOrganizations,
             organizationsLinkData = organizationsLinkData,
             pagerState = organizationsPagerState,
+            horizontalPadding = horizontalPadding,
             onLinkOrganization = onLinkOrganization,
         )
         SubjectsLinkerSection(
             isLoading = isLoading,
             organizationLinkData = linkData,
+            horizontalPadding = horizontalPadding,
             onLinkSubjects = onLinkSubjects,
         )
         EmployeeLinkerSection(
             isLoading = isLoading,
             organizationLinkData = linkData,
+            horizontalPadding = horizontalPadding,
             onLinkTeachers = onLinkTeachers,
         )
     }
@@ -101,10 +106,11 @@ private fun OrganizationsSelectorSection(
     allOrganizations: List<OrganizationShortUi>,
     organizationsLinkData: List<OrganizationLinkData>,
     pagerState: PagerState,
+    horizontalPadding: Dp,
     onLinkOrganization: (sharedOrganization: UID, linkedOrganization: UID?) -> Unit,
 ) {
     Column(
-        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
@@ -166,10 +172,11 @@ private fun SubjectsLinkerSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     organizationLinkData: OrganizationLinkData?,
+    horizontalPadding: Dp,
     onLinkSubjects: (sharedOrganization: UID, subjects: Map<UID, SubjectUi>) -> Unit,
 ) {
     Column(
-        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
@@ -233,10 +240,11 @@ private fun EmployeeLinkerSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     organizationLinkData: OrganizationLinkData?,
+    horizontalPadding: Dp,
     onLinkTeachers: (sharedOrganization: UID, teachers: Map<UID, EmployeeUi>) -> Unit,
 ) {
     Column(
-        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.animateContentSize().fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(

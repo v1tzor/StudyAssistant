@@ -25,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
@@ -40,10 +41,11 @@ internal fun EmployeeFiltersView(
     selectedOrganization: UID?,
     allOrganizations: List<OrganizationShortUi>,
     onSelectOrganization: (OrganizationShortUi) -> Unit,
+    horizontalPadding: Dp = 16.dp,
 ) {
     Column(modifier = modifier) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

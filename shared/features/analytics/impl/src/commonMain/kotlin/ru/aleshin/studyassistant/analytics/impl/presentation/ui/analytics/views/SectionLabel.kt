@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +40,7 @@ internal fun SectionLabel(
     icon: ImageVector
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.Top,
     ) {
@@ -50,10 +51,11 @@ internal fun SectionLabel(
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
+            modifier = Modifier.weight(1f),
             text = title,
             style = MaterialTheme.typography.titleSmall,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

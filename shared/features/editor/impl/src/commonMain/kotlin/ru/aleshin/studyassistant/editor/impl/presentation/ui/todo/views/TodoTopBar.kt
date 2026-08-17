@@ -24,10 +24,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.editor.impl.resources.Res
 import ru.aleshin.studyassistant.editor.impl.resources.todo_editor_header
 
@@ -38,18 +41,35 @@ import ru.aleshin.studyassistant.editor.impl.resources.todo_editor_header
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun TodoTopBar(
     modifier: Modifier = Modifier,
+    isExpanded: Boolean = false,
     onBackClick: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = { Text(text = stringResource(Res.string.todo_editor_header)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onBackClick) {
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+        }
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.background,
     )
+    if (isExpanded) {
+        TopAppBar(
+            modifier = modifier,
+            title = {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.todo_editor_header),
+                    textAlign = TextAlign.Start,
+                )
+            },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    } else {
+        CenterAlignedTopAppBar(
+            modifier = modifier,
+            title = { Text(text = stringResource(Res.string.todo_editor_header)) },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    }
 }

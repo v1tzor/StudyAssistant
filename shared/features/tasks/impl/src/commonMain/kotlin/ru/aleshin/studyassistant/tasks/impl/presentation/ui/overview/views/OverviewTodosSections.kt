@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +69,7 @@ import ru.aleshin.studyassistant.tasks.impl.resources.in_progress_todos_section_
 internal fun OverviewTodosInProgressSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    useExpandedStyle: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
@@ -165,7 +167,9 @@ internal fun OverviewTodosInProgressSection(
                         }
                     } else {
                         item {
-                            TodoViewNoneItem(modifier = Modifier.fillParentMaxWidth())
+                            TodoViewNoneItem(
+                                modifier = if (useExpandedStyle) Modifier.width(240.dp) else Modifier.fillParentMaxWidth()
+                            )
                         }
                     }
                 }
@@ -187,6 +191,7 @@ internal fun OverviewTodosInProgressSection(
 internal fun OverviewTodosErrorSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    useExpandedStyle: Boolean,
     currentDate: Instant,
     todos: List<TodoDetailsUi>,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
@@ -284,7 +289,9 @@ internal fun OverviewTodosErrorSection(
                         }
                     } else {
                         item {
-                            TodoViewNoneItem(modifier = Modifier.fillParentMaxWidth())
+                            TodoViewNoneItem(
+                                modifier = if (useExpandedStyle) Modifier.width(240.dp) else Modifier.fillParentMaxWidth()
+                            )
                         }
                     }
                 }
@@ -306,6 +313,7 @@ internal fun OverviewTodosErrorSection(
 internal fun OverviewTodosCompletedSection(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    useExpandedStyle: Boolean,
     todos: List<TodoDetailsUi>,
     onOpenTodoTask: (TodoDetailsUi) -> Unit,
     onChangeTodoDone: (TodoDetailsUi, Boolean) -> Unit,
@@ -373,7 +381,9 @@ internal fun OverviewTodosCompletedSection(
                         }
                     } else {
                         item {
-                            TodoViewNoneItem(modifier = Modifier.fillParentMaxWidth())
+                            TodoViewNoneItem(
+                                modifier = if (useExpandedStyle) Modifier.width(240.dp) else Modifier.fillParentMaxWidth()
+                            )
                         }
                     }
                 }

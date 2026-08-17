@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,10 +40,13 @@ import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
 import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEffect
@@ -53,6 +57,9 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.Im
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSubjectEditorSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportTeacherEditorSheet
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportTopBar
+import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_new_subject_name
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_new_teacher_name
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -71,6 +78,10 @@ internal fun ImportContent(
     var editingClassId by rememberSaveable { mutableStateOf<String?>(null) }
     var editingSubjectId by rememberSaveable { mutableStateOf<String?>(null) }
     var editingEmployeeId by rememberSaveable { mutableStateOf<String?>(null) }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchImportLayoutMode()
+    val isExpanded = layoutMode == ImportLayoutMode.EXPANDED
+    val newSubjectName = stringResource(Res.string.schedule_import_new_subject_name)
+    val newTeacherName = stringResource(Res.string.schedule_import_new_teacher_name)
 
     val galleryLauncher = rememberFilePickerLauncher(
         type = FileKitType.Image,
@@ -84,7 +95,8 @@ internal fun ImportContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             ImportTopBar(
-                onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) }
+                isExpanded = isExpanded,
+                onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) },
             )
         },
         bottomBar = {
@@ -92,6 +104,16 @@ internal fun ImportContent(
                 ImportBottomActionBar(
                     enabled = !state.isRewardInProgress && !state.isAnalysisInProgress,
                     isLoadingAccept = state.isRewardInProgress || state.isAnalysisInProgress,
+                    contentMaxWidth = if (isExpanded) {
+                        AdaptiveLayoutDefaults.MediumContentMaxWidth
+                    } else {
+                        null
+                    },
+                    horizontalPadding = if (isExpanded) {
+                        AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+                    } else {
+                        AdaptiveLayoutDefaults.CompactHorizontalPadding
+                    },
                     onSaveClick = { store.dispatchEvent(ImportEvent.ApplySession) },
                     onEditSourceClick = { store.dispatchEvent(ImportEvent.EditSource) },
                 )
@@ -108,6 +130,7 @@ internal fun ImportContent(
         ImportLayout(
             modifier = Modifier.padding(contentPadding),
             state = state,
+            layoutMode = layoutMode,
             onSelectPhoto = { galleryLauncher.launch() },
             onTakePhoto = { cameraLauncher.launch(cameraFacing = FileKitCameraFacing.Back) },
             onNoteChanged = { note -> store.dispatchEvent(ImportEvent.UpdateNote(note)) },
@@ -122,6 +145,16 @@ internal fun ImportContent(
             },
             onSubjectClick = { subjectId -> editingSubjectId = subjectId },
             onTeacherClick = { employeeId -> editingEmployeeId = employeeId },
+            onAddSubject = {
+                val uid = randomUUID()
+                store.dispatchEvent(ImportEvent.AddSubject(name = newSubjectName, uid = uid))
+                editingSubjectId = uid
+            },
+            onAddTeacher = {
+                val uid = randomUUID()
+                store.dispatchEvent(ImportEvent.AddEmployee(firstName = newTeacherName, uid = uid))
+                editingEmployeeId = uid
+            },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
         )
     }

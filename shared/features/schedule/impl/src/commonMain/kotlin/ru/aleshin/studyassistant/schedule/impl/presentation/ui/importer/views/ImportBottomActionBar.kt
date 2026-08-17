@@ -20,10 +20,13 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Button
@@ -34,8 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_apply_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_edit_source_button
@@ -48,11 +53,29 @@ internal fun ImportBottomActionBar(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoadingAccept: Boolean,
+    contentMaxWidth: Dp? = null,
+    horizontalPadding: Dp = AdaptiveLayoutDefaults.CompactHorizontalPadding,
     onSaveClick: () -> Unit,
     onEditSourceClick: () -> Unit,
 ) {
+    val barModifier = if (contentMaxWidth != null) {
+        Modifier
+            .widthIn(max = contentMaxWidth)
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = horizontalPadding, vertical = AdaptiveLayoutDefaults.SpaceLarge)
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = horizontalPadding, vertical = AdaptiveLayoutDefaults.SpaceLarge)
+    }
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopStart,
+    ) {
     Row(
-        modifier = modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 16.dp),
+        modifier = barModifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -99,5 +122,6 @@ internal fun ImportBottomActionBar(
                 maxLines = 1,
             )
         }
+    }
     }
 }

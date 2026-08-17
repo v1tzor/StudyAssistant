@@ -41,7 +41,6 @@ internal sealed class ProfileEvent : StoreEvent {
     data class UpdateAvatar(val file: PlatformFile) : ProfileEvent()
     data object DeleteAvatar : ProfileEvent()
     data class UpdateUsername(val name: String) : ProfileEvent()
-    data class UpdateDescription(val text: String?) : ProfileEvent()
     data class UpdateBirthday(val text: String?) : ProfileEvent()
     data class UpdateGender(val gender: Gender?) : ProfileEvent()
     data class UpdateCity(val city: String?) : ProfileEvent()

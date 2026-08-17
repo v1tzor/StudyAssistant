@@ -31,6 +31,16 @@
     <string name="tasks_progress_title">Выполнено заданий</string>
     <string name="complete_schedule_title">Нету ближайших событий</string>
     <string name="analysis_day_title">Анализ дня</string>
+    <string name="analysis_workload_title">Загруженность</string>
+    <string name="overview_pane_header">Расписание</string>
+    <string name="overview_today_desc">Перейти к сегодня</string>
+    <string name="overview_week_view_desc">Недельное расписание</string>
+    <string name="overview_edit_desc">Редактировать расписание</string>
+    <string name="previous_date_desc">Предыдущий день</string>
+    <string name="next_date_desc">Следующий день</string>
+    <string name="choose_date_desc">Выбрать дату</string>
+    <string name="date_picker_confirm">Выбрать</string>
+    <string name="date_picker_cancel">Отменить</string>
     <string name="analysis_homeworks_label">Задания</string>
     <string name="analysis_tests_label">Тесты</string>
     <string name="analysis_classes_label">Занятия</string>
@@ -156,6 +166,7 @@
     <string name="schedule_import_catalog_existing_label">В организации</string>
     <string name="schedule_import_new_subject_name">Новый предмет</string>
     <string name="schedule_import_new_teacher_name">Новый преподаватель</string>
+    <string name="schedule_import_add_button">Добавить</string>
     <string name="schedule_import_class_editor_title">Занятие</string>
     <string name="schedule_import_subject_editor_title">Предмет</string>
     <string name="schedule_import_teacher_editor_title">Преподаватель</string>

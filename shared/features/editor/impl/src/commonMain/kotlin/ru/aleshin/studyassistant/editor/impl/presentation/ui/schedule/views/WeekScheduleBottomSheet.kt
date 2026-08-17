@@ -23,6 +23,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -61,6 +62,7 @@ import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.presentation.models.organizations.ScheduleTimeIntervalsUi
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SegmentedButtons
 import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
@@ -135,21 +137,62 @@ internal fun WeekScheduleBottomSheet(
 }
 
 @Composable
-private fun WeekScheduleBottomSheetHeader(
+internal fun WeekScheduleEditorPane(
+    modifier: Modifier = Modifier,
+    isLoading: Boolean,
+    weekSchedule: BaseWeekScheduleUi?,
+    maxNumberOfWeek: NumberOfRepeatWeek?,
+    selectedWeek: NumberOfRepeatWeek,
+    organizations: List<OrganizationShortUi>,
+    onSelectedWeek: (NumberOfRepeatWeek) -> Unit,
+    onUpdateOrganization: (OrganizationShortUi) -> Unit,
+    onAddOrganization: () -> Unit,
+    onSaveClick: () -> Unit,
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.SpaceExtraLarge),
+    ) {
+        WeekScheduleBottomSheetHeader(
+            isLoading = isLoading,
+            numberOfClasses = weekSchedule?.weekDaySchedules?.values?.sumOf { schedule ->
+                schedule.classes.size
+            } ?: 0,
+            maxNumberOfWeek = maxNumberOfWeek,
+            selectedWeek = selectedWeek,
+            contentPadding = PaddingValues(),
+            stacked = true,
+            onSelectedWeek = onSelectedWeek,
+        )
+        WeekScheduleBottomSheetContent(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            isLoading = isLoading,
+            organizations = organizations,
+            contentPadding = PaddingValues(),
+            onAddOrganization = onAddOrganization,
+            onUpdateOrganization = onUpdateOrganization,
+        )
+        WeekScheduleBottomSheetFooter(
+            contentPadding = PaddingValues(),
+            onSaveClick = onSaveClick,
+        )
+    }
+}
+
+@Composable
+internal fun WeekScheduleBottomSheetHeader(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     numberOfClasses: Int,
     maxNumberOfWeek: NumberOfRepeatWeek?,
     selectedWeek: NumberOfRepeatWeek,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+    stacked: Boolean = false,
     onSelectedWeek: (NumberOfRepeatWeek) -> Unit,
 ) {
-    Row(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    val title: @Composable (Modifier) -> Unit = { titleModifier ->
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = titleModifier,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
@@ -181,21 +224,43 @@ private fun WeekScheduleBottomSheetHeader(
                 }
             }
         }
+    }
+    val weekSelector: @Composable (Modifier) -> Unit = { selectorModifier ->
         SegmentedButtons(
-            modifier = Modifier.width(180.dp),
+            modifier = selectorModifier,
             enabled = { it.isoWeekNumber <= (maxNumberOfWeek?.toItem()?.isoWeekNumber ?: -1) },
             items = NumberOfWeekItem.entries.toTypedArray(),
             selectedItem = selectedWeek.toItem(),
             onItemClick = { onSelectedWeek(it.toModel()) },
         )
     }
+
+    if (stacked) {
+        Column(
+            modifier = modifier.padding(contentPadding),
+            verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.SpaceLarge),
+        ) {
+            title(Modifier.fillMaxWidth())
+            weekSelector(Modifier.fillMaxWidth())
+        }
+    } else {
+        Row(
+            modifier = modifier.padding(contentPadding),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            title(Modifier.weight(1f))
+            weekSelector(Modifier.width(180.dp))
+        }
+    }
 }
 
 @Composable
-private fun WeekScheduleBottomSheetContent(
+internal fun WeekScheduleBottomSheetContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     organizations: List<OrganizationShortUi>,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
     onAddOrganization: () -> Unit,
     onUpdateOrganization: (OrganizationShortUi) -> Unit,
 ) {
@@ -203,7 +268,7 @@ private fun WeekScheduleBottomSheetContent(
     var scheduleIntervalsDialogState by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+        modifier = modifier.padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
@@ -257,13 +322,14 @@ private fun WeekScheduleBottomSheetContent(
 }
 
 @Composable
-private fun WeekScheduleBottomSheetFooter(
+internal fun WeekScheduleBottomSheetFooter(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
     onSaveClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+        modifier = modifier.padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

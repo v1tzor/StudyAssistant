@@ -24,23 +24,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
@@ -71,6 +74,7 @@ import ru.aleshin.studyassistant.core.ui.resources.ok_confirm_title as core_ok_c
 internal fun ShareLayout(
     modifier: Modifier = Modifier,
     state: ShareState,
+    contentMaxWidth: Dp? = null,
     onCodeChange: (String) -> Unit,
     onOpenClick: () -> Unit,
     onScanClick: () -> Unit,
@@ -88,12 +92,14 @@ internal fun ShareLayout(
         when (status) {
             HomeworkShareStatus.INPUT -> ShareInputLayout(
                 state = state,
+                contentMaxWidth = contentMaxWidth,
                 onCodeChange = onCodeChange,
                 onOpenClick = onOpenClick,
                 onScanClick = onScanClick,
             )
             HomeworkShareStatus.PREVIEW -> SharePreviewLayout(
                 state = state,
+                contentMaxWidth = contentMaxWidth,
                 onLinkRequest = onLinkRequest,
             )
             HomeworkShareStatus.LOADING, HomeworkShareStatus.IMPORTING -> {
@@ -127,41 +133,67 @@ internal fun ShareLayout(
 private fun ShareInputLayout(
     modifier: Modifier = Modifier,
     state: ShareState,
+    contentMaxWidth: Dp? = null,
     onCodeChange: (String) -> Unit,
     onOpenClick: () -> Unit,
     onScanClick: () -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.receive_homework_share_title),
-            style = MaterialTheme.typography.titleLarge,
-        )
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = state.code,
-            onValueChange = onCodeChange,
-            singleLine = true,
-            shape = MaterialTheme.shapes.large,
-            label = { Text(text = stringResource(Res.string.share_code_label)) },
-            placeholder = { Text(text = stringResource(Res.string.share_code_placeholder)) },
-        )
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = state.code.count { character -> character.isLetterOrDigit() } == SHARE_CODE_LENGTH,
-            onClick = onOpenClick,
+    val form: @Composable (Modifier) -> Unit = { formModifier ->
+        Column(
+            modifier = formModifier,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(text = stringResource(Res.string.open_share_title))
+            Text(
+                text = stringResource(Res.string.receive_homework_share_title),
+                style = MaterialTheme.typography.titleLarge,
+            )
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.code,
+                onValueChange = onCodeChange,
+                singleLine = true,
+                shape = MaterialTheme.shapes.large,
+                label = { Text(text = stringResource(Res.string.share_code_label)) },
+                placeholder = { Text(text = stringResource(Res.string.share_code_placeholder)) },
+            )
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = state.code.count { character -> character.isLetterOrDigit() } == SHARE_CODE_LENGTH,
+                onClick = onOpenClick,
+            ) {
+                Text(text = stringResource(Res.string.open_share_title))
+            }
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onScanClick,
+            ) {
+                Text(text = stringResource(Res.string.scan_qr_button_title))
+            }
         }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onScanClick,
+    }
+
+    if (contentMaxWidth == null) {
+        form(
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            contentAlignment = Alignment.TopStart,
         ) {
-            Text(text = stringResource(Res.string.scan_qr_button_title))
+            Surface(
+                modifier = Modifier
+                    .widthIn(max = contentMaxWidth)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraLarge,
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+            ) {
+                form(Modifier.padding(24.dp))
+            }
         }
     }
 }
@@ -170,52 +202,76 @@ private fun ShareInputLayout(
 private fun SharePreviewLayout(
     modifier: Modifier = Modifier,
     state: ShareState,
+    contentMaxWidth: Dp? = null,
     onLinkRequest: () -> Unit,
 ) {
     val share = checkNotNull(state.share)
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+    val preview: @Composable (Modifier) -> Unit = { paneModifier ->
+        Column(
+            modifier = paneModifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = share.senderName,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = share.date.formatByTimeZone(DateTimeComponents.Formats.dayMonthYearFormat()),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                share.homeworks.forEach { homework ->
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     Text(
-                        text = stringResource(
-                            Res.string.homework_share_subject_item,
-                            homework.subjectName,
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = share.senderName,
+                        style = MaterialTheme.typography.titleMedium,
                     )
+                    Text(
+                        text = share.date.formatByTimeZone(DateTimeComponents.Formats.dayMonthYearFormat()),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    share.homeworks.forEach { homework ->
+                        Text(
+                            text = stringResource(Res.string.homework_share_subject_item, homework.subjectName),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onLinkRequest,
+            ) {
+                Text(text = stringResource(Res.string.accept_homework_title))
+            }
         }
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onLinkRequest,
+    }
+
+    if (contentMaxWidth == null) {
+        preview(
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        )
+    } else {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopStart,
         ) {
-            Text(text = stringResource(Res.string.accept_homework_title))
+            preview(
+                Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = contentMaxWidth)
+                    .fillMaxWidth()
+                    .padding(24.dp),
+            )
         }
     }
 }
 
 @Composable
-private fun ShareLoadingState(modifier: Modifier = Modifier) {
+private fun ShareLoadingState(
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

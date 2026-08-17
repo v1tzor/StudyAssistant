@@ -16,8 +16,12 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +48,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
@@ -55,6 +61,9 @@ import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.settings.WeekScheduleViewType
+import ru.aleshin.studyassistant.core.ui.utils.isBookPosture
+import ru.aleshin.studyassistant.core.ui.utils.isCompactHeight
+import ru.aleshin.studyassistant.core.ui.utils.useExpandedLayout
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.schedule.impl.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.classes.ActiveClassUi
@@ -65,6 +74,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.common.ClassBotto
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsEvent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.contract.DetailsState
+import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.layouts.DetailsExpandedWeekSection
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.store.DetailsComponent
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleView
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views.CommonScheduleViewPlaceholder
@@ -82,29 +92,16 @@ internal fun DetailsContent(
     val store = detailsComponent.store
     val state by store.stateAsState()
     val snackbarState = remember { SnackbarHostState() }
+    val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val useExpandedWeek = adaptiveInfo.useExpandedLayout ||
+        (adaptiveInfo.isBookPosture && !adaptiveInfo.isCompactHeight)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        content = { paddingValues ->
-            BaseDetailsContent(
-                state = state,
-                modifier = Modifier.padding(paddingValues),
-                onEditHomeworkClick = {
-                    store.dispatchEvent(DetailsEvent.ClickEditHomework(it))
-                },
-                onAddHomeworkClick = { homework, date ->
-                    store.dispatchEvent(DetailsEvent.ClickAddHomework(homework, date))
-                },
-                onAgainHomeworkClick = {
-                    store.dispatchEvent(DetailsEvent.ClickAgainHomework(it))
-                },
-                onCompleteHomework = {
-                    store.dispatchEvent(DetailsEvent.CompleteHomework(it))
-                },
-            )
-        },
         topBar = {
             DetailsTopBar(
+                showNavigationIcon = !useExpandedWeek,
+                titleAlign = if (useExpandedWeek) TextAlign.Start else TextAlign.Center,
                 onEditClick = {
                     store.dispatchEvent(DetailsEvent.ClickEdit)
                 },
@@ -121,6 +118,7 @@ internal fun DetailsContent(
                 currentWeek = state.currentDate.dateTime().weekTimeRange(),
                 selectedWeek = state.selectedWeek,
                 viewType = state.scheduleView,
+                useExpandedWeek = useExpandedWeek,
                 onNextWeekSelected = {
                     store.dispatchEvent(DetailsEvent.SelectedNextWeek)
                 },
@@ -138,7 +136,51 @@ internal fun DetailsContent(
                 snackbar = { ErrorSnackbar(it) },
             )
         },
-    )
+    ) { paddingValues ->
+        AnimatedContent(
+            targetState = useExpandedWeek,
+            modifier = Modifier.padding(paddingValues),
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "DetailsLayout",
+        ) { expandedWeek ->
+            if (expandedWeek) {
+                DetailsExpandedWeekSection(
+                    isLoading = state.isLoading,
+                    currentDate = state.currentDate,
+                    weekSchedule = state.weekSchedule,
+                    activeClass = state.activeClass,
+                    onAddHomeworkClick = { homework, date ->
+                        store.dispatchEvent(DetailsEvent.ClickAddHomework(homework, date))
+                    },
+                    onEditHomeworkClick = {
+                        store.dispatchEvent(DetailsEvent.ClickEditHomework(it))
+                    },
+                    onAgainHomeworkClick = {
+                        store.dispatchEvent(DetailsEvent.ClickAgainHomework(it))
+                    },
+                    onCompleteHomeworkClick = {
+                        store.dispatchEvent(DetailsEvent.CompleteHomework(it))
+                    },
+                )
+            } else {
+                BaseDetailsContent(
+                    state = state,
+                    onEditHomeworkClick = {
+                        store.dispatchEvent(DetailsEvent.ClickEditHomework(it))
+                    },
+                    onAddHomeworkClick = { homework, date ->
+                        store.dispatchEvent(DetailsEvent.ClickAddHomework(homework, date))
+                    },
+                    onAgainHomeworkClick = {
+                        store.dispatchEvent(DetailsEvent.ClickAgainHomework(it))
+                    },
+                    onCompleteHomework = {
+                        store.dispatchEvent(DetailsEvent.CompleteHomework(it))
+                    },
+                )
+            }
+        }
+    }
 
     store.handleEffects { effect ->
         when (effect) {

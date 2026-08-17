@@ -49,15 +49,22 @@ internal fun ShortEmployeeView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     avatar: String?,
     post: EmployeePost,
     firstName: String,
     secondName: String?,
     subjects: List<SubjectUi>,
 ) {
+    val sizedModifier = if (useExpandedStyle) {
+        modifier.fillMaxWidth()
+    } else {
+        modifier.width(300.dp)
+    }
+
     Surface(
         onClick = onClick,
-        modifier = modifier.width(300.dp),
+        modifier = sizedModifier,
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,

@@ -24,10 +24,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.todos_header
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -40,22 +43,39 @@ import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_i
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun TodoTopBar(
     modifier: Modifier = Modifier,
+    titleAlign: TextAlign = TextAlign.Center,
     onBackClick: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = { Text(text = stringResource(Res.string.todos_header)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.background,
     )
+    if (titleAlign == TextAlign.Start) {
+        TopAppBar(
+            modifier = modifier,
+            title = {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.todos_header),
+                    textAlign = TextAlign.Start,
+                )
+            },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    } else {
+        CenterAlignedTopAppBar(
+            modifier = modifier,
+            title = { Text(text = stringResource(Res.string.todos_header)) },
+            navigationIcon = navigationIcon,
+            colors = colors,
+        )
+    }
 }

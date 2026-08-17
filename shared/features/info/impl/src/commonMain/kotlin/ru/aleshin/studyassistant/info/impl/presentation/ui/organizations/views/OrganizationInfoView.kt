@@ -66,14 +66,23 @@ internal fun OrganizationView(
     modifier: Modifier = Modifier,
     organizationData: OrganizationUi,
     classesInfo: OrganizationClassesInfoUi?,
+    useExpandedStyle: Boolean = false,
 ) {
+    val contentPadding = if (useExpandedStyle) 16.dp else 12.dp
+    val avatarSize = if (useExpandedStyle) 120.dp else 100.dp
+    val nameStyle = if (useExpandedStyle) {
+        MaterialTheme.typography.titleLarge
+    } else {
+        MaterialTheme.typography.titleMedium
+    }
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(
@@ -81,7 +90,7 @@ internal fun OrganizationView(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AvatarView(
-                    modifier = modifier.size(100.dp),
+                    modifier = Modifier.size(avatarSize),
                     firstName = organizationData.shortName.split(' ').getOrElse(0) { "-" },
                     secondName = organizationData.shortName.split(' ').getOrNull(1),
                     imageUrl = organizationData.avatar,
@@ -104,7 +113,7 @@ internal fun OrganizationView(
                         fontWeight = FontWeight.Bold,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = nameStyle,
                     )
                 }
             }

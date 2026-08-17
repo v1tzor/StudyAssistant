@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.settings.impl.domain.interactors
 
 import kotlinx.coroutines.flow.first
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.settings.CalendarSettings
@@ -37,7 +38,7 @@ import ru.aleshin.studyassistant.settings.impl.domain.entities.SettingsFailures
  */
 internal interface UserDataInteractor {
 
-    suspend fun deleteCurrentSchedule(): UnitDomainResult<SettingsFailures>
+    suspend fun deleteCurrentSchedule(organizationIds: Set<UID>): UnitDomainResult<SettingsFailures>
     suspend fun deleteAllUserData(): UnitDomainResult<SettingsFailures>
 
     class Base(
@@ -53,10 +54,13 @@ internal interface UserDataInteractor {
         private val eitherWrapper: SettingsEitherWrapper,
     ) : UserDataInteractor {
 
-        override suspend fun deleteCurrentSchedule() = eitherWrapper.wrapUnit {
-            userDataResetRepository.deleteAllSchedules()
-            startClassesReminderManager.stopReminderService(emptyList())
-            endClassesReminderManager.stopReminderService(emptyList())
+        override suspend fun deleteCurrentSchedule(organizationIds: Set<UID>) = eitherWrapper.wrapUnit {
+            if (organizationIds.isEmpty()) return@wrapUnit
+            userDataResetRepository.deleteSchedulesByOrganizations(organizationIds)
+            startClassesReminderManager.stopReminderService(organizationIds.toList())
+            endClassesReminderManager.stopReminderService(organizationIds.toList())
+            startClassesReminderManager.startOrRetryReminderService()
+            endClassesReminderManager.startOrRetryReminderService()
         }
 
         override suspend fun deleteAllUserData() = eitherWrapper.wrapUnit {

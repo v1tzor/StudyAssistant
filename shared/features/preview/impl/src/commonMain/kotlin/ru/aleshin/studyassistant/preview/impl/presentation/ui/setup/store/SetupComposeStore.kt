@@ -124,6 +124,12 @@ internal class SetupComposeStore(
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
+            is SetupEvent.ClickImportSchedule -> {
+                launchBackgroundWork(BackgroundKey.FINISH_SETUP) {
+                    val command = SetupWorkCommand.FinishSetup(SetupDestination.SCHEDULE_IMPORT)
+                    workProcessor.work(command).collectAndHandleWork()
+                }
+            }
             is SetupEvent.ClickGoToApp -> {
                 launchBackgroundWork(BackgroundKey.FINISH_SETUP) {
                     val command = SetupWorkCommand.FinishSetup(SetupDestination.APP)

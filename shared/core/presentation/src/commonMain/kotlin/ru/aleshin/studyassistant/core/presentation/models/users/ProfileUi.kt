@@ -30,7 +30,6 @@ data class ProfileUi(
     val uid: UID,
     val username: String,
     val avatar: String? = null,
-    val description: String? = null,
     val city: String? = null,
     val birthday: String? = null,
     val gender: Gender? = null,

@@ -43,6 +43,8 @@ import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun DetailsTopBar(
     modifier: Modifier = Modifier,
+    showNavigationIcon: Boolean = true,
+    titleAlign: TextAlign = TextAlign.Center,
     onEditClick: () -> Unit,
     onOverviewClick: () -> Unit,
     onCurrentWeekSelected: () -> Unit,
@@ -52,21 +54,30 @@ internal fun DetailsTopBar(
         title = {
             TopAppBarTitle(
                 header = stringResource(Res.string.details_header),
-                textAlign = TextAlign.Center,
+                textAlign = titleAlign,
             )
         },
         navigationIcon = {
-            Row {
-                TopAppBarButton(
-                    imagePainter = painterResource(Res.drawable.ic_table_edit),
-                    imageDescription = null,
-                    onButtonClick = onEditClick,
-                )
-                TopAppBarEmptyButton()
+            if (showNavigationIcon) {
+                Row {
+                    TopAppBarButton(
+                        imagePainter = painterResource(Res.drawable.ic_table_edit),
+                        imageDescription = null,
+                        onButtonClick = onEditClick,
+                    )
+                    TopAppBarEmptyButton()
+                }
             }
         },
         actions = {
             Row {
+                if (!showNavigationIcon) {
+                    TopAppBarButton(
+                        imagePainter = painterResource(Res.drawable.ic_table_edit),
+                        imageDescription = null,
+                        onButtonClick = onEditClick,
+                    )
+                }
                 TopAppBarButton(
                     imagePainter = painterResource(CoreRes.drawable.core_ic_calendar_today),
                     imageDescription = null,

@@ -16,7 +16,11 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.details.views
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -67,6 +71,7 @@ internal fun DetailsBottomBar(
     currentWeek: TimeRange?,
     selectedWeek: TimeRange?,
     viewType: WeekScheduleViewType,
+    useExpandedWeek: Boolean,
     onNextWeekSelected: () -> Unit,
     onPreviousWeekSelected: () -> Unit,
     onViewTypeSelected: (WeekScheduleViewType) -> Unit,
@@ -74,24 +79,41 @@ internal fun DetailsBottomBar(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge.topSide,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        color = if (useExpandedWeek) {
+            MaterialTheme.colorScheme.background
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        },
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = if (useExpandedWeek) {
+                Arrangement.End
+            } else {
+                Arrangement.spacedBy(16.dp)
+            }
         ) {
             WeekPickerView(
+                modifier = if (useExpandedWeek) Modifier.padding(bottom = 12.dp, end = 12.dp) else Modifier,
                 currentWeek = currentWeek,
                 selectedWeek = selectedWeek,
                 onPreviousWeekSelected = onPreviousWeekSelected,
                 onNextWeekSelected = onNextWeekSelected,
             )
-            Spacer(modifier = Modifier.weight(1f))
-            ScheduleViewTypePicker(
-                selectedType = viewType,
-                onSelected = onViewTypeSelected,
-            )
+            if (!useExpandedWeek) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            AnimatedVisibility(
+                visible = !useExpandedWeek,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut(),
+            ) {
+                ScheduleViewTypePicker(
+                    selectedType = viewType,
+                    onSelected = onViewTypeSelected,
+                )
+            }
         }
     }
 }

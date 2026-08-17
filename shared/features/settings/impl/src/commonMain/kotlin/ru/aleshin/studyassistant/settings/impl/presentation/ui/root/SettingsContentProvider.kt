@@ -16,16 +16,12 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.root
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
@@ -36,11 +32,10 @@ import ru.aleshin.studyassistant.core.common.inject.FeatureContentProvider
 import ru.aleshin.studyassistant.core.ui.views.TabItem
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.AiSettingsContent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.calendar.CalendarContent
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.fetchSettingsLayoutMode
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.general.GeneralContent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.info.AboutAppContent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.contract.TabNavigationEvent
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views.TabNavigationRow
-import ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views.TabNavigationTopBar
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.notification.NotificationContent
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.root.SettingsFeatureComponent.Child
 import ru.aleshin.studyassistant.settings.impl.resources.Res
@@ -63,64 +58,56 @@ internal class SettingsContentProvider(
     override fun RootContent(modifier: Modifier) {
         val store = component.store
         val stack by component.stack.subscribeAsState()
+        val layoutMode = currentWindowAdaptiveInfoV2().fetchSettingsLayoutMode()
+        val selectedItem = remember(stack.active) {
+            when (stack.active.instance) {
+                is Child.GeneralChild -> SettingsTabItem.GENERAL
+                is Child.CalendarChild -> SettingsTabItem.CALENDAR
+                is Child.NotificationChild -> SettingsTabItem.NOTIFICATION
+                is Child.AiSettingsChild -> SettingsTabItem.AI
+                is Child.AboutAppChild -> SettingsTabItem.ABOUT_APP
+            }
+        }
 
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            content = { paddingValues ->
-                ChildStack(
-                    modifier = Modifier.padding(paddingValues),
-                    stack = stack,
-                    animation = stackAnimation(),
-                ) { child ->
-                    when (val instance = child.instance) {
-                        is Child.GeneralChild -> GeneralContent(instance.component)
-                        is Child.AboutAppChild -> AboutAppContent(instance.component)
-                        is Child.CalendarChild -> CalendarContent(instance.component)
-                        is Child.AiSettingsChild -> AiSettingsContent(instance.component)
-                        is Child.NotificationChild -> NotificationContent(instance.component)
+        SettingsLayout(
+            modifier = modifier,
+            layoutMode = layoutMode,
+            selectedItem = selectedItem,
+            onBackClick = { store.dispatchEvent(TabNavigationEvent.NavigateToBack) },
+            onSelectTab = { tabItem ->
+                when (tabItem) {
+                    SettingsTabItem.GENERAL -> {
+                        store.dispatchEvent(TabNavigationEvent.NavigateToGeneral)
+                    }
+                    SettingsTabItem.NOTIFICATION -> {
+                        store.dispatchEvent(TabNavigationEvent.NavigateToNotification)
+                    }
+                    SettingsTabItem.CALENDAR -> {
+                        store.dispatchEvent(TabNavigationEvent.NavigateToCalendar)
+                    }
+                    SettingsTabItem.AI -> {
+                        store.dispatchEvent(TabNavigationEvent.NavigateToAi)
+                    }
+                    SettingsTabItem.ABOUT_APP -> {
+                        store.dispatchEvent(TabNavigationEvent.NavigateToAboutApp)
                     }
                 }
             },
-            topBar = {
-                Column {
-                    TabNavigationTopBar(
-                        onBackClick = { store.dispatchEvent(TabNavigationEvent.NavigateToBack) },
-                    )
-                    TabNavigationRow(
-                        selectedItem = remember(stack.active) {
-                            when (stack.active.instance) {
-                                is Child.GeneralChild -> SettingsTabItem.GENERAL
-                                is Child.CalendarChild -> SettingsTabItem.CALENDAR
-                                is Child.NotificationChild -> SettingsTabItem.NOTIFICATION
-                                is Child.AiSettingsChild -> SettingsTabItem.AI
-                                is Child.AboutAppChild -> SettingsTabItem.ABOUT_APP
-                            }
-                        },
-                        onSelect = { tabItem ->
-                            when (tabItem) {
-                                SettingsTabItem.GENERAL -> {
-                                    store.dispatchEvent(TabNavigationEvent.NavigateToGeneral)
-                                }
-                                SettingsTabItem.NOTIFICATION -> {
-                                    store.dispatchEvent(TabNavigationEvent.NavigateToNotification)
-                                }
-                                SettingsTabItem.CALENDAR -> {
-                                    store.dispatchEvent(TabNavigationEvent.NavigateToCalendar)
-                                }
-                                SettingsTabItem.AI -> {
-                                    store.dispatchEvent(TabNavigationEvent.NavigateToAi)
-                                }
-                                SettingsTabItem.ABOUT_APP -> {
-                                    store.dispatchEvent(TabNavigationEvent.NavigateToAboutApp)
-                                }
-                            }
-                        },
-                    )
+        ) { paddingValues ->
+            ChildStack(
+                modifier = Modifier.padding(paddingValues),
+                stack = stack,
+                animation = stackAnimation(),
+            ) { child ->
+                when (val instance = child.instance) {
+                    is Child.GeneralChild -> GeneralContent(instance.component)
+                    is Child.AboutAppChild -> AboutAppContent(instance.component)
+                    is Child.CalendarChild -> CalendarContent(instance.component)
+                    is Child.AiSettingsChild -> AiSettingsContent(instance.component)
+                    is Child.NotificationChild -> NotificationContent(instance.component)
                 }
-            },
-            contentWindowInsets = WindowInsets(0.dp),
-        )
-
+            }
+        }
     }
 }
 

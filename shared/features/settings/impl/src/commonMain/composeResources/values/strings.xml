@@ -26,7 +26,11 @@
     <string name="theme_chooser_view_title">Theme</string>
     <string name="delete_schedule_button">Delete current schedule</string>
     <string name="delete_schedule_warning_title">Delete the schedule?</string>
-    <string name="delete_schedule_warning_text">This removes only the current timetable. Organizations, teachers, and subjects stay saved.</string>
+    <string name="delete_schedule_warning_text">This removes the timetable only for the selected organizations. Organizations, teachers, and subjects stay saved.</string>
+    <string name="delete_schedule_organizations_title">Organizations</string>
+    <string name="delete_schedule_main_label">Main</string>
+    <string name="delete_schedule_select_all">Select all</string>
+    <string name="delete_schedule_empty_organizations">Create an organization first.</string>
     <string name="delete_all_data_button">Delete all data</string>
     <string name="delete_all_data_warning_title">Delete all data?</string>
     <string name="delete_all_data_warning_text">This permanently deletes the profile, organizations, teachers, subjects, schedule, tasks, and chat history. You will go through setup again.</string>

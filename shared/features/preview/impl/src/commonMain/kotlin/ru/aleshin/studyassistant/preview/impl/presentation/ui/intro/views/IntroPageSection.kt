@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -43,10 +44,12 @@ internal fun IntroPageSection(
     page: IntroPage,
     useHorizontalLayout: Boolean,
     modifier: Modifier = Modifier,
+    horizontalPadding: Dp? = null,
 ) {
+    val resolvedHorizontalPadding = horizontalPadding ?: if (useHorizontalLayout) 48.dp else 24.dp
     if (useHorizontalLayout) {
         Row(
-            modifier = modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = 24.dp),
+            modifier = modifier.fillMaxSize().padding(horizontal = resolvedHorizontalPadding, vertical = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(48.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -61,7 +64,7 @@ internal fun IntroPageSection(
         }
     } else {
         Column(
-            modifier = modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 24.dp),
+            modifier = modifier.fillMaxSize().padding(horizontal = resolvedHorizontalPadding, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

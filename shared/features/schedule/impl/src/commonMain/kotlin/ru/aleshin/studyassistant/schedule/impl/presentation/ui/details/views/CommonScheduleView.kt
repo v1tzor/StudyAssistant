@@ -22,12 +22,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
@@ -64,6 +69,7 @@ internal fun CommonScheduleView(
     isCurrentDay: Boolean,
     activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
+    scrollableClasses: Boolean = false,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
     val localizedMonthNames = monthNames()
@@ -72,20 +78,32 @@ internal fun CommonScheduleView(
         char(' ')
         monthName(localizedMonthNames)
     }
+    val surfaceModifier = if (scrollableClasses) {
+        modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .heightIn(min = EXPANDED_DAY_MIN_HEIGHT)
+            .animateContentSize()
+    } else {
+        modifier.fillMaxWidth().animateContentSize()
+    }
     Surface(
-        modifier = modifier.fillMaxWidth().animateContentSize(),
+        modifier = surfaceModifier,
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        Column {
+        val columnModifier = if (scrollableClasses) Modifier.fillMaxHeight() else Modifier
+        Column(modifier = columnModifier) {
             CommonScheduleViewHeader(
                 dayOfWeek = date.dayOfWeek.mapToSting(),
                 date = date.format(dateFormat),
                 isCurrentDay = isCurrentDay,
             )
             CommonScheduleViewContent(
+                modifier = if (scrollableClasses) Modifier.weight(1f) else Modifier,
                 activeClass = activeClass,
                 classes = classes,
+                scrollableClasses = scrollableClasses,
                 onClassClick = onClassClick,
             )
         }
@@ -182,12 +200,28 @@ private fun CommonScheduleViewContent(
     modifier: Modifier = Modifier,
     activeClass: ActiveClassUi?,
     classes: List<ClassDetailsUi>,
+    scrollableClasses: Boolean = false,
     onClassClick: (ClassDetailsUi) -> Unit,
 ) {
-    Column(modifier = modifier.padding(start = 2.dp, end = 2.dp, top = 4.dp, bottom = 8.dp)) {
-        if (classes.isEmpty()) {
-            EmptyClassesView()
+    if (classes.isEmpty()) {
+        val emptyModifier = if (scrollableClasses) {
+            modifier.fillMaxSize()
         } else {
+            modifier.padding(start = 2.dp, end = 2.dp, top = 4.dp, bottom = 8.dp)
+        }
+        EmptyClassesView(
+            modifier = emptyModifier,
+            showFrame = !scrollableClasses,
+        )
+    } else {
+        val contentModifier = if (scrollableClasses) {
+            modifier
+                .verticalScroll(rememberScrollState())
+                .padding(start = 2.dp, end = 2.dp, top = 4.dp, bottom = 8.dp)
+        } else {
+            modifier.padding(start = 2.dp, end = 2.dp, top = 4.dp, bottom = 8.dp)
+        }
+        Column(modifier = contentModifier) {
             classes.forEachWith {
                 CommonClassView(
                     onClick = { onClassClick(this) },
@@ -223,19 +257,45 @@ private fun CommonScheduleViewContent(
 @Composable
 private fun EmptyClassesView(
     modifier: Modifier = Modifier,
+    showFrame: Boolean = true,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth().height(42.dp).padding(horizontal = 4.dp),
-        shape = MaterialTheme.shapes.medium,
-        color = Color.Transparent,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    if (showFrame) {
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(42.dp)
+                .padding(horizontal = 4.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = Color.Transparent,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant),
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(Res.string.empty_classes_title),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    } else {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
             Text(
+                modifier = Modifier.width(100.dp),
                 text = stringResource(Res.string.empty_classes_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyMedium,
+                minLines = 2,
+                maxLines = 2,
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
+
+private val EXPANDED_DAY_MIN_HEIGHT = 320.dp

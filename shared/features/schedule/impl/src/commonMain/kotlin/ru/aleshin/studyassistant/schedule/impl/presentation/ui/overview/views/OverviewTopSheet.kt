@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.overview.views
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,6 +66,11 @@ import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.toMinutesAndHoursString
+import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle_outline
+import ru.aleshin.studyassistant.core.ui.resources.ic_classes_column
+import ru.aleshin.studyassistant.core.ui.resources.ic_movements
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_outline
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.theme.material.bottomSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -85,11 +91,6 @@ import ru.aleshin.studyassistant.schedule.impl.resources.until_end_class_title
 import ru.aleshin.studyassistant.schedule.impl.resources.until_start_class_title
 import kotlin.math.roundToInt
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.ic_alert_circle_outline as core_ic_alert_circle_outline
-import ru.aleshin.studyassistant.core.ui.resources.ic_classes_column as core_ic_classes_column
-import ru.aleshin.studyassistant.core.ui.resources.ic_movements as core_ic_movements
-import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
-import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_outline as core_ic_tasks_outline
 
 /**
  * @author Stanislav Aleshin on 13.06.2024.
@@ -142,7 +143,7 @@ internal fun OverviewTopSheet(
 }
 
 @Composable
-private fun OverviewTopSheetChart(
+internal fun OverviewTopSheetChart(
     modifier: Modifier = Modifier,
     selectedDate: Instant?,
     weekAnalysis: List<DailyAnalysisUi>?,
@@ -174,7 +175,7 @@ private fun OverviewTopSheetChart(
                 minimumMajorTickSpacing = 16.dp,
             )
         },
-        modifier = modifier.fillMaxWidth().height(130.dp),
+        modifier = modifier.fillMaxWidth().padding(top = 8.dp).height(130.dp),
         xAxisContent = rememberAxisContent(
             labels = { date ->
                 Text(
@@ -221,7 +222,7 @@ private fun OverviewTopSheetChart(
 }
 
 @Composable
-private fun OverviewTopSheetClassTime(
+internal fun OverviewTopSheetClassTime(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     activeClass: ActiveClassUi?,
@@ -310,19 +311,21 @@ private fun OverviewTopSheetClassTime(
 }
 
 @Composable
-private fun OverviewTopSheetAnalysis(
+internal fun OverviewTopSheetAnalysis(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     analysis: DailyAnalysisUi?,
+    useContainer: Boolean = true,
+    useContentContainer: Boolean = false,
+    useCompactStyle: Boolean = true,
 ) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-    ) {
+    val headerSpacing = if (useCompactStyle) 8.dp else 16.dp
+    val contentSpacing = if (useCompactStyle) 8.dp else 12.dp
+    val contentPadding = if (useCompactStyle) 8.dp else 0.dp
+    val analysisContent: @Composable () -> Unit = {
         Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(contentPadding),
+            verticalArrangement = Arrangement.spacedBy(headerSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
@@ -332,10 +335,19 @@ private fun OverviewTopSheetAnalysis(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = stringResource(Res.string.analysis_day_title),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (useCompactStyle) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = if (useCompactStyle) FontWeight.Bold else null,
+                    style = if (useCompactStyle) {
+                        MaterialTheme.typography.labelLarge
+                    } else {
+                        MaterialTheme.typography.titleMedium
+                    },
                 )
                 Crossfade(
                     targetState = isLoading,
@@ -361,7 +373,11 @@ private fun OverviewTopSheetAnalysis(
                             Text(
                                 text = assessment.toString(),
                                 fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.labelLarge,
+                                style = if (useCompactStyle) {
+                                    MaterialTheme.typography.labelLarge
+                                } else {
+                                    MaterialTheme.typography.titleSmall
+                                },
                             )
                         }
                     } else {
@@ -373,78 +389,109 @@ private fun OverviewTopSheetAnalysis(
                     }
                 }
             }
-            OverviewTopSheetAnalysisItem(
-                isLoading = isLoading,
-                icon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
-                label = stringResource(Res.string.analysis_homeworks_label),
-                value = analysis?.let {
-                    buildString {
-                        append(analysis.numberOfHomeworks.count { it })
-                        append("/")
-                        append(analysis.numberOfHomeworks.size)
-                    }
-                },
-                valueColor = if (analysis?.numberOfHomeworks?.count { it } == analysis?.numberOfHomeworks?.size) {
-                    if (analysis?.numberOfHomeworks?.isEmpty() == true) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        StudyAssistantRes.colors.accents.green
-                    }
-                } else {
-                    StudyAssistantRes.colors.accents.red
-                },
-            )
-            OverviewTopSheetAnalysisItem(
-                isLoading = isLoading,
-                icon = painterResource(CoreRes.drawable.core_ic_alert_circle_outline),
-                label = stringResource(Res.string.analysis_tests_label),
-                value = analysis?.numberOfTests?.toString(),
-                valueColor = if (analysis?.numberOfTests == 0) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    StudyAssistantRes.colors.accents.red
-                },
-            )
-            OverviewTopSheetAnalysisItem(
-                isLoading = isLoading,
-                icon = painterResource(CoreRes.drawable.core_ic_classes_column),
-                label = stringResource(Res.string.analysis_classes_label),
-                value = analysis?.numberOfClasses?.toString(),
-                valueColor = MaterialTheme.colorScheme.onSurface,
-            )
-            OverviewTopSheetAnalysisItem(
-                isLoading = isLoading,
-                icon = painterResource(CoreRes.drawable.core_ic_movements),
-                label = stringResource(Res.string.analysis_movement_label),
-                value = analysis?.numberOfMovements?.toString(),
-                valueColor = if ((analysis?.numberOfTests ?: 0) <= 2) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    StudyAssistantRes.colors.accents.red
-                },
-            )
-            OverviewTopSheetAnalysisItem(
-                isLoading = isLoading,
-                icon = painterResource(CoreRes.drawable.core_ic_tasks_outline),
-                label = stringResource(Res.string.analysis_tasks_label),
-                value = analysis?.let {
-                    buildString {
-                        append(analysis.numberOfTasks.count { it })
-                        append("/")
-                        append(analysis.numberOfTasks.size)
-                    }
-                },
-                valueColor = if (analysis?.numberOfTasks?.count { it } == analysis?.numberOfTasks?.size) {
-                    if (analysis?.numberOfTasks?.isEmpty() == true) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        StudyAssistantRes.colors.accents.green
-                    }
-                } else {
-                    StudyAssistantRes.colors.accents.red
-                },
-            )
+            val analysisItems: @Composable () -> Unit = {
+                Column(verticalArrangement = Arrangement.spacedBy(contentSpacing)) {
+                    OverviewTopSheetAnalysisItem(
+                        isLoading = isLoading,
+                        useCompactStyle = useCompactStyle,
+                        icon = painterResource(CoreRes.drawable.ic_tasks_circular),
+                        label = stringResource(Res.string.analysis_homeworks_label),
+                        value = analysis?.let {
+                            buildString {
+                                append(analysis.numberOfHomeworks.count { it })
+                                append("/")
+                                append(analysis.numberOfHomeworks.size)
+                            }
+                        },
+                        valueColor = if (analysis?.numberOfHomeworks?.count { it } == analysis?.numberOfHomeworks?.size) {
+                            if (analysis?.numberOfHomeworks?.isEmpty() == true) {
+                                MaterialTheme.colorScheme.onSurface
+                            } else {
+                                StudyAssistantRes.colors.accents.green
+                            }
+                        } else {
+                            StudyAssistantRes.colors.accents.red
+                        },
+                    )
+                    OverviewTopSheetAnalysisItem(
+                        isLoading = isLoading,
+                        useCompactStyle = useCompactStyle,
+                        icon = painterResource(CoreRes.drawable.ic_alert_circle_outline),
+                        label = stringResource(Res.string.analysis_tests_label),
+                        value = analysis?.numberOfTests?.toString(),
+                        valueColor = if (analysis?.numberOfTests == 0) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            StudyAssistantRes.colors.accents.red
+                        },
+                    )
+                    OverviewTopSheetAnalysisItem(
+                        isLoading = isLoading,
+                        useCompactStyle = useCompactStyle,
+                        icon = painterResource(CoreRes.drawable.ic_classes_column),
+                        label = stringResource(Res.string.analysis_classes_label),
+                        value = analysis?.numberOfClasses?.toString(),
+                        valueColor = MaterialTheme.colorScheme.onSurface,
+                    )
+                    OverviewTopSheetAnalysisItem(
+                        isLoading = isLoading,
+                        useCompactStyle = useCompactStyle,
+                        icon = painterResource(CoreRes.drawable.ic_movements),
+                        label = stringResource(Res.string.analysis_movement_label),
+                        value = analysis?.numberOfMovements?.toString(),
+                        valueColor = if ((analysis?.numberOfTests ?: 0) <= 2) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            StudyAssistantRes.colors.accents.red
+                        },
+                    )
+                    OverviewTopSheetAnalysisItem(
+                        isLoading = isLoading,
+                        useCompactStyle = useCompactStyle,
+                        icon = painterResource(CoreRes.drawable.ic_tasks_outline),
+                        label = stringResource(Res.string.analysis_tasks_label),
+                        value = analysis?.let {
+                            buildString {
+                                append(analysis.numberOfTasks.count { it })
+                                append("/")
+                                append(analysis.numberOfTasks.size)
+                            }
+                        },
+                        valueColor = if (analysis?.numberOfTasks?.count { it } == analysis?.numberOfTasks?.size) {
+                            if (analysis?.numberOfTasks?.isEmpty() == true) {
+                                MaterialTheme.colorScheme.onSurface
+                            } else {
+                                StudyAssistantRes.colors.accents.green
+                            }
+                        } else {
+                            StudyAssistantRes.colors.accents.red
+                        },
+                    )
+                }
+            }
+            if (useContentContainer) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                ) {
+                    Box(modifier = Modifier.padding(12.dp), content = { analysisItems() })
+                }
+            } else {
+                analysisItems()
+            }
         }
+    }
+
+    if (useContainer) {
+        Surface(
+            modifier = modifier,
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            content = { analysisContent() },
+        )
+    } else {
+        Box(modifier = modifier, content = { analysisContent() })
     }
 }
 
@@ -452,19 +499,21 @@ private fun OverviewTopSheetAnalysis(
 private fun OverviewTopSheetAnalysisItem(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
+    useCompactStyle: Boolean = true,
     icon: Painter,
     label: String,
     value: String?,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     valueColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
+    val iconSize = if (useCompactStyle) 18.dp else 22.dp
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(if (useCompactStyle) 8.dp else 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(iconSize),
             painter = icon,
             contentDescription = null,
             tint = color,
@@ -475,7 +524,11 @@ private fun OverviewTopSheetAnalysisItem(
             color = color,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium,
+            style = if (useCompactStyle) {
+                MaterialTheme.typography.labelMedium
+            } else {
+                MaterialTheme.typography.bodyMedium
+            },
         )
         Crossfade(
             modifier = Modifier,
@@ -491,7 +544,11 @@ private fun OverviewTopSheetAnalysisItem(
                     textAlign = TextAlign.End,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = if (useCompactStyle) {
+                        MaterialTheme.typography.labelLarge
+                    } else {
+                        MaterialTheme.typography.titleSmall
+                    },
                 )
             } else {
                 PlaceholderBox(

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,15 +55,22 @@ internal fun ShortSubjectView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     eventType: EventType,
     office: String,
     color: Color,
     name: String,
     teacher: EmployeeUi?,
 ) {
+    val sizedModifier = if (useExpandedStyle) {
+        modifier.fillMaxWidth()
+    } else {
+        modifier.width(230.dp)
+    }
+
     Surface(
         onClick = onClick,
-        modifier = modifier.width(230.dp),
+        modifier = sizedModifier,
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -141,6 +149,8 @@ internal fun ShortSubjectView(
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }

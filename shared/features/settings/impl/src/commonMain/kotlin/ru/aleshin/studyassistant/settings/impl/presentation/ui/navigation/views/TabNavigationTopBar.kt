@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -24,10 +25,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.settings.impl.resources.Res
 import ru.aleshin.studyassistant.settings.impl.resources.settings_header
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -52,6 +57,35 @@ internal fun TabNavigationTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(CoreRes.string.core_back_title),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun TabNavigationExpandedTopBar(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+) {
+    TopAppBar(
+        modifier = modifier,
+        title = {
+            TopAppBarTitle(
+                header = stringResource(Res.string.settings_header),
+                textAlign = TextAlign.Start,
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(CoreRes.string.core_back_title),
+                    modifier = Modifier.size(24.dp),
                 )
             }
         },

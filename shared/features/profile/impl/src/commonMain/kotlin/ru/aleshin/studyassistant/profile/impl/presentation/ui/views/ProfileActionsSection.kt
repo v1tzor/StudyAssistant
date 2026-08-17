@@ -157,7 +157,7 @@ internal fun ProfileActionsSection(
 }
 
 @Composable
-private fun ProfileActionViewItem(
+internal fun ProfileActionViewItem(
     onClick: () -> Unit,
     title: String,
     icon: @Composable () -> Unit,

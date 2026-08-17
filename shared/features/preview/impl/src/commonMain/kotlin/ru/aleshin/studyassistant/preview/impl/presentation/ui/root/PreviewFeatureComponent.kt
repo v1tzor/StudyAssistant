@@ -114,6 +114,9 @@ internal abstract class PreviewFeatureComponent(
                 is SetupOutput.NavigateToWeekScheduleEditor -> {
                     outputConsumer.consume(PreviewOutput.NavigateToWeekScheduleEditor)
                 }
+                is SetupOutput.NavigateToScheduleImport -> {
+                    outputConsumer.consume(PreviewOutput.NavigateToScheduleImport)
+                }
                 is SetupOutput.NavigateToBack -> navigateToBack()
             }
         }

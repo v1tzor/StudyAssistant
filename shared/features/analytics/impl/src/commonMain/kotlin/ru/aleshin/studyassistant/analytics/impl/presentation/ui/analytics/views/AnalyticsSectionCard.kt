@@ -70,7 +70,9 @@ internal fun AnalyticsSectionCard(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues),
             verticalArrangement = contentArrangement,
             content = content,
         )

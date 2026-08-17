@@ -3,7 +3,6 @@ CREATE TABLE profileEntity (
   uid TEXT NOT NULL,
   username TEXT NOT NULL,
   avatar TEXT,
-  description TEXT,
   city TEXT,
   birthday TEXT,
   sex TEXT,
@@ -11,7 +10,7 @@ CREATE TABLE profileEntity (
 );
 
 addOrUpdateProfile:
-INSERT OR REPLACE INTO profileEntity (id, uid, username, avatar, description, city, birthday, sex, updated_at)
+INSERT OR REPLACE INTO profileEntity (id, uid, username, avatar, city, birthday, sex, updated_at)
 VALUES ?;
 
 fetchProfile:

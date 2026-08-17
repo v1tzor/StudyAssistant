@@ -106,14 +106,20 @@ import ru.aleshin.studyassistant.core.ui.resources.select_confirm_title as core_
 @Composable
 internal fun HolidaysView(
     modifier: Modifier = Modifier,
+    useExpandedStyle: Boolean = false,
     allOrganizations: List<OrganizationShortUi>,
     holidays: List<HolidaysUi>,
     onUpdateHolidays: (List<HolidaysUi>) -> Unit,
 ) {
+    val containerShape = MaterialTheme.shapes.large
+    val headerPadding = PaddingValues(horizontal = 12.dp, vertical = 16.dp)
+    val headerSpacing = 16.dp
+    val titleStyle = MaterialTheme.typography.titleMedium
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = MaterialTheme.shapes.large,
+        shape = containerShape,
     ) {
         Column {
             var showHolidayItems by rememberSaveable { mutableStateOf(false) }
@@ -122,14 +128,14 @@ internal fun HolidaysView(
                 onClick = { showHolidayItems = showHolidayItems.not() },
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
                 shape = if (showHolidayItems) {
-                    MaterialTheme.shapes.large.topSide
+                    containerShape.topSide
                 } else {
-                    MaterialTheme.shapes.large
+                    containerShape
                 },
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(headerPadding),
+                    horizontalArrangement = Arrangement.spacedBy(headerSpacing),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
@@ -141,7 +147,7 @@ internal fun HolidaysView(
                         modifier = Modifier.weight(1f),
                         text = stringResource(Res.string.holidays_view_title),
                         color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = titleStyle,
                     )
                     ExpandedIcon(isExpanded = showHolidayItems)
                 }

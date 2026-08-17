@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,7 +52,9 @@ import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.BirthdayInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
@@ -65,6 +68,7 @@ import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.Empl
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeePostInfoField
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.EmployeeTopBar
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.employee.views.WorkTimeInfoField
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.resources.Res
 import ru.aleshin.studyassistant.editor.impl.resources.contact_info_section_header
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -83,13 +87,15 @@ internal fun EmployeeContent(
     val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
-            BaseEmployeeContent(
-                state = state,
+            EmployeeLayout(
                 modifier = Modifier.padding(paddingValues),
+                state = state,
+                layoutMode = layoutMode,
                 onUpdateAvatar = { store.dispatchEvent(EmployeeEvent.UpdateAvatar(it)) },
                 onDeleteAvatar = { store.dispatchEvent(EmployeeEvent.DeleteAvatar) },
                 onEmployeePostSelected = { store.dispatchEvent(EmployeeEvent.UpdatePost(it)) },
@@ -139,6 +145,163 @@ internal fun EmployeeContent(
             }
         }
     }
+}
+
+@Composable
+private fun EmployeeLayout(
+    modifier: Modifier = Modifier,
+    state: EmployeeState,
+    layoutMode: EditorLayoutMode,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
+    onUpdateName: (first: String?, second: String?, patronymic: String?) -> Unit,
+    onEmployeePostSelected: (EmployeePost?) -> Unit,
+    omWorkTimeSelected: (Instant?, Instant?) -> Unit,
+    omBirthdaySelected: (String?) -> Unit,
+    onUpdateEmails: (List<ContactInfoUi>) -> Unit,
+    onUpdatePhones: (List<ContactInfoUi>) -> Unit,
+    onUpdateWebs: (List<ContactInfoUi>) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseEmployeeContent(
+            state = state,
+            modifier = modifier,
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
+            onUpdateName = onUpdateName,
+            onEmployeePostSelected = onEmployeePostSelected,
+            omWorkTimeSelected = omWorkTimeSelected,
+            omBirthdaySelected = omBirthdaySelected,
+            onUpdateEmails = onUpdateEmails,
+            onUpdatePhones = onUpdatePhones,
+            onUpdateWebs = onUpdateWebs,
+            onUpdateLocations = onUpdateLocations,
+        )
+        EditorLayoutMode.EXPANDED -> EmployeeExpandedLayout(
+            modifier = modifier,
+            state = state,
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
+            onUpdateName = onUpdateName,
+            onEmployeePostSelected = onEmployeePostSelected,
+            omWorkTimeSelected = omWorkTimeSelected,
+            omBirthdaySelected = omBirthdaySelected,
+            onUpdateEmails = onUpdateEmails,
+            onUpdatePhones = onUpdatePhones,
+            onUpdateWebs = onUpdateWebs,
+            onUpdateLocations = onUpdateLocations,
+        )
+    }
+}
+
+@Composable
+private fun EmployeeExpandedLayout(
+    modifier: Modifier = Modifier,
+    state: EmployeeState,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
+    onUpdateName: (first: String?, second: String?, patronymic: String?) -> Unit,
+    onEmployeePostSelected: (EmployeePost?) -> Unit,
+    omWorkTimeSelected: (Instant?, Instant?) -> Unit,
+    omBirthdaySelected: (String?) -> Unit,
+    onUpdateEmails: (List<ContactInfoUi>) -> Unit,
+    onUpdatePhones: (List<ContactInfoUi>) -> Unit,
+    onUpdateWebs: (List<ContactInfoUi>) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+) {
+    val editableEmployee = state.editableEmployee
+    EditorSplitPanes(
+        modifier = modifier,
+        startPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 24.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                EmployeeAvatarSection(
+                    isLoading = state.isLoading,
+                    firstName = editableEmployee?.firstName,
+                    lastName = editableEmployee?.patronymic ?: editableEmployee?.secondName,
+                    avatar = when (state.actionWithAvatar) {
+                        is ActionWithAvatar.None -> state.actionWithAvatar.uri
+                        is ActionWithAvatar.Set -> state.actionWithAvatar.file.uri
+                        is ActionWithAvatar.Delete -> null
+                    },
+                    onUpdateAvatar = onUpdateAvatar,
+                    onDeleteAvatar = onDeleteAvatar,
+                    onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
+                )
+                EmployeeNameInfoField(
+                    isLoading = state.isLoading,
+                    firstName = editableEmployee?.firstName,
+                    secondName = editableEmployee?.secondName,
+                    patronymic = editableEmployee?.patronymic,
+                    onUpdateFirstName = { onUpdateName(it, editableEmployee?.secondName, editableEmployee?.patronymic) },
+                    onUpdateSecondName = { onUpdateName(editableEmployee?.firstName, it, editableEmployee?.patronymic) },
+                    onUpdatePatronymic = { onUpdateName(editableEmployee?.firstName, editableEmployee?.secondName, it) },
+                )
+                EmployeePostInfoField(
+                    isLoading = state.isLoading,
+                    post = editableEmployee?.post,
+                    onSelected = onEmployeePostSelected,
+                )
+                WorkTimeInfoField(
+                    isLoading = state.isLoading,
+                    startTime = editableEmployee?.workTimeStart,
+                    endTime = editableEmployee?.workTimeEnd,
+                    onSelected = omWorkTimeSelected,
+                )
+                BirthdayInfoField(
+                    isLoading = state.isLoading,
+                    birthday = editableEmployee?.birthday,
+                    onSelected = omBirthdaySelected,
+                )
+            }
+        },
+        endPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 24.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.contact_info_section_header),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+                Spacer(modifier = Modifier.height(90.dp))
+                EmailInfoFields(
+                    isLoading = state.isLoading,
+                    emails = editableEmployee?.emails ?: emptyList(),
+                    onUpdate = onUpdateEmails,
+                )
+                PhoneInfoFields(
+                    isLoading = state.isLoading,
+                    phones = editableEmployee?.phones ?: emptyList(),
+                    onUpdate = onUpdatePhones,
+                )
+                WebInfoFields(
+                    isLoading = state.isLoading,
+                    webs = editableEmployee?.webs ?: emptyList(),
+                    onUpdate = onUpdateWebs,
+                )
+                LocationsInfoFields(
+                    isLoading = state.isLoading,
+                    locations = editableEmployee?.locations ?: emptyList(),
+                    onUpdate = onUpdateLocations,
+                )
+            }
+        },
+    )
 }
 
 @Composable

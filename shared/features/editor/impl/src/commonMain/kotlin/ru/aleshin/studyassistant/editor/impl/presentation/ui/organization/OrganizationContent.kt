@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,12 +51,15 @@ import ru.aleshin.studyassistant.core.presentation.models.users.ContactInfoUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.editor.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.EditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.AvatarSection
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EditorSplitPanes
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.EmailInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.HideButton
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.LocationsInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.PhoneInfoFields
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.WebInfoFields
+import ru.aleshin.studyassistant.editor.impl.presentation.ui.fetchEditorLayoutMode
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationEffect
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationEvent
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.organization.contract.OrganizationState
@@ -83,53 +87,10 @@ internal fun OrganizationContent(
     val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchEditorLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        content = { paddingValues ->
-            BaseOrganizationContent(
-                state = state,
-                modifier = Modifier.padding(paddingValues),
-                onUpdateAvatar = {
-                    store.dispatchEvent(OrganizationEvent.UpdateAvatar(it))
-                },
-                onDeleteAvatar = {
-                    store.dispatchEvent(OrganizationEvent.DeleteAvatar)
-                },
-                onSelectedType = {
-                    store.dispatchEvent(OrganizationEvent.UpdateType(it))
-                },
-                onUpdateName = { short, full ->
-                    store.dispatchEvent(OrganizationEvent.UpdateName(short, full))
-                },
-                onUpdateEmails = {
-                    store.dispatchEvent(OrganizationEvent.UpdateEmails(it))
-                },
-                onUpdatePhones = {
-                    store.dispatchEvent(OrganizationEvent.UpdatePhones(it))
-                },
-                onUpdateWebs = {
-                    store.dispatchEvent(OrganizationEvent.UpdateWebs(it))
-                },
-                onUpdateLocations = {
-                    store.dispatchEvent(OrganizationEvent.UpdateLocations(it))
-                },
-                onStatusChange = {
-                    store.dispatchEvent(OrganizationEvent.UpdateStatus(it))
-                },
-                onHideOrganization = {
-                    store.dispatchEvent(OrganizationEvent.HideOrganization)
-                },
-                onExceedingAvatarSizeLimit = {
-                    coroutineScope.launch {
-                        snackbarState.showSnackbar(
-                            message = coreExceedingLimitImageSizeMessage,
-                            withDismissAction = true,
-                        )
-                    }
-                }
-            )
-        },
         topBar = {
             OrganizationTopBar(
                 enabledSave = state.editableOrganization?.isValid() == true,
@@ -143,7 +104,51 @@ internal fun OrganizationContent(
                 snackbar = { ErrorSnackbar(it) },
             )
         },
-    )
+    ) { paddingValues ->
+        OrganizationLayout(
+            state = state,
+            modifier = Modifier.padding(paddingValues),
+            layoutMode = layoutMode,
+            onUpdateAvatar = {
+                store.dispatchEvent(OrganizationEvent.UpdateAvatar(it))
+            },
+            onDeleteAvatar = {
+                store.dispatchEvent(OrganizationEvent.DeleteAvatar)
+            },
+            onSelectedType = {
+                store.dispatchEvent(OrganizationEvent.UpdateType(it))
+            },
+            onUpdateName = { short, full ->
+                store.dispatchEvent(OrganizationEvent.UpdateName(short, full))
+            },
+            onUpdateEmails = {
+                store.dispatchEvent(OrganizationEvent.UpdateEmails(it))
+            },
+            onUpdatePhones = {
+                store.dispatchEvent(OrganizationEvent.UpdatePhones(it))
+            },
+            onUpdateWebs = {
+                store.dispatchEvent(OrganizationEvent.UpdateWebs(it))
+            },
+            onUpdateLocations = {
+                store.dispatchEvent(OrganizationEvent.UpdateLocations(it))
+            },
+            onStatusChange = {
+                store.dispatchEvent(OrganizationEvent.UpdateStatus(it))
+            },
+            onHideOrganization = {
+                store.dispatchEvent(OrganizationEvent.HideOrganization)
+            },
+            onExceedingAvatarSizeLimit = {
+                coroutineScope.launch {
+                    snackbarState.showSnackbar(
+                        message = coreExceedingLimitImageSizeMessage,
+                        withDismissAction = true,
+                    )
+                }
+            }
+        )
+    }
 
     store.handleEffects { effect ->
         when (effect) {
@@ -155,6 +160,161 @@ internal fun OrganizationContent(
             }
         }
     }
+}
+
+@Composable
+private fun OrganizationLayout(
+    state: OrganizationState,
+    modifier: Modifier,
+    layoutMode: EditorLayoutMode,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
+    onSelectedType: (OrganizationType?) -> Unit,
+    onUpdateName: (short: String?, full: String?) -> Unit,
+    onUpdateEmails: (List<ContactInfoUi>) -> Unit,
+    onUpdatePhones: (List<ContactInfoUi>) -> Unit,
+    onUpdateWebs: (List<ContactInfoUi>) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onStatusChange: (Boolean) -> Unit,
+    onHideOrganization: () -> Unit,
+) {
+    when (layoutMode) {
+        EditorLayoutMode.COMPACT -> BaseOrganizationContent(
+            state = state,
+            modifier = modifier,
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
+            onSelectedType = onSelectedType,
+            onUpdateName = onUpdateName,
+            onUpdateEmails = onUpdateEmails,
+            onUpdatePhones = onUpdatePhones,
+            onUpdateWebs = onUpdateWebs,
+            onUpdateLocations = onUpdateLocations,
+            onStatusChange = onStatusChange,
+            onHideOrganization = onHideOrganization,
+        )
+        EditorLayoutMode.EXPANDED -> OrganizationExpandedLayout(
+            state = state,
+            modifier = modifier,
+            onUpdateAvatar = onUpdateAvatar,
+            onDeleteAvatar = onDeleteAvatar,
+            onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
+            onSelectedType = onSelectedType,
+            onUpdateName = onUpdateName,
+            onUpdateEmails = onUpdateEmails,
+            onUpdatePhones = onUpdatePhones,
+            onUpdateWebs = onUpdateWebs,
+            onUpdateLocations = onUpdateLocations,
+            onStatusChange = onStatusChange,
+            onHideOrganization = onHideOrganization,
+        )
+    }
+}
+
+@Composable
+private fun OrganizationExpandedLayout(
+    state: OrganizationState,
+    modifier: Modifier,
+    onUpdateAvatar: (PlatformFile) -> Unit,
+    onDeleteAvatar: () -> Unit,
+    onExceedingAvatarSizeLimit: (Int) -> Unit,
+    onSelectedType: (OrganizationType?) -> Unit,
+    onUpdateName: (short: String?, full: String?) -> Unit,
+    onUpdateEmails: (List<ContactInfoUi>) -> Unit,
+    onUpdatePhones: (List<ContactInfoUi>) -> Unit,
+    onUpdateWebs: (List<ContactInfoUi>) -> Unit,
+    onUpdateLocations: (List<ContactInfoUi>) -> Unit,
+    onStatusChange: (Boolean) -> Unit,
+    onHideOrganization: () -> Unit,
+) {
+    val editableOrganization = state.editableOrganization
+    EditorSplitPanes(
+        modifier = modifier,
+        startPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 24.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                AvatarSection(
+                    isLoading = state.isLoading,
+                    shortName = editableOrganization?.shortName,
+                    avatar = when (val actionWithAvatar = state.actionWithAvatar) {
+                        is ActionWithAvatar.None -> actionWithAvatar.uri
+                        is ActionWithAvatar.Set -> actionWithAvatar.file.uri
+                        is ActionWithAvatar.Delete -> null
+                    },
+                    onUpdateAvatar = onUpdateAvatar,
+                    onDeleteAvatar = onDeleteAvatar,
+                    onExceedingLimit = onExceedingAvatarSizeLimit,
+                )
+                OrganizationTypeInfoField(
+                    isLoading = state.isLoading,
+                    type = editableOrganization?.type,
+                    onSelected = onSelectedType,
+                )
+                OrganizationNameInfoField(
+                    isLoading = state.isLoading,
+                    shortName = editableOrganization?.shortName,
+                    fullName = editableOrganization?.fullName,
+                    onUpdateShortName = { onUpdateName(it, editableOrganization?.fullName) },
+                    onUpdateFullName = { onUpdateName(editableOrganization?.shortName, it) },
+                )
+                OrganizationStatusChooser(
+                    isLoading = state.isLoading,
+                    isMain = editableOrganization?.isMain ?: false,
+                    onStatusChange = onStatusChange,
+                )
+                if (editableOrganization?.uid?.isNotBlank() == true) {
+                    HideButton(
+                        onHide = onHideOrganization,
+                        modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+                        warningMessage = stringResource(Res.string.hide_organization_warning),
+                    )
+                }
+            }
+        },
+        endPane = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 24.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Spacer(modifier = Modifier.height(90.dp))
+                Text(
+                    text = stringResource(Res.string.contact_info_section_header),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+                EmailInfoFields(
+                    isLoading = state.isLoading,
+                    emails = editableOrganization?.emails ?: emptyList(),
+                    onUpdate = onUpdateEmails,
+                )
+                PhoneInfoFields(
+                    isLoading = state.isLoading,
+                    phones = editableOrganization?.phones ?: emptyList(),
+                    onUpdate = onUpdatePhones,
+                )
+                WebInfoFields(
+                    isLoading = state.isLoading,
+                    webs = editableOrganization?.webs ?: emptyList(),
+                    onUpdate = onUpdateWebs,
+                )
+                LocationsInfoFields(
+                    isLoading = state.isLoading,
+                    locations = editableOrganization?.locations ?: emptyList(),
+                    onUpdate = onUpdateLocations,
+                )
+            }
+        },
+    )
 }
 
 @Composable

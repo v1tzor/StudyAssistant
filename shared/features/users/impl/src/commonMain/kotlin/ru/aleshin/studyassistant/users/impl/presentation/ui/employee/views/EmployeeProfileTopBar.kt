@@ -25,10 +25,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.users.impl.resources.Res
 import ru.aleshin.studyassistant.users.impl.resources.employee_profile_header
 
@@ -40,29 +43,48 @@ import ru.aleshin.studyassistant.users.impl.resources.employee_profile_header
 internal fun EmployeeProfileTopBar(
     modifier: Modifier = Modifier,
     enabledEdit: Boolean,
+    isExpanded: Boolean = false,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = {
-            Text(text = stringResource(Res.string.employee_profile_header))
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            }
-        },
-        actions = {
-            IconButton(
-                enabled = enabledEdit,
-                onClick = onEditClick,
-            ) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        )
+    val navigationIcon: @Composable () -> Unit = {
+        IconButton(onClick = onBackClick) {
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+        }
+    }
+    val actions: @Composable () -> Unit = {
+        IconButton(
+            enabled = enabledEdit,
+            onClick = onEditClick,
+        ) {
+            Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+        }
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     )
+    if (isExpanded) {
+        TopAppBar(
+            modifier = modifier,
+            title = {
+                TopAppBarTitle(
+                    header = stringResource(Res.string.employee_profile_header),
+                    textAlign = TextAlign.Start,
+                )
+            },
+            navigationIcon = navigationIcon,
+            actions = { actions() },
+            colors = colors,
+        )
+    } else {
+        CenterAlignedTopAppBar(
+            modifier = modifier,
+            title = {
+                Text(text = stringResource(Res.string.employee_profile_header))
+            },
+            navigationIcon = navigationIcon,
+            actions = { actions() },
+            colors = colors,
+        )
+    }
 }

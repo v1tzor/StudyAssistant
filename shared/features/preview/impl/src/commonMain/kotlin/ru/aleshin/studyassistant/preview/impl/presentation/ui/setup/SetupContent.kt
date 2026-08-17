@@ -25,10 +25,13 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -55,9 +58,11 @@ import ru.aleshin.studyassistant.core.presentation.models.organizations.Organiza
 import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
 import ru.aleshin.studyassistant.core.ui.models.ActionWithAvatar
-import ru.aleshin.studyassistant.core.ui.utils.useLargeLayout
+import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.preview.impl.presentation.mappers.mapToMessage
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.PreviewLayoutMode
+import ru.aleshin.studyassistant.preview.impl.presentation.ui.fetchPreviewLayoutMode
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEffect
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupEvent
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.contract.SetupState
@@ -70,6 +75,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.Schedu
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
 import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.schedule_import_ai_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.schedule_start_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.step_title
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -86,7 +92,7 @@ internal fun SetupContent(
     val store = setupComponent.store
     val state by store.stateAsState()
     val coreExceedingLimitImageSizeMessage = stringResource(CoreRes.string.core_exceeding_limit_image_size_message)
-    val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchPreviewLayoutMode()
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
 
@@ -97,33 +103,29 @@ internal fun SetupContent(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.TopCenter,
             ) {
+                val setupWidthModifier = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+                    Modifier
+                        .fillMaxHeight()
+                        .widthIn(max = 920.dp)
+                        .fillMaxWidth()
+                } else {
+                    Modifier.fillMaxSize().widthIn(max = 720.dp)
+                }
                 SetupLayout(
                     state = state,
-                    modifier = Modifier.fillMaxSize().widthIn(
-                        max = if (adaptiveInfo.useLargeLayout) 960.dp else 720.dp,
-                    ),
+                    modifier = setupWidthModifier,
+                    layoutMode = layoutMode,
                     onUpdateProfile = { store.dispatchEvent(SetupEvent.UpdateProfile(it)) },
                     onUpdateOrganization = { store.dispatchEvent(SetupEvent.UpdateOrganization(it)) },
-                    onUpdateCalendarSettings = {
-                        store.dispatchEvent(
-                            SetupEvent.UpdateCalendarSettings(
-                                it
-                            )
-                        )
-                    },
+                    onUpdateCalendarSettings = { store.dispatchEvent(SetupEvent.UpdateCalendarSettings(it)) },
                     onSaveProfile = { store.dispatchEvent(SetupEvent.ClickSaveProfileInfo) },
                     onUpdateProfileAvatar = { store.dispatchEvent(SetupEvent.UpdateProfileAvatar(it)) },
                     onDeleteProfileAvatar = { store.dispatchEvent(SetupEvent.DeleteProfileAvatar) },
                     onSaveOrganization = { store.dispatchEvent(SetupEvent.ClickSaveOrganizationInfo) },
-                    onUpdateOrganizationAvatar = {
-                        store.dispatchEvent(
-                            SetupEvent.UpdateOrganizationAvatar(
-                                it
-                            )
-                        )
-                    },
+                    onUpdateOrganizationAvatar = { store.dispatchEvent(SetupEvent.UpdateOrganizationAvatar(it)) },
                     onDeleteOrganizationAvatar = { store.dispatchEvent(SetupEvent.DeleteOrganizationAvatar) },
                     onSaveCalendar = { store.dispatchEvent(SetupEvent.ClickSaveCalendarInfo) },
+                    onImportSchedule = { store.dispatchEvent(SetupEvent.ClickImportSchedule) },
                     onFillOutSchedule = { store.dispatchEvent(SetupEvent.ClickEditWeekSchedule) },
                     onStartUsing = { store.dispatchEvent(SetupEvent.ClickGoToApp) },
                     onExceedingAvatarSizeLimit = {
@@ -168,6 +170,7 @@ internal fun SetupContent(
 private fun SetupLayout(
     state: SetupState,
     modifier: Modifier,
+    layoutMode: PreviewLayoutMode,
     onUpdateProfile: (ProfileUi) -> Unit,
     onUpdateOrganization: (OrganizationUi) -> Unit,
     onUpdateCalendarSettings: (CalendarSettingsUi) -> Unit,
@@ -179,6 +182,7 @@ private fun SetupLayout(
     onDeleteOrganizationAvatar: () -> Unit,
     onSaveCalendar: () -> Unit,
     onExceedingAvatarSizeLimit: (Int) -> Unit,
+    onImportSchedule: () -> Unit,
     onFillOutSchedule: () -> Unit,
     onStartUsing: () -> Unit,
 ) {
@@ -189,6 +193,7 @@ private fun SetupLayout(
         SetupPageInfoSection(
             modifier = Modifier.weight(1f),
             currentPage = state.currentPage,
+            layoutMode = layoutMode,
             profile = state.profile,
             actionWithProfileAvatar = state.actionWithProfileAvatar,
             organization = state.organization,
@@ -204,12 +209,14 @@ private fun SetupLayout(
             onExceedingAvatarSizeLimit = onExceedingAvatarSizeLimit,
         )
         SetupPageNavigationSection(
+            layoutMode = layoutMode,
             enabledSaveProfile = state.profile?.username?.isNotBlank() == true,
             enabledSaveOrganization = state.organization?.shortName?.isNotBlank() == true,
             currentPage = state.currentPage,
             onSaveProfile = onSaveProfile,
             onSaveOrganization = onSaveOrganization,
             onSaveCalendar = onSaveCalendar,
+            onImportSchedule = onImportSchedule,
             onFillOutSchedule = onFillOutSchedule,
             onStartUsing = onStartUsing,
         )
@@ -220,6 +227,7 @@ private fun SetupLayout(
 private fun SetupPageInfoSection(
     modifier: Modifier = Modifier,
     currentPage: SetupPage,
+    layoutMode: PreviewLayoutMode,
     profile: ProfileUi?,
     actionWithProfileAvatar: ActionWithAvatar,
     organization: OrganizationUi?,
@@ -236,7 +244,13 @@ private fun SetupPageInfoSection(
 ) {
     AnimatedContent(
         targetState = if (profile != null) currentPage else null,
-        modifier = modifier.padding(horizontal = 24.dp),
+        modifier = modifier.padding(
+            horizontal = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+                AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+            } else {
+                24.dp
+            },
+        ),
         transitionSpec = {
             fadeIn(animationSpec = tween(320, delayMillis = 90)).togetherWith(
                 fadeOut(animationSpec = tween(320))
@@ -245,14 +259,17 @@ private fun SetupPageInfoSection(
     ) { page ->
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             if (page != null) {
-                Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(32.dp)
+                ) {
                     SetupStepHeader(
                         title = page.stepTitle,
                         currentStep = page.id.inc(),
                         maxSteps = SetupPage.entries.size,
+                        centered = true,
                     )
                     when (page) {
                         SetupPage.PROFILE -> if (profile != null) {
@@ -269,7 +286,6 @@ private fun SetupPageInfoSection(
                                 onExceedingLimit = onExceedingAvatarSizeLimit,
                             )
                         }
-
                         SetupPage.ORGANIZATION -> if (organization != null) {
                             OrganizationPageInfo(
                                 organization = organization,
@@ -284,14 +300,12 @@ private fun SetupPageInfoSection(
                                 onExceedingLimit = onExceedingAvatarSizeLimit,
                             )
                         }
-
                         SetupPage.CALENDAR -> if (calendarSettings != null) {
                             CalendarPageInfo(
                                 calendarSettings = calendarSettings,
                                 onUpdateCalendarSettings = onUpdateCalendarSettings,
                             )
                         }
-
                         SetupPage.SCHEDULE -> SchedulePageInfo()
                     }
                 }
@@ -308,11 +322,12 @@ private fun SetupStepHeader(
     title: String,
     currentStep: Int,
     maxSteps: Int,
+    centered: Boolean = true,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = if (centered) 24.dp else 0.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start,
     ) {
         Text(
             text = buildAnnotatedString {
@@ -327,7 +342,7 @@ private fun SetupStepHeader(
         Text(
             text = title,
             color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
+            textAlign = if (centered) TextAlign.Center else TextAlign.Start,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
             ),
@@ -338,17 +353,32 @@ private fun SetupStepHeader(
 @Composable
 private fun SetupPageNavigationSection(
     modifier: Modifier = Modifier,
+    layoutMode: PreviewLayoutMode,
     enabledSaveProfile: Boolean,
     enabledSaveOrganization: Boolean,
     currentPage: SetupPage,
     onSaveProfile: () -> Unit,
     onSaveOrganization: () -> Unit,
     onSaveCalendar: () -> Unit,
+    onImportSchedule: () -> Unit,
     onFillOutSchedule: () -> Unit,
     onStartUsing: () -> Unit,
 ) {
     Column(
-        modifier = modifier.padding(start = 24.dp, end = 24.dp, bottom = 36.dp, top = 16.dp)
+        modifier = modifier.padding(
+            start = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+                AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+            } else {
+                24.dp
+            },
+            end = if (layoutMode == PreviewLayoutMode.EXPANDED) {
+                AdaptiveLayoutDefaults.ExpandedHorizontalPadding
+            } else {
+                24.dp
+            },
+            bottom = 36.dp,
+            top = 16.dp,
+        )
             .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -372,8 +402,14 @@ private fun SetupPageNavigationSection(
 
             SetupPage.SCHEDULE -> {
                 NavigationPageButton(
+                    onClick = onImportSchedule,
+                    navigationLabel = stringResource(Res.string.schedule_import_ai_button_label),
+                    leadingIcon = Icons.Default.AutoAwesome,
+                )
+                NavigationPageButton(
                     onClick = onFillOutSchedule,
                     navigationLabel = currentPage.buttonLabel,
+                    isTonal = true,
                 )
                 NavigationPageButton(
                     onClick = onStartUsing,

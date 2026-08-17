@@ -16,10 +16,13 @@
 
 package ru.aleshin.studyassistant.core.domain.repositories
 
+import ru.aleshin.studyassistant.core.common.functional.UID
+
 /**
  * @author Stanislav Aleshin on 17.08.2026.
  */
 interface UserDataResetRepository {
     suspend fun deleteAllSchedules()
+    suspend fun deleteSchedulesByOrganizations(organizationIds: Set<UID>)
     suspend fun deleteAllUserData()
 }

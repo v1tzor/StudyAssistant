@@ -1026,9 +1026,12 @@ internal interface AiToolCallProcessor {
             if (teacherId != null && teacher == null) return AiToolResultMapper.error("teacher_not_found")
 
             val colorName = args["color"]
+            val usedColors = subjectsRepository.fetchAllSubjectsByOrganization(organizationId)
+                .first()
+                .map(Subject::color)
             val color = colorName?.let { name ->
                 runCatching { CustomColors.valueOf(name).light.toInt() }.getOrNull()
-            } ?: CustomColors.entries.random().light.toInt()
+            } ?: CustomColors.randomUnusedArgb(usedColors)
 
             val subject = Subject(
                 uid = randomUUID(),

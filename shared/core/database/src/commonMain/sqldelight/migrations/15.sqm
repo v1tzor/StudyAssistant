@@ -1,0 +1,35 @@
+CREATE TABLE profileEntity_new (
+  id INTEGER PRIMARY KEY NOT NULL,
+  uid TEXT NOT NULL,
+  username TEXT NOT NULL,
+  avatar TEXT,
+  city TEXT,
+  birthday TEXT,
+  sex TEXT,
+  updated_at INTEGER NOT NULL
+);
+
+INSERT INTO profileEntity_new (
+  id,
+  uid,
+  username,
+  avatar,
+  city,
+  birthday,
+  sex,
+  updated_at
+)
+SELECT
+  id,
+  uid,
+  username,
+  avatar,
+  city,
+  birthday,
+  sex,
+  updated_at
+FROM profileEntity;
+
+DROP TABLE profileEntity;
+
+ALTER TABLE profileEntity_new RENAME TO profileEntity;

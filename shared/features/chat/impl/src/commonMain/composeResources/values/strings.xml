@@ -17,6 +17,10 @@
 
 <resources>
     <string name="assistant_top_bar_title">Assistant (Beta)</string>
+    <string name="assistant_expanded_header">Assistant</string>
+    <string name="assistant_quota_remaining">%1$d of %2$d messages left today</string>
+    <string name="assistant_send_action_description">Send message</string>
+    <string name="assistant_clear_history_description">Clear chat history</string>
     <string name="assistant_sender_badge">Assistant</string>
     <string name="chat_assistant_error_message">Error in assistant work</string>
     <string name="functional_chat_suggestion">What can you do?</string>

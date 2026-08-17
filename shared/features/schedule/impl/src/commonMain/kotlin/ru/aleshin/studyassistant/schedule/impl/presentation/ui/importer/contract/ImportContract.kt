@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreAc
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEffect
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreEvent
 import ru.aleshin.studyassistant.core.common.architecture.store.contract.StoreState
+import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
@@ -39,6 +40,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.Sch
 internal data class ImportState(
     val isLoadingPhoto: Boolean = false,
     val isAnalysisInProgress: Boolean = false,
+    val analysisStartedAt: Long? = null,
     val isRewardInProgress: Boolean = false,
     val isApplied: Boolean = false,
     var preparedImage: CompressedScheduleImage? = null,
@@ -62,8 +64,8 @@ internal sealed class ImportEvent : StoreEvent {
     data class UpdateEmployee(val employee: EmployeeUi) : ImportEvent()
     data class AssignSubject(val classId: UID, val subjectId: UID?) : ImportEvent()
     data class AssignTeacher(val classId: UID, val teacherId: UID?) : ImportEvent()
-    data class AddSubject(val name: String) : ImportEvent()
-    data class AddEmployee(val firstName: String) : ImportEvent()
+    data class AddSubject(val name: String, val uid: UID = randomUUID()) : ImportEvent()
+    data class AddEmployee(val firstName: String, val uid: UID = randomUUID()) : ImportEvent()
     data class DeleteClass(val classId: UID) : ImportEvent()
     data class DeleteSubject(val subjectId: UID) : ImportEvent()
     data class DeleteEmployee(val employeeId: UID) : ImportEvent()
@@ -87,7 +89,10 @@ internal sealed class ImportEffect : StoreEffect {
 
 internal sealed class ImportAction : StoreAction {
     data class UpdateLoadingPhoto(val isLoading: Boolean) : ImportAction()
-    data class UpdateAnalysisProgress(val isLoading: Boolean) : ImportAction()
+    data class UpdateAnalysisProgress(
+        val isLoading: Boolean,
+        val startedAt: Long?,
+    ) : ImportAction()
     data class UpdatePhoto(val preparedImage: CompressedScheduleImage?) : ImportAction()
     data class UpdateNote(val note: String) : ImportAction()
     data class UpdateSelectedOrganization(val organization: OrganizationShortUi?) : ImportAction()

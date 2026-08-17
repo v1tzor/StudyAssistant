@@ -16,45 +16,24 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.ai
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.domain.entities.ai.AiSettings
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.settings.impl.presentation.mappers.mapToMessage
-import ru.aleshin.studyassistant.settings.impl.presentation.models.settings.AiSettingsUi
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.contract.AiSettingsEffect
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.ai.store.AiSettingsComponent
-import ru.aleshin.studyassistant.settings.impl.resources.Res
-import ru.aleshin.studyassistant.settings.impl.resources.ai_privacy_description
-import ru.aleshin.studyassistant.settings.impl.resources.ai_privacy_title
-import ru.aleshin.studyassistant.settings.impl.resources.ai_quota_title
-import ru.aleshin.studyassistant.settings.impl.resources.ai_settings_description
-import ru.aleshin.studyassistant.settings.impl.resources.ai_settings_title
-import ru.aleshin.studyassistant.settings.impl.resources.backend_ai_description
-import ru.aleshin.studyassistant.settings.impl.resources.backend_ai_title
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.fetchSettingsLayoutMode
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -67,6 +46,7 @@ internal fun AiSettingsContent(
     val store = component.store
     val state by store.stateAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchSettingsLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -76,8 +56,9 @@ internal fun AiSettingsContent(
         contentWindowInsets = WindowInsets()
     ) { contentPadding ->
         AiSettingsLayout(
-            settings = state.settings,
             modifier = Modifier.padding(contentPadding),
+            layoutMode = layoutMode,
+            settings = state.settings,
         )
     }
 
@@ -87,101 +68,6 @@ internal fun AiSettingsContent(
                 message = effect.failure.mapToMessage(),
                 withDismissAction = true,
             )
-        }
-    }
-}
-
-@Composable
-private fun AiSettingsLayout(
-    settings: AiSettingsUi?,
-    modifier: Modifier = Modifier,
-) {
-    if (settings == null) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        AiSettingsView(
-            settings = settings,
-            modifier = modifier,
-        )
-    }
-}
-
-@Composable
-private fun AiSettingsView(
-    settings: AiSettingsUi,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.ai_settings_title),
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Text(
-            text = stringResource(Res.string.ai_settings_description),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        AiSettingsCard(
-            title = stringResource(Res.string.backend_ai_title),
-            description = stringResource(Res.string.backend_ai_description),
-            supportingText = stringResource(
-                Res.string.ai_quota_title,
-                settings.quotaRemaining,
-                settings.quotaLimit,
-                settings.rewardedResetsRemaining,
-                AiSettings.MAX_REWARDED_RESETS,
-            ),
-        )
-        AiSettingsCard(
-            title = stringResource(Res.string.ai_privacy_title),
-            description = stringResource(Res.string.ai_privacy_description),
-        )
-    }
-}
-
-@Composable
-private fun AiSettingsCard(
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier,
-    supportingText: String? = null,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            supportingText?.let { text ->
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
         }
     }
 }

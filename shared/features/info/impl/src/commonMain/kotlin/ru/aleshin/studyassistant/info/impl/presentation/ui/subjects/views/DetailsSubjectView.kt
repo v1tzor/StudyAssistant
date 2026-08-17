@@ -76,6 +76,7 @@ import ru.aleshin.studyassistant.core.ui.resources.warning_dialog_title as core_
 internal fun DetailsSubjectViewItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     eventType: EventType,
     office: String,
     color: Color,
@@ -120,6 +121,7 @@ internal fun DetailsSubjectViewItem(
         DetailsSubjectView(
             onClick = onEdit,
             enabled = enabled,
+            useExpandedStyle = useExpandedStyle,
             eventType = eventType,
             office = office,
             color = color,
@@ -155,6 +157,7 @@ private fun DetailsSubjectView(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useExpandedStyle: Boolean = false,
     eventType: EventType,
     office: String,
     color: Color,
@@ -162,11 +165,17 @@ private fun DetailsSubjectView(
     teacher: EmployeeUi?,
     location: ContactInfoUi?,
 ) {
+    val shape = if (useExpandedStyle) {
+        MaterialTheme.shapes.extraLarge
+    } else {
+        MaterialTheme.shapes.large
+    }
+
     Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
-        shape = MaterialTheme.shapes.large,
+        shape = shape,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(modifier = Modifier.height(IntrinsicSize.Min)) {
@@ -188,6 +197,7 @@ private fun DetailsSubjectView(
                     DetailsSubjectViewContent(
                         eventType = eventType,
                         name = name,
+                        useExpandedStyle = useExpandedStyle,
                     )
                 }
                 if (teacher != null || location != null) {
@@ -235,6 +245,7 @@ private fun DetailsSubjectViewContent(
     modifier: Modifier = Modifier,
     eventType: EventType,
     name: String,
+    useExpandedStyle: Boolean = false,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -249,7 +260,11 @@ private fun DetailsSubjectViewContent(
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 4,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
+            style = if (useExpandedStyle) {
+                MaterialTheme.typography.titleLarge
+            } else {
+                MaterialTheme.typography.titleMedium
+            },
         )
     }
 }

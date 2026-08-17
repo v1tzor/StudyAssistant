@@ -21,6 +21,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -46,6 +48,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +59,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
@@ -90,6 +95,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.store.Overv
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.DailyGoalsView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksExecutionAnalysisView
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.HomeworksOverview
+import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewExpandedTopBar
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosCompletedSection
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosErrorSection
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.overview.views.OverviewTodosInProgressSection
@@ -120,6 +126,7 @@ internal fun OverviewContent(
     val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
     val overviewTasksTab = rememberSaveable { mutableStateOf(OverviewTasksTab.HOMEWORKS) }
     val snackbarState = remember { SnackbarHostState() }
+    val layoutMode = currentWindowAdaptiveInfoV2().fetchOverviewLayoutMode()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -127,6 +134,7 @@ internal fun OverviewContent(
             BaseOverviewContent(
                 state = state,
                 modifier = Modifier.padding(paddingValues),
+                layoutMode = layoutMode,
                 overviewTasksTab = overviewTasksTab.value,
                 onChangeTab = { overviewTasksTab.value = it },
                 onEditHomeworkClick = {
@@ -192,11 +200,19 @@ internal fun OverviewContent(
             )
         },
         topBar = {
-            OverviewTopBar(
-                onAnalyticsClick = {
-                    store.dispatchEvent(OverviewEvent.ClickAnalytics)
-                },
-            )
+            if (layoutMode == OverviewLayoutMode.EXPANDED) {
+                OverviewExpandedTopBar(
+                    onAnalyticsClick = {
+                        store.dispatchEvent(OverviewEvent.ClickAnalytics)
+                    },
+                )
+            } else {
+                OverviewTopBar(
+                    onAnalyticsClick = {
+                        store.dispatchEvent(OverviewEvent.ClickAnalytics)
+                    },
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -277,6 +293,7 @@ internal fun OverviewContent(
 private fun BaseOverviewContent(
     state: OverviewState,
     modifier: Modifier = Modifier,
+    layoutMode: OverviewLayoutMode,
     scrollState: ScrollState = rememberScrollState(),
     overviewTasksTab: OverviewTasksTab,
     onChangeTab: (OverviewTasksTab) -> Unit,
@@ -307,6 +324,7 @@ private fun BaseOverviewContent(
     ) {
         DailyGoalsSection(
             isLoadingGoals = false,
+            layoutMode = layoutMode,
             currentDate = state.currentDate,
             selectedGoalsDate = state.selectedGoalsDate,
             dailyGoals = state.dailyGoals,
@@ -324,12 +342,13 @@ private fun BaseOverviewContent(
             onChangeGoalDesiredTime = onChangeGoalDesiredTime,
         )
         YandexInlineBanner(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.widthIn(max = 640.dp).padding(horizontal = 16.dp),
             placement = AdPlacement.TASKS_OVERVIEW,
         )
         HorizontalDivider()
         OverviewContentDetails(
             currentTab = overviewTasksTab,
+            layoutMode = layoutMode,
             isLoadingHomeworks = state.isLoadingHomeworks,
             isLoadingHomeworksProgress = state.isLoadingHomeworksProgress,
             isLoadingTasks = state.isLoadingTasks,
@@ -359,6 +378,7 @@ private fun BaseOverviewContent(
 private fun OverviewContentDetails(
     modifier: Modifier = Modifier,
     currentTab: OverviewTasksTab,
+    layoutMode: OverviewLayoutMode,
     isLoadingHomeworks: Boolean,
     isLoadingHomeworksProgress: Boolean,
     isLoadingTasks: Boolean,
@@ -398,6 +418,7 @@ private fun OverviewContentDetails(
                 OverviewTasksTab.HOMEWORKS -> HomeworksSection(
                     isLoadingHomeworks = isLoadingHomeworks,
                     isLoadingProgress = isLoadingHomeworksProgress,
+                    layoutMode = layoutMode,
                     currentDate = currentDate,
                     dailyHomeworks = dailyHomeworks,
                     homeworksScope = homeworksScope,
@@ -410,10 +431,10 @@ private fun OverviewContentDetails(
                     onRepeatHomework = onRepeatHomework,
                     onShareHomeworks = onShareHomeworks,
                 )
-
                 OverviewTasksTab.TODO -> TodosSection(
                     isLoadingTasks = isLoadingTasks,
                     groupedTodos = groupedTodos,
+                    layoutMode = layoutMode,
                     currentDate = currentDate,
                     onShowAllTodoTasks = onShowAllTodoTasks,
                     onOpenTodoTask = onOpenTodoTask,
@@ -431,6 +452,7 @@ private fun OverviewContentDetails(
 private fun DailyGoalsSection(
     modifier: Modifier = Modifier,
     isLoadingGoals: Boolean,
+    layoutMode: OverviewLayoutMode,
     currentDate: Instant,
     selectedGoalsDate: Instant,
     dailyGoals: List<GoalDetailsUi>,
@@ -447,36 +469,44 @@ private fun DailyGoalsSection(
     onChangeGoalTimeType: (GoalTime.Type, GoalDetailsUi) -> Unit,
     onChangeGoalDesiredTime: (Millis?, GoalDetailsUi) -> Unit,
 ) {
-    Column(
+    val headerStyle = layoutMode.sectionHeaderStyle()
+    val dateHeaderStyle = layoutMode.goalsDateHeaderStyle()
+    ConstrainedStartPane(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = stringResource(Res.string.daily_goals_section_header),
-            color = MaterialTheme.colorScheme.onBackground,
-            maxLines = 1,
-            style = MaterialTheme.typography.titleMedium,
-        )
-        DailyGoalsView(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            isLoadingGoals = isLoadingGoals,
-            currentDate = currentDate,
-            selectedGoalsDate = selectedGoalsDate,
-            dailyGoals = dailyGoals,
-            goalsProgress = goalsProgress,
-            onSelectDate = onSelectDate,
-            onEditHomeworkClick = onEditHomeworkClick,
-            onEditTodoClick = onEditTodoClick,
-            onChangeGoalNumbers = onChangeGoalNumbers,
-            onCompleteGoal = onCompleteGoal,
-            onDeleteGoal = onDeleteGoal,
-            onStartGoalTime = onStartGoalTime,
-            onPauseGoalTime = onPauseGoalTime,
-            onResetGoalTime = onResetGoalTime,
-            onChangeGoalTimeType = onChangeGoalTimeType,
-            onChangeGoalDesiredTime = onChangeGoalDesiredTime,
-        )
+        maxWidth = layoutMode.sectionMaxWidth(),
+    ) { paneModifier ->
+        Column(
+            modifier = paneModifier,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = stringResource(Res.string.daily_goals_section_header),
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                style = headerStyle,
+            )
+            DailyGoalsView(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                isLoadingGoals = isLoadingGoals,
+                currentDate = currentDate,
+                selectedGoalsDate = selectedGoalsDate,
+                dailyGoals = dailyGoals,
+                goalsProgress = goalsProgress,
+                dateHeaderStyle = dateHeaderStyle,
+                onSelectDate = onSelectDate,
+                onEditHomeworkClick = onEditHomeworkClick,
+                onEditTodoClick = onEditTodoClick,
+                onChangeGoalNumbers = onChangeGoalNumbers,
+                onCompleteGoal = onCompleteGoal,
+                onDeleteGoal = onDeleteGoal,
+                onStartGoalTime = onStartGoalTime,
+                onPauseGoalTime = onPauseGoalTime,
+                onResetGoalTime = onResetGoalTime,
+                onChangeGoalTimeType = onChangeGoalTimeType,
+                onChangeGoalDesiredTime = onChangeGoalDesiredTime,
+            )
+        }
     }
 }
 
@@ -545,6 +575,7 @@ private fun HomeworksSection(
     modifier: Modifier = Modifier,
     isLoadingHomeworks: Boolean,
     isLoadingProgress: Boolean,
+    layoutMode: OverviewLayoutMode,
     currentDate: Instant,
     dailyHomeworks: Map<Instant, DailyHomeworksUi>,
     homeworksScope: HomeworkScopeUi?,
@@ -561,13 +592,16 @@ private fun HomeworksSection(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        HomeworksExecutionAnalysisView(
-            isLoading = isLoadingProgress,
-            completeProgress = completeProgress,
-            onEditHomework = onHomeworkClick,
-            onDoHomework = onDoHomework,
-            onSkipHomework = onSkipHomework,
-        )
+        ConstrainedStartPane(maxWidth = layoutMode.sectionMaxWidth()) { paneModifier ->
+            HomeworksExecutionAnalysisView(
+                modifier = paneModifier,
+                isLoading = isLoadingProgress,
+                completeProgress = completeProgress,
+                onEditHomework = onHomeworkClick,
+                onDoHomework = onDoHomework,
+                onSkipHomework = onSkipHomework,
+            )
+        }
         HomeworksOverview(
             isLoadingHomeworks = isLoadingHomeworks,
             currentDate = currentDate,
@@ -597,6 +631,7 @@ private fun HomeworksSection(
 private fun TodosSection(
     modifier: Modifier = Modifier,
     isLoadingTasks: Boolean,
+    layoutMode: OverviewLayoutMode,
     currentDate: Instant,
     groupedTodos: DetailsGroupedTodosUi?,
     onShowAllTodoTasks: () -> Unit,
@@ -611,6 +646,7 @@ private fun TodosSection(
     ) {
         OverviewTodosInProgressSection(
             isLoading = isLoadingTasks,
+            useExpandedStyle = layoutMode != OverviewLayoutMode.COMPACT,
             currentDate = currentDate,
             todos = groupedTodos?.runningTodos ?: emptyList(),
             onOpenTodoTask = onOpenTodoTask,
@@ -620,6 +656,7 @@ private fun TodosSection(
         )
         OverviewTodosErrorSection(
             isLoading = isLoadingTasks,
+            useExpandedStyle = layoutMode != OverviewLayoutMode.COMPACT,
             currentDate = currentDate,
             todos = groupedTodos?.errorTodos ?: emptyList(),
             onOpenTodoTask = onOpenTodoTask,
@@ -629,6 +666,7 @@ private fun TodosSection(
         )
         OverviewTodosCompletedSection(
             isLoading = isLoadingTasks,
+            useExpandedStyle = layoutMode != OverviewLayoutMode.COMPACT,
             todos = groupedTodos?.completedTodos ?: emptyList(),
             onOpenTodoTask = onOpenTodoTask,
             onChangeTodoDone = onChangeTodoDone,
@@ -641,3 +679,50 @@ private fun TodosSection(
         }
     }
 }
+
+@Composable
+private fun ConstrainedStartPane(
+    modifier: Modifier = Modifier,
+    maxWidth: Dp?,
+    content: @Composable (Modifier) -> Unit,
+) {
+    if (maxWidth == null) {
+        content(modifier)
+    } else {
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopStart,
+        ) {
+            content(
+                Modifier
+                    .widthIn(max = maxWidth)
+                    .fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun OverviewLayoutMode.sectionHeaderStyle(): TextStyle {
+    return when (this) {
+        OverviewLayoutMode.COMPACT -> MaterialTheme.typography.titleMedium
+        OverviewLayoutMode.EXPANDED -> MaterialTheme.typography.titleLarge
+    }
+}
+
+@Composable
+private fun OverviewLayoutMode.goalsDateHeaderStyle(): TextStyle {
+    return when (this) {
+        OverviewLayoutMode.COMPACT -> MaterialTheme.typography.titleMedium
+        OverviewLayoutMode.EXPANDED -> MaterialTheme.typography.titleLarge
+    }
+}
+
+private fun OverviewLayoutMode.sectionMaxWidth(): Dp? {
+    return when (this) {
+        OverviewLayoutMode.COMPACT -> null
+        OverviewLayoutMode.EXPANDED -> OVERVIEW_EXPANDED_SECTION_MAX_WIDTH
+    }
+}
+
+private val OVERVIEW_EXPANDED_SECTION_MAX_WIDTH = 640.dp

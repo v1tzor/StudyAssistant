@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -67,10 +68,11 @@ internal fun SubjectFiltersView(
     allOrganizations: List<OrganizationShortUi>,
     onSelectOrganization: (OrganizationShortUi) -> Unit,
     onSelectSortedType: (SubjectSortedType) -> Unit,
+    horizontalPadding: Dp = 16.dp,
 ) {
     Column(modifier = modifier) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

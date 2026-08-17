@@ -16,16 +16,19 @@
 
 package ru.aleshin.studyassistant.settings.impl.presentation.ui.navigation.views
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.aleshin.studyassistant.settings.impl.presentation.ui.SettingsLayoutMode
 import ru.aleshin.studyassistant.settings.impl.presentation.ui.root.SettingsTabItem
 
 /**
@@ -36,36 +39,63 @@ internal fun TabNavigationRow(
     modifier: Modifier = Modifier,
     selectedItem: SettingsTabItem,
     onSelect: (SettingsTabItem) -> Unit,
+    layoutMode: SettingsLayoutMode = SettingsLayoutMode.COMPACT,
 ) {
-    ScrollableTabRow(
-        selectedTabIndex = selectedItem.index,
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        edgePadding = 8.dp,
-        indicator = { tabPositions ->
-            TabRowDefaults.PrimaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedItem.index]))
-        },
-    ) {
-        SettingsTabItem.entries.forEach { tabItem ->
-            Tab(
-                selected = tabItem == selectedItem,
-                onClick = { onSelect(tabItem) },
-                text = {
-                    Text(text = tabItem.title)
-                },
-                icon = if (tabItem.icon != null) {
-                    {
-                        Icon(
-                            painter = checkNotNull(tabItem.icon),
-                            contentDescription = null
-                        )
-                    }
-                } else {
-                    null
-                },
-                selectedContentColor = MaterialTheme.colorScheme.primary,
-                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    when (layoutMode) {
+        SettingsLayoutMode.COMPACT -> ScrollableTabRow(
+            selectedTabIndex = selectedItem.index,
+            modifier = modifier,
+            containerColor = MaterialTheme.colorScheme.background,
+            edgePadding = 8.dp,
+            indicator = { tabPositions ->
+                TabRowDefaults.PrimaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedItem.index]))
+            },
+        ) {
+            SettingsTabItems(
+                selectedItem = selectedItem,
+                onSelect = onSelect,
             )
         }
+        SettingsLayoutMode.EXPANDED -> TabRow(
+            selectedTabIndex = selectedItem.index,
+            modifier = modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.background,
+            indicator = { tabPositions ->
+                TabRowDefaults.PrimaryIndicator(Modifier.tabIndicatorOffset(tabPositions[selectedItem.index]))
+            },
+        ) {
+            SettingsTabItems(
+                selectedItem = selectedItem,
+                onSelect = onSelect,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsTabItems(
+    selectedItem: SettingsTabItem,
+    onSelect: (SettingsTabItem) -> Unit,
+) {
+    SettingsTabItem.entries.forEach { tabItem ->
+        Tab(
+            selected = tabItem == selectedItem,
+            onClick = { onSelect(tabItem) },
+            text = {
+                Text(text = tabItem.title)
+            },
+            icon = if (tabItem.icon != null) {
+                {
+                    Icon(
+                        painter = checkNotNull(tabItem.icon),
+                        contentDescription = null,
+                    )
+                }
+            } else {
+                null
+            },
+            selectedContentColor = MaterialTheme.colorScheme.primary,
+            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

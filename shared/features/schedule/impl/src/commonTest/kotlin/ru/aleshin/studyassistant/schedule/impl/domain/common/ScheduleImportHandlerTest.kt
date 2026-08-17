@@ -76,6 +76,27 @@ internal class ScheduleImportHandlerTest {
     }
 
     @Test
+    fun createdSubjectsPreferUnusedLightAndDarkColors() {
+        val draft = ScheduleImportDraft(
+            title = "Week",
+            entries = listOf(
+                entry(subject = "Algebra", startTime = "08:00", endTime = "08:45"),
+                entry(subject = "Painting", startTime = "09:00", endTime = "09:45"),
+                entry(subject = "Geography", startTime = "10:00", endTime = "10:45"),
+                entry(subject = "Robotics", startTime = "11:00", endTime = "11:45"),
+                entry(subject = "Choir", startTime = "12:00", endTime = "12:45"),
+            ),
+            unparsedLines = emptyList(),
+        )
+
+        val session = composer.handleDraft(draft, organization())
+        val createdColors = session.subjects.map(Subject::color)
+
+        assertEquals(5, createdColors.size)
+        assertEquals(createdColors.toSet().size, createdColors.size)
+    }
+
+    @Test
     fun assignExistingCatalogSubjectToClass() {
         val organization = organization(
             subjects = listOf(
