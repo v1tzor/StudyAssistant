@@ -26,31 +26,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
-import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
-import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.core.common.extensions.handleLazyListScroll
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
@@ -111,12 +99,11 @@ internal fun ImportDayColumn(
                     }
                 }
             } else {
-                ImportDayReorderList(
+                ImportDayClassList(
                     classes = classes,
                     subjects = subjects,
                     employees = employees,
                     onClassClick = onClassClick,
-                    onReorderClasses = onReorderClasses,
                 )
             }
         }
@@ -124,62 +111,26 @@ internal fun ImportDayColumn(
 }
 
 @Composable
-private fun ImportDayReorderList(
+private fun ImportDayClassList(
     classes: List<ScheduleImportClassUi>,
     subjects: List<SubjectUi>,
     employees: List<EmployeeUi>,
     onClassClick: (UID) -> Unit,
-    onReorderClasses: (List<UID>) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    val reorderState = rememberReorderState<ScheduleImportClassUi>()
-    var classItems by remember { mutableStateOf(classes) }
-    val lazyListState = rememberLazyListState()
-
-    LaunchedEffect(classes) {
-        if (reorderState.draggedItem == null) classItems = classes
-    }
-
-    ReorderContainer(state = reorderState) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
-            state = lazyListState,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            items(
-                items = classItems,
-                key = { classModel -> classModel.uid },
-            ) { classModel ->
-                ReorderableItem(
-                    state = reorderState,
-                    key = classModel.uid,
-                    data = classModel,
-                    requireFirstDownUnconsumed = true,
-                    onDrop = { onReorderClasses(classItems.map(ScheduleImportClassUi::uid)) },
-                    onDragEnter = { state ->
-                        classItems = classItems.toMutableList().apply {
-                            val index = indexOfFirst { item -> item.uid == classModel.uid }
-                            if (index == -1) return@ReorderableItem
-                            removeAll { item -> item.uid == state.data.uid }
-                            add(index, state.data)
-                            scope.launch {
-                                handleLazyListScroll(
-                                    lazyListState = lazyListState,
-                                    dropIndex = index,
-                                )
-                            }
-                        }
-                    },
-                    modifier = Modifier.animateItem(),
-                ) {
-                    ImportClassCard(
-                        classModel = classModel,
-                        subject = subjects.firstOrNull { subject -> subject.uid == classModel.subjectId },
-                        teacher = employees.firstOrNull { employee -> employee.uid == classModel.teacherId },
-                        onClick = { onClassClick(classModel.uid) },
-                    )
-                }
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        classes.forEach { classModel ->
+            ImportClassCard(
+                classModel = classModel,
+                subject = subjects.firstOrNull { subject -> subject.uid == classModel.subjectId },
+                teacher = employees.firstOrNull { employee -> employee.uid == classModel.teacherId },
+                onClick = { onClassClick(classModel.uid) },
+            )
         }
     }
 }

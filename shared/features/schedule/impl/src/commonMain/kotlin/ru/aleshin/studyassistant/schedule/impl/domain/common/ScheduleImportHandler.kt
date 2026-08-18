@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
+import kotlinx.datetime.LocalTime
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
@@ -67,43 +68,45 @@ internal interface ScheduleImportHandler {
             val createdEmployeeIds = linkedMapOf<String, UID>()
             val createdSubjectIds = linkedMapOf<String, UID>()
 
-            val classes = draft.entries.map { entry ->
-                val teacherId = resolveTeacherId(
-                    entryTeacherId = entry.teacherId,
-                    teacherName = entry.teacher,
-                    employees = employees,
-                    createdEmployeeIds = createdEmployeeIds,
-                    organizationId = organization.uid,
-                )
-                val subjectId = resolveSubjectId(
-                    entrySubjectId = entry.subjectId,
-                    subjectName = entry.subject,
-                    eventType = entry.eventType.toEventType(),
-                    teacherId = teacherId,
-                    office = entry.office,
-                    location = entry.location,
-                    employees = employees,
-                    subjects = subjects,
-                    createdSubjectIds = createdSubjectIds,
-                    organizationId = organization.uid,
-                )
-                val start = validator.parseTime(entry.startTime)
-                val end = validator.parseTime(entry.endTime)
-                ScheduleImportClass(
-                    uid = randomUUID(),
-                    repeatWeek = entry.repeatWeek,
-                    dayOfWeek = entry.dayOfWeek,
-                    number = entry.classNumber,
-                    startTime = start?.formatClock().orEmpty(),
-                    endTime = end?.formatClock().orEmpty(),
-                    subjectId = subjectId,
-                    teacherId = teacherId,
-                    office = entry.office.orEmpty(),
-                    location = entry.location,
-                    eventType = entry.eventType.toEventType(),
-                    included = entry.included,
-                )
-            }
+            val classes = normalizeClassNumbers(
+                classes = draft.entries.map { entry ->
+                    val teacherId = resolveTeacherId(
+                        entryTeacherId = entry.teacherId,
+                        teacherName = entry.teacher,
+                        employees = employees,
+                        createdEmployeeIds = createdEmployeeIds,
+                        organizationId = organization.uid,
+                    )
+                    val subjectId = resolveSubjectId(
+                        entrySubjectId = entry.subjectId,
+                        subjectName = entry.subject,
+                        eventType = entry.eventType.toEventType(),
+                        teacherId = teacherId,
+                        office = entry.office,
+                        location = entry.location,
+                        employees = employees,
+                        subjects = subjects,
+                        createdSubjectIds = createdSubjectIds,
+                        organizationId = organization.uid,
+                    )
+                    val start = validator.parseTime(entry.startTime)
+                    val end = validator.parseTime(entry.endTime)
+                    ScheduleImportClass(
+                        uid = randomUUID(),
+                        repeatWeek = entry.repeatWeek,
+                        dayOfWeek = entry.dayOfWeek,
+                        number = entry.classNumber,
+                        startTime = start?.formatClock().orEmpty(),
+                        endTime = end?.formatClock().orEmpty(),
+                        subjectId = subjectId,
+                        teacherId = teacherId,
+                        office = entry.office.orEmpty(),
+                        location = entry.location,
+                        eventType = entry.eventType.toEventType(),
+                        included = entry.included,
+                    )
+                },
+            )
 
             return ScheduleImportSession(
                 title = draft.title,
@@ -270,6 +273,44 @@ internal interface ScheduleImportHandler {
                         endTime = slot.third,
                     )
                 },
+            )
+        }
+
+        private fun normalizeClassNumbers(
+            classes: List<ScheduleImportClass>,
+        ): List<ScheduleImportClass> {
+            val normalizedById = classes.groupBy { classModel ->
+                classModel.repeatWeek to classModel.dayOfWeek
+            }.flatMap { (_, dayClasses) ->
+                val sorted = dayClasses.sortedWith(
+                    compareBy<ScheduleImportClass> { classModel ->
+                        validator.parseTime(classModel.startTime) ?: LocalTime(23, 59, 59)
+                    }.thenBy { classModel -> classModel.number ?: Int.MAX_VALUE },
+                )
+                val numbers = sorted.map(ScheduleImportClass::number)
+                val uniquePresent = numbers.filterNotNull().toSet()
+                val shouldRenumber = sorted.size > 1 && (
+                    numbers.any { number -> number == null } ||
+                        uniquePresent.size <= 1 ||
+                        uniquePresent.size != numbers.filterNotNull().size
+                )
+                if (!shouldRenumber) {
+                    sorted
+                } else {
+                    sorted.mapIndexed { index, classModel ->
+                        classModel.copy(number = index + 1)
+                    }
+                }
+            }.associateBy(ScheduleImportClass::uid)
+            return classes.map { classModel ->
+                normalizedById[classModel.uid] ?: classModel
+            }.sortedWith(
+                compareBy(
+                    ScheduleImportClass::repeatWeek,
+                    ScheduleImportClass::dayOfWeek,
+                    { classModel -> classModel.number ?: Int.MAX_VALUE },
+                    ScheduleImportClass::startTime,
+                )
             )
         }
 

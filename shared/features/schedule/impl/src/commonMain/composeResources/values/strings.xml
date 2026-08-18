@@ -82,8 +82,11 @@
     <string name="schedule_reward_unavailable_error">The ad is unavailable right now. Please try again later.</string>
     <string name="reject_shared_schedule_button_title">Reject</string>
     <string name="create_share_title">Share schedule</string>
-    <string name="create_share_description">Create a temporary code containing the schedule and related study data without profile or account data.</string>
+    <string name="create_share_description">Choose organizations and create a temporary code. Only their timetable is shared — no profile or account data.</string>
     <string name="create_share_button_title">Create code</string>
+    <string name="share_organizations_title">Which organizations to share</string>
+    <string name="share_organizations_empty">There are no classes in the current schedule. Fill the week first.</string>
+    <string name="share_organization_main_label">Main</string>
     <string name="receive_share_title">Receive schedule</string>
     <string name="share_code_label">Sharing code</string>
     <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>

@@ -139,7 +139,7 @@ fun InfoTextField(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = 1
                 )
             },
             placeholder = placeholder,
@@ -364,6 +364,7 @@ fun VerticalInfoTextField(
                     text = placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis
                 )
             },
             leadingIcon = {
@@ -445,6 +446,7 @@ fun VerticalInfoTextField(
                     text = placeholder,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis
                 )
             },
             leadingIcon = {

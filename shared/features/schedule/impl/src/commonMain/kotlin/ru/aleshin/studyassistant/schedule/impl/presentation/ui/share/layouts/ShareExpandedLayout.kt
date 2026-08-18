@@ -59,6 +59,7 @@ internal fun ShareExpandedLayout(
     state: ShareState,
     onCodeChange: (String) -> Unit,
     onCreateClick: () -> Unit,
+    onToggleOrganization: (UID) -> Unit,
     onClaimClick: () -> Unit,
     onScanClick: () -> Unit,
     onCopyLinkClick: () -> Unit,
@@ -91,6 +92,7 @@ internal fun ShareExpandedLayout(
                     state = state,
                     onCodeChange = onCodeChange,
                     onCreateClick = onCreateClick,
+                    onToggleOrganization = onToggleOrganization,
                     onClaimClick = onClaimClick,
                     onScanClick = onScanClick,
                 )

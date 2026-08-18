@@ -95,6 +95,55 @@ internal class ScheduleImportHandlerTest {
     }
 
     @Test
+    fun handleDraftRenumbersIdenticalClassNumbersByStartTime() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:45", classNumber = 9),
+                    entry(subject = "Physics", startTime = "09:00", endTime = "09:45", classNumber = 9),
+                    entry(subject = "History", startTime = "10:00", endTime = "10:45", classNumber = 9),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        assertEquals(listOf(1, 2, 3), session.classes.map { classModel -> classModel.number })
+    }
+
+    @Test
+    fun handleDraftKeepsUniqueSequentialClassNumbers() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:45", classNumber = 1),
+                    entry(subject = "Physics", startTime = "09:00", endTime = "09:45", classNumber = 2),
+                    entry(subject = "History", startTime = "10:00", endTime = "10:45", classNumber = 3),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        assertEquals(listOf(1, 2, 3), session.classes.map { classModel -> classModel.number })
+    }
+
+    @Test
+    fun handleDraftKeepsSingleClassNumber() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "14:00", endTime = "14:45", classNumber = 9),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        assertEquals(9, session.classes.single().number)
+    }
+
+    @Test
     fun assignExistingCatalogSubjectToClass() {
         val organization = organization(
             subjects = listOf(
@@ -318,10 +367,11 @@ internal class ScheduleImportHandlerTest {
         teacher: String? = null,
         startTime: String,
         endTime: String,
+        classNumber: Int? = 1,
     ) = ScheduleImportEntry(
         repeatWeek = 1,
         dayOfWeek = 1,
-        classNumber = 1,
+        classNumber = classNumber,
         startTime = startTime,
         endTime = endTime,
         subject = subject,

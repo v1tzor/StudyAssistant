@@ -48,6 +48,7 @@ import ru.aleshin.studyassistant.widget.presentation.theme.formatWidgetDate
 import ru.aleshin.studyassistant.widget.presentation.theme.formatWidgetTime
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetDimensions
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetShapes
+import ru.aleshin.studyassistant.widget.presentation.theme.widgetAccents
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetString
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetTypography
 import ru.aleshin.studyassistant.widget.presentation.utils.WidgetSizeClass
@@ -69,22 +70,18 @@ fun TodoWidgetRow(
     } else {
         WidgetDimensions.todoRowHeight
     }
-    val container = if (todo.status == WidgetTodoStatus.OVERDUE) {
-        GlanceTheme.colors.errorContainer
-    } else {
-        GlanceTheme.colors.surfaceVariant
-    }
+    val palette = todo.colorPalette()
     val deadlineColor = if (todo.status == WidgetTodoStatus.OVERDUE) {
-        GlanceTheme.colors.error
+        palette.accent
     } else {
-        GlanceTheme.colors.onSurfaceVariant
+        palette.onContainer
     }
 
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(rowHeight)
-            .compatCornerBackground(container, WidgetShapes.LARGE)
+            .compatCornerBackground(palette.container, WidgetShapes.LARGE)
             .clickable(action)
             .padding(horizontal = WidgetDimensions.spacingSmall),
         verticalAlignment = Alignment.CenterVertically,
@@ -103,7 +100,7 @@ fun TodoWidgetRow(
                 modifier = GlanceModifier.size(WidgetDimensions.checkboxSize),
                 provider = ImageProvider(R.drawable.ic_widget_checkbox),
                 contentDescription = widgetString(R.string.widget_complete_todo_description),
-                colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+                colorFilter = ColorFilter.tint(palette.accent),
             )
         }
         Column(GlanceModifier.defaultWeight()) {
@@ -115,15 +112,13 @@ fun TodoWidgetRow(
                     modifier = GlanceModifier.defaultWeight(),
                     text = todo.name,
                     maxLines = 1,
-                    style = GlanceTheme.widgetTypography().label.copy(
-                        color = GlanceTheme.colors.onSurface,
-                    ),
+                    style = GlanceTheme.widgetTypography().label.copy(color = palette.onContainer),
                 )
                 Spacer(GlanceModifier.width(WidgetDimensions.spacingExtraSmall))
                 Box(
                     modifier = GlanceModifier
-                        .size(WidgetDimensions.spacingSmall)
-                        .compatCornerBackground(todo.priority.priorityColor(), WidgetShapes.FULL),
+                        .size(WidgetDimensions.priorityDotSize)
+                        .compatCornerBackground(palette.accent, WidgetShapes.FULL),
                 ) {}
             }
             todo.deadline?.let { deadline ->
@@ -137,9 +132,7 @@ fun TodoWidgetRow(
                 Text(
                     text = todo.description,
                     maxLines = 1,
-                    style = GlanceTheme.widgetTypography().caption.copy(
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                    ),
+                    style = GlanceTheme.widgetTypography().caption.copy(color = palette.onContainer),
                 )
             }
         }
@@ -147,8 +140,34 @@ fun TodoWidgetRow(
 }
 
 @Composable
-private fun TaskPriority.priorityColor(): ColorProvider = when (this) {
-    TaskPriority.STANDARD -> GlanceTheme.colors.outline
-    TaskPriority.MEDIUM -> GlanceTheme.colors.secondary
-    TaskPriority.HIGH -> GlanceTheme.colors.error
+private fun TodoWidgetItemUi.colorPalette(): TodoColorPalette {
+    val accents = widgetAccents()
+    return when {
+        status == WidgetTodoStatus.OVERDUE -> TodoColorPalette(
+            accent = accents.red,
+            container = accents.redContainer,
+            onContainer = accents.onRedContainer,
+        )
+        priority == TaskPriority.HIGH -> TodoColorPalette(
+            accent = accents.red,
+            container = accents.redContainer,
+            onContainer = accents.onRedContainer,
+        )
+        priority == TaskPriority.MEDIUM -> TodoColorPalette(
+            accent = accents.orange,
+            container = accents.orangeContainer,
+            onContainer = accents.onOrangeContainer,
+        )
+        else -> TodoColorPalette(
+            accent = GlanceTheme.colors.primary,
+            container = GlanceTheme.colors.primaryContainer,
+            onContainer = GlanceTheme.colors.onPrimaryContainer,
+        )
+    }
 }
+
+private data class TodoColorPalette(
+    val accent: ColorProvider,
+    val container: ColorProvider,
+    val onContainer: ColorProvider,
+)

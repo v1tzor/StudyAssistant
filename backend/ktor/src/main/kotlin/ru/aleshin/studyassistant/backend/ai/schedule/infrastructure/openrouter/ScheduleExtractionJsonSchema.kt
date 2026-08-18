@@ -93,7 +93,7 @@ internal object ScheduleExtractionJsonSchema {
                     put(
                         "classNumber",
                         nullableInteger(
-                            description = "Visible lesson number. Null if the photo has no lesson number.",
+                            description = "Lesson/period index in the day (1, 2, 3, 4, ...). Null if no period number is visible. Never a school grade or group such as 9А.",
                             minimum = 1,
                             maximum = 30,
                         ),

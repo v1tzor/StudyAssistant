@@ -81,6 +81,7 @@ internal fun ShareInputSection(
     state: ShareState,
     onCodeChange: (String) -> Unit,
     onCreateClick: () -> Unit,
+    onToggleOrganization: (UID) -> Unit,
     onClaimClick: () -> Unit,
     onScanClick: () -> Unit,
 ) {
@@ -98,8 +99,16 @@ internal fun ShareInputSection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
+            ShareOrganizationSelector(
+                organizations = state.shareableOrganizations,
+                selectedOrganizationIds = state.selectedOrganizationIds,
+                isLoading = state.isLoadingShareableOrganizations,
+                onToggleOrganization = onToggleOrganization,
+            )
             Button(
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoadingShareableOrganizations &&
+                    state.selectedOrganizationIds.isNotEmpty(),
                 onClick = onCreateClick,
             ) {
                 Text(text = stringResource(Res.string.create_share_button_title))

@@ -16,10 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.layouts
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
@@ -30,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportContentState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportLoadingSection
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportReviewSection
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSourceSection
@@ -61,47 +56,36 @@ internal fun ImportCompactLayout(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
     ) {
-        AnimatedContent(
-            targetState = when {
-                state.isAnalysisInProgress -> ImportContentState.LOADING
-                state.isApplied -> ImportContentState.SUCCESS
-                state.session != null -> ImportContentState.REVIEW
-                else -> ImportContentState.SOURCE
-            },
-            transitionSpec = { fadeIn().togetherWith(fadeOut()) },
-            contentKey = { contentState -> contentState },
-        ) { contentState ->
-            when (contentState) {
-                ImportContentState.SOURCE -> ImportSourceSection(
-                    modifier = Modifier.widthIn(max = 600.dp),
-                    state = state,
-                    enabled = !state.isAnalysisInProgress,
-                    onSelectPhoto = onSelectPhoto,
-                    onTakePhoto = onTakePhoto,
-                    onNoteChanged = onNoteChanged,
-                    onOrganizationSelect = onOrganizationSelect,
-                    onAddOrganization = onAddOrganization,
-                    onExtract = onExtract,
-                )
-                ImportContentState.LOADING -> ImportLoadingSection(
-                    modifier = Modifier.fillMaxSize(),
-                    startedAt = state.analysisStartedAt,
-                )
-                ImportContentState.REVIEW -> ImportReviewSection(
-                    modifier = Modifier.widthIn(max = 800.dp),
-                    state = state,
-                    onClassClick = onClassClick,
-                    onReorderDayClasses = onReorderDayClasses,
-                    onSubjectClick = onSubjectClick,
-                    onTeacherClick = onTeacherClick,
-                    onAddSubject = onAddSubject,
-                    onAddTeacher = onAddTeacher,
-                )
-                ImportContentState.SUCCESS -> ImportSuccessSection(
-                    modifier = Modifier.widthIn(max = 600.dp),
-                    onDone = onDone,
-                )
-            }
+        when {
+            state.isAnalysisInProgress -> ImportLoadingSection(
+                modifier = Modifier.fillMaxSize(),
+                startedAt = state.analysisStartedAt,
+            )
+            state.isApplied -> ImportSuccessSection(
+                modifier = Modifier.widthIn(max = 600.dp),
+                onDone = onDone,
+            )
+            state.session != null -> ImportReviewSection(
+                modifier = Modifier.widthIn(max = 800.dp),
+                state = state,
+                onClassClick = onClassClick,
+                onReorderDayClasses = onReorderDayClasses,
+                onSubjectClick = onSubjectClick,
+                onTeacherClick = onTeacherClick,
+                onAddSubject = onAddSubject,
+                onAddTeacher = onAddTeacher,
+            )
+            else -> ImportSourceSection(
+                modifier = Modifier.widthIn(max = 600.dp),
+                state = state,
+                enabled = !state.isAnalysisInProgress,
+                onSelectPhoto = onSelectPhoto,
+                onTakePhoto = onTakePhoto,
+                onNoteChanged = onNoteChanged,
+                onOrganizationSelect = onOrganizationSelect,
+                onAddOrganization = onAddOrganization,
+                onExtract = onExtract,
+            )
         }
     }
 }

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.store
 
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.Either
@@ -25,6 +26,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.MediatedBaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.share.ScheduleShareClaim
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
@@ -47,6 +49,34 @@ import kotlin.test.assertIs
  * @author Stanislav Aleshin on 08.08.2026.
  */
 class ShareWorkProcessorTest {
+
+    @Test
+    fun loadShareableOrganizationsSelectsAllLoadedIds() = runBlocking {
+        val interactor = FakeShareSchedulesInteractor().apply {
+            shareableOrganizations = listOf(
+                OrganizationShort(uid = "org-main", isMain = true, shortName = "School", updatedAt = 0L),
+                OrganizationShort(uid = "org-extra", shortName = "Courses", updatedAt = 0L),
+            )
+        }
+        val processor = ShareWorkProcessor.Base(interactor)
+
+        val results = processor.work(ShareWorkCommand.LoadShareableOrganizations).toList()
+
+        val setupResult = assertIs<WorkResult.Action<ShareAction>>(results.single())
+        val setup = assertIs<ShareAction.SetupShareableOrganizations>(setupResult.action)
+        assertEquals(listOf("org-main", "org-extra"), setup.organizations.map { it.uid })
+        assertEquals(setOf("org-main", "org-extra"), setup.selectedOrganizationIds)
+    }
+
+    @Test
+    fun createSharePassesSelectedOrganizationIds() = runBlocking {
+        val interactor = FakeShareSchedulesInteractor()
+        val processor = ShareWorkProcessor.Base(interactor)
+
+        processor.work(ShareWorkCommand.CreateShare(listOf("org-main"))).toList()
+
+        assertEquals(listOf("org-main"), interactor.createdOrganizationIds)
+    }
 
     @Test
     fun invalidClaimChangesStatusWithoutErrorEffect() = runBlocking {
@@ -90,8 +120,26 @@ class ShareWorkProcessorTest {
 
         var releasedClaim: ScheduleShareClaim? = null
         var claimFailure: ScheduleFailures? = null
+        var shareableOrganizations: List<OrganizationShort> = emptyList()
+        var createdOrganizationIds: List<UID>? = null
 
-        override suspend fun createShare(): DomainResult<ScheduleFailures, ShareLink> = error("Unused")
+        override suspend fun fetchShareableOrganizations(): DomainResult<ScheduleFailures, List<OrganizationShort>> {
+            return Either.Right(shareableOrganizations)
+        }
+
+        override suspend fun createShare(
+            organizationIds: List<UID>,
+        ): DomainResult<ScheduleFailures, ShareLink> {
+            createdOrganizationIds = organizationIds
+            return Either.Right(
+                ShareLink(
+                    code = "AAAA-AAAA-AAAA",
+                    deepLink = "studyassistant://share/schedule?code=AAAA-AAAA-AAAA",
+                    createdAt = Instant.fromEpochMilliseconds(1L),
+                    expiresAt = Instant.fromEpochMilliseconds(2L),
+                )
+            )
+        }
 
         override suspend fun claimShare(
             code: String,

@@ -56,7 +56,8 @@ internal interface ShareWorkProcessor :
     ) : ShareWorkProcessor {
 
         override suspend fun work(command: ShareWorkCommand) = when (command) {
-            is ShareWorkCommand.CreateShare -> createShareWork()
+            is ShareWorkCommand.LoadShareableOrganizations -> loadShareableOrganizationsWork()
+            is ShareWorkCommand.CreateShare -> createShareWork(command.organizationIds)
             is ShareWorkCommand.ClaimShare -> claimShareWork(command.code)
             is ShareWorkCommand.ReleaseShare -> releaseShareWork(command)
             is ShareWorkCommand.LinkOrganization -> linkOrganizationWork(command)
@@ -66,8 +67,27 @@ internal interface ShareWorkProcessor :
             is ShareWorkCommand.PrepareImportReward -> prepareImportRewardWork(command.claim)
         }
 
-        private fun createShareWork() = flow<ShareWorkResult> {
-            shareSchedulesInteractor.createShare().handle(
+        private fun loadShareableOrganizationsWork() = flow<ShareWorkResult> {
+            shareSchedulesInteractor.fetchShareableOrganizations().handle(
+                onLeftAction = { failure ->
+                    emit(ActionResult(ShareAction.SetupShareableOrganizations(emptyList(), emptySet())))
+                    emit(EffectResult(ShareEffect.ShowError(failure)))
+                },
+                onRightAction = { organizations ->
+                    val organizationUi = organizations.map { organization ->
+                        organization.mapOrganizationToUi()
+                    }
+                    val action = ShareAction.SetupShareableOrganizations(
+                        organizations = organizationUi,
+                        selectedOrganizationIds = organizationUi.map { organization -> organization.uid }.toSet(),
+                    )
+                    emit(ActionResult(action))
+                },
+            )
+        }
+
+        private fun createShareWork(organizationIds: List<UID>) = flow<ShareWorkResult> {
+            shareSchedulesInteractor.createShare(organizationIds).handle(
                 onLeftAction = { failure ->
                     when ((failure as? ScheduleFailures.OtherError)?.throwable) {
                         is ShareException.RateLimit,
@@ -78,14 +98,14 @@ internal interface ShareWorkProcessor :
                             emit(EffectResult(ShareEffect.ShowError(failure)))
                         }
                         else -> when (failure) {
-                            ScheduleFailures.InternetError -> emit(
-                                ActionResult(ShareAction.UpdateStatus(ShareStatus.OFFLINE))
-                            )
+                            ScheduleFailures.InternetError -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.OFFLINE)))
                             else -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.ERROR)))
                         }
                     }
                 },
-                onRightAction = { link -> emit(ActionResult(ShareAction.SetupLink(link.mapToUi()))) },
+                onRightAction = { link ->
+                    emit(ActionResult(ShareAction.SetupLink(link.mapToUi())))
+                }
             )
         }.onStart {
             emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.LOADING)))
@@ -95,18 +115,10 @@ internal interface ShareWorkProcessor :
             shareSchedulesInteractor.claimShare(code).handle(
                 onLeftAction = { failure ->
                     when ((failure as? ScheduleFailures.OtherError)?.throwable) {
-                        is ShareException.InvalidCode -> emit(
-                            ActionResult(ShareAction.UpdateStatus(ShareStatus.INVALID))
-                        )
-                        is ShareException.Expired -> emit(
-                            ActionResult(ShareAction.UpdateStatus(ShareStatus.EXPIRED))
-                        )
-                        is ShareException.Claimed -> emit(
-                            ActionResult(ShareAction.UpdateStatus(ShareStatus.CLAIMED))
-                        )
-                        is ShareException.Consumed -> emit(
-                            ActionResult(ShareAction.UpdateStatus(ShareStatus.CONSUMED))
-                        )
+                        is ShareException.InvalidCode -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.INVALID)))
+                        is ShareException.Expired -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.EXPIRED)))
+                        is ShareException.Claimed -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.CLAIMED)))
+                        is ShareException.Consumed -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.CONSUMED)))
                         is ShareException.RateLimit,
                         is ShareException.ShareLimit,
                         is ShareException.ItemLimit,
@@ -115,23 +127,23 @@ internal interface ShareWorkProcessor :
                             emit(EffectResult(ShareEffect.ShowError(failure)))
                         }
                         else -> when (failure) {
-                            ScheduleFailures.InternetError -> emit(
-                                ActionResult(ShareAction.UpdateStatus(ShareStatus.OFFLINE))
-                            )
+                            ScheduleFailures.InternetError -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.OFFLINE)))
                             else -> emit(ActionResult(ShareAction.UpdateStatus(ShareStatus.ERROR)))
                         }
                     }
                 },
                 onRightAction = { preview ->
-                    emit(ActionResult(ShareAction.SetupClaim(
+                    val setupAction = ShareAction.SetupClaim(
                         claim = preview.claim.mapToUi(),
                         organizationsLinkData = preview.links.map { link -> link.mapToUi() },
                         linkedSchedules = preview.schedules.map { schedule -> schedule.mapToUi() },
                         maxNumberOfWeek = preview.maxNumberOfWeek,
-                    )))
-                    emit(ActionResult(ShareAction.UpdateOrganizations(
+                    )
+                    val updateOrganizationAction = ShareAction.UpdateOrganizations(
                         preview.organizations.map { organization -> organization.mapOrganizationToUi() },
-                    )))
+                    )
+                    emit(ActionResult(setupAction))
+                    emit(ActionResult(updateOrganizationAction))
                 },
             )
         }.onStart {
@@ -288,7 +300,8 @@ internal interface ShareWorkProcessor :
 }
 
 internal sealed class ShareWorkCommand : WorkCommand {
-    data object CreateShare : ShareWorkCommand()
+    data object LoadShareableOrganizations : ShareWorkCommand()
+    data class CreateShare(val organizationIds: List<UID>) : ShareWorkCommand()
     data class ClaimShare(val code: String) : ShareWorkCommand()
     data class ReleaseShare(
         val claim: ScheduleShareClaimUi,

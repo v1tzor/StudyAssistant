@@ -64,8 +64,20 @@ fun WidgetTheme(
         CompositionLocalProvider(
             LocalWidgetTypography provides WidgetTypography(),
             LocalWidgetLanguage provides language,
+            LocalWidgetAccents provides widgetAccentColors(isWidgetDark(context, theme)),
             content = content,
         )
+    }
+}
+
+private fun isWidgetDark(context: Context, theme: ThemeType): Boolean {
+    return when (theme) {
+        ThemeType.LIGHT -> false
+        ThemeType.DARK -> true
+        ThemeType.DEFAULT -> {
+            val nightMask = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            nightMask == Configuration.UI_MODE_NIGHT_YES
+        }
     }
 }
 

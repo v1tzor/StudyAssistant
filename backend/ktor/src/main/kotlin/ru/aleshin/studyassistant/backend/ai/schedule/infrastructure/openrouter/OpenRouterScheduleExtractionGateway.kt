@@ -348,6 +348,8 @@ class OpenRouterScheduleExtractionGateway(
 
             TIME AND ORDER:
             - Normalize recognizable times to HH:mm.
+            - classNumber is only the lesson/period index in that day (1, 2, 3).
+            - Never put a school grade, group or class name into classNumber. Values such as 9, 9А, 10Б or "9 класс" are not lesson numbers.
             - Lesson numbers and clock times are independent: if only one is visible, do not invent the other.
             - Breaks and gaps are normal and must not become events.
             - Remove exact duplicates and sort entries chronologically within each week/day.

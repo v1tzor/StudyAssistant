@@ -156,7 +156,10 @@ private fun IntroLayout(
         modifier = modifier.fillMaxSize(),
         contentAlignment = contentAlignment,
     ) {
-        Column(modifier = contentModifier) {
+        Column(
+            modifier = contentModifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             HorizontalPager(
                 modifier = Modifier.weight(1f),
                 state = pagerState,
@@ -174,7 +177,7 @@ private fun IntroLayout(
             }
             IntroStepsSection(
                 stepsCount = IntroPage.entries.size,
-                currentStep = pagerState.currentPage,
+                currentStep = pagerState.currentPage
             )
             IntroNavigationSection(
                 isFirstPage = pagerState.currentPage == 0,

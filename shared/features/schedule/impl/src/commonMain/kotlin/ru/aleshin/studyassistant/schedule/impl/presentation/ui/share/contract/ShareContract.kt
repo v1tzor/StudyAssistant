@@ -50,6 +50,9 @@ internal data class ShareState(
     val isLoadingLinkedOrganization: Boolean = false,
     val currentTime: Instant = Clock.System.now(),
     val allOrganizations: List<OrganizationShortUi> = emptyList(),
+    val shareableOrganizations: List<OrganizationShortUi> = emptyList(),
+    val selectedOrganizationIds: Set<UID> = emptySet(),
+    val isLoadingShareableOrganizations: Boolean = true,
     val organizationsLinkData: List<OrganizationLinkData> = emptyList(),
     val linkedSchedules: List<BaseScheduleUi> = emptyList(),
     val maxNumberOfWeek: Int = 1,
@@ -58,6 +61,7 @@ internal data class ShareState(
 internal sealed class ShareEvent : StoreEvent {
     data class Started(val inputData: ShareInput, val isRestore: Boolean) : ShareEvent()
     data class UpdatedCode(val code: String) : ShareEvent()
+    data class ToggleShareOrganization(val organizationId: UID) : ShareEvent()
     data object CreateShare : ShareEvent()
     data object ClaimShare : ShareEvent()
     data class ScannedCode(val code: String) : ShareEvent()
@@ -91,6 +95,11 @@ internal sealed class ShareAction : StoreAction {
         val linkedSchedules: List<BaseScheduleUi>,
     ) : ShareAction()
     data class UpdateOrganizations(val organizations: List<OrganizationShortUi>) : ShareAction()
+    data class SetupShareableOrganizations(
+        val organizations: List<OrganizationShortUi>,
+        val selectedOrganizationIds: Set<UID>,
+    ) : ShareAction()
+    data class UpdateSelectedOrganizations(val organizationIds: Set<UID>) : ShareAction()
     data class UpdateCurrentTime(val time: Instant) : ShareAction()
     data class UpdateLoadingLinkedOrganization(val isLoading: Boolean) : ShareAction()
     data class UpdateRewardChallenge(

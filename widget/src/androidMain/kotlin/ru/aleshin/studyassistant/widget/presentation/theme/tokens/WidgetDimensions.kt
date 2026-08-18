@@ -43,8 +43,10 @@ object WidgetDimensions {
     val goalRowHeight = 72.dp
     val timeColumnWidth = 48.dp
     val timeColumnWidthCompact = 40.dp
-    val subjectRailWidth = 4.dp
+    val subjectRailWidth = 6.dp
     val checkboxSize = 24.dp
+    val priorityDotSize = 8.dp
+    val statusChipHeight = 18.dp
     val progressHeight = 4.dp
     val progressHeightCompact = 4.dp
 }

@@ -115,6 +115,9 @@ internal fun ShareContent(
             layoutMode = layoutMode,
             onCodeChange = { code -> store.dispatchEvent(ShareEvent.UpdatedCode(code)) },
             onCreateClick = { store.dispatchEvent(ShareEvent.CreateShare) },
+            onToggleOrganization = { organizationId ->
+                store.dispatchEvent(ShareEvent.ToggleShareOrganization(organizationId))
+            },
             onClaimClick = { store.dispatchEvent(ShareEvent.ClaimShare) },
             onScanClick = { isScannerOpen = true },
             onCopyLinkClick = {

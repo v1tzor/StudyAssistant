@@ -45,6 +45,7 @@ import ru.aleshin.studyassistant.widget.domain.entities.schedule.WidgetScheduleS
 import ru.aleshin.studyassistant.widget.presentation.models.ScheduleWidgetItemUi
 import ru.aleshin.studyassistant.widget.presentation.theme.compatCornerBackground
 import ru.aleshin.studyassistant.widget.presentation.theme.formatWidgetTime
+import ru.aleshin.studyassistant.widget.presentation.theme.tintedSubjectColor
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetDimensions
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetShapes
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetString
@@ -81,9 +82,14 @@ fun ScheduleWidgetRow(
     val container = when (item.status) {
         WidgetScheduleStatus.ACTIVE -> GlanceTheme.colors.primaryContainer
         WidgetScheduleStatus.COMPLETED -> GlanceTheme.colors.surfaceVariant
-        WidgetScheduleStatus.UPCOMING -> item.color?.let {
-            ColorProvider(Color(it).copy(alpha = 0.14f))
-        } ?: GlanceTheme.colors.surfaceVariant
+        WidgetScheduleStatus.UPCOMING -> item.color?.let { color ->
+            tintedSubjectColor(color)
+        } ?: GlanceTheme.colors.primaryContainer
+    }
+    val titleColor = if (item.status == WidgetScheduleStatus.COMPLETED) {
+        GlanceTheme.colors.onSurfaceVariant
+    } else {
+        GlanceTheme.colors.onSurface
     }
 
     Row(
@@ -143,9 +149,7 @@ fun ScheduleWidgetRow(
                     Text(
                         text = item.title ?: widgetString(R.string.widget_no_subject),
                         maxLines = 1,
-                        style = GlanceTheme.widgetTypography().label.copy(
-                            color = GlanceTheme.colors.onSurface,
-                        ),
+                        style = GlanceTheme.widgetTypography().label.copy(color = titleColor),
                     )
                     Text(
                         text = eventTypeTitle(item.eventType),

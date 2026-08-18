@@ -34,6 +34,7 @@ import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.organizations.MediatedOrganization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
+import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToMediate
 import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToShort
 import ru.aleshin.studyassistant.core.domain.entities.schedules.DateVersion
@@ -64,7 +65,11 @@ import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleSharePrev
  */
 internal interface ShareSchedulesInteractor {
 
-    suspend fun createShare(): DomainResult<ScheduleFailures, ShareLink>
+    suspend fun fetchShareableOrganizations(): DomainResult<ScheduleFailures, List<OrganizationShort>>
+
+    suspend fun createShare(
+        organizationIds: List<UID>,
+    ): DomainResult<ScheduleFailures, ShareLink>
 
     suspend fun claimShare(code: String): DomainResult<ScheduleFailures, ScheduleSharePreview>
 
@@ -112,24 +117,44 @@ internal interface ShareSchedulesInteractor {
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
 
-        override suspend fun createShare() = eitherWrapper.wrap {
+        override suspend fun fetchShareableOrganizations() = eitherWrapper.wrap {
+            val organizationIds = fetchCurrentWeekOrganizationIds()
+            if (organizationIds.isEmpty()) return@wrap emptyList()
+            organizationRepository.fetchOrganizationsById(organizationIds).first()
+                .map { organization -> organization.convertToShort() }
+                .sortedByDescending { organization -> organization.isMain }
+        }
+
+        override suspend fun createShare(
+            organizationIds: List<UID>,
+        ) = eitherWrapper.wrap {
+            val selectedOrganizationIds = organizationIds.toSet()
+            if (selectedOrganizationIds.isEmpty()) {
+                throw ShareException.ItemLimit()
+            }
             val currentTime = dateManager.fetchCurrentInstant()
             val profile = profileRepository.fetchProfile().filterNotNull().first()
             val schedules = baseSchedulesRepository.fetchSchedulesByVersion(
                 version = dateManager.fetchCurrentWeek(),
                 numberOfWeek = null,
             ).first().map { schedule ->
-                schedule.copy(dateVersion = DateVersion.createNewVersion(currentTime)).convertToMediate()
+                val filteredClasses = schedule.classes.filter { classModel ->
+                    classModel.organization.uid in selectedOrganizationIds
+                }
+                schedule.copy(
+                    dateVersion = DateVersion.createNewVersion(currentTime),
+                    classes = filteredClasses,
+                ).convertToMediate()
             }.filter { schedule -> schedule.classes.isNotEmpty() }
             if (schedules.isEmpty() || schedules.size > MAX_SCHEDULES) {
                 throw ShareException.ItemLimit()
             }
 
-            val organizationIds = schedules
+            val sharedOrganizationIds = schedules
                 .map { schedule -> schedule.classes.map { it.organizationId } }
                 .extractAllItem()
                 .distinct()
-            val organizations = organizationRepository.fetchOrganizationsById(organizationIds)
+            val organizations = organizationRepository.fetchOrganizationsById(sharedOrganizationIds)
                 .first()
                 .map { it.convertToMediate() }
 
@@ -266,6 +291,15 @@ internal interface ShareSchedulesInteractor {
                 }
                 throw error
             }
+        }
+
+        private suspend fun fetchCurrentWeekOrganizationIds(): List<UID> {
+            return baseSchedulesRepository.fetchSchedulesByVersion(
+                version = dateManager.fetchCurrentWeek(),
+                numberOfWeek = null,
+            ).first()
+                .flatMap { schedule -> schedule.classes.map { classModel -> classModel.organization.uid } }
+                .distinct()
         }
 
         private suspend fun deprecateCurrentSchedules(currentInstant: Instant) {

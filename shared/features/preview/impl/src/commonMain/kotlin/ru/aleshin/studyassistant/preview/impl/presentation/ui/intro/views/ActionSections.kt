@@ -17,6 +17,7 @@
 package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,15 +40,19 @@ import ru.aleshin.studyassistant.preview.impl.resources.setup_label
  */
 @Composable
 internal fun IntroStepsSection(
+    modifier: Modifier = Modifier,
     stepsCount: Int,
     currentStep: Int,
-    modifier: Modifier = Modifier,
 ) {
-    CircularStepsRow(
+    Box(
         modifier = modifier.fillMaxWidth().padding(vertical = 16.dp),
-        stepsCount = stepsCount,
-        currentStep = currentStep,
-    )
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularStepsRow(
+            stepsCount = stepsCount,
+            currentStep = currentStep,
+        )
+    }
 }
 
 @Composable

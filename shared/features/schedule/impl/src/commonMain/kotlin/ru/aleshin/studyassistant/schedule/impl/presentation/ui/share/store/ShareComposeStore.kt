@@ -57,6 +57,12 @@ internal class ShareComposeStore(
         when (event) {
             is ShareEvent.Started -> with(event) {
                 sendAction(ShareAction.UpdateCurrentTime(dateManager.fetchCurrentInstant()))
+                if (state.shareableOrganizations.isEmpty()) {
+                    launchBackgroundWork(BackgroundKey.LOAD_ORGANIZATIONS) {
+                        val command = ShareWorkCommand.LoadShareableOrganizations
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
                 if (!isRestore && !inputData.code.isNullOrBlank()) {
                     sendAction(ShareAction.UpdateCode(inputData.code))
                     launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
@@ -68,9 +74,21 @@ internal class ShareComposeStore(
             is ShareEvent.UpdatedCode -> {
                 sendAction(ShareAction.UpdateCode(event.code))
             }
+            is ShareEvent.ToggleShareOrganization -> {
+                val selectedIds = state().selectedOrganizationIds
+                val updatedIds = if (event.organizationId in selectedIds) {
+                    selectedIds - event.organizationId
+                } else {
+                    selectedIds + event.organizationId
+                }
+                sendAction(ShareAction.UpdateSelectedOrganizations(updatedIds))
+            }
             is ShareEvent.CreateShare -> {
+                val selectedIds = state().selectedOrganizationIds
+                if (selectedIds.isEmpty()) return
                 launchBackgroundWork(BackgroundKey.SHARE_ACTION) {
-                    workProcessor.work(ShareWorkCommand.CreateShare).collectAndHandleWork()
+                    val command = ShareWorkCommand.CreateShare(selectedIds.toList())
+                    workProcessor.work(command).collectAndHandleWork()
                 }
             }
             is ShareEvent.ClaimShare -> with(state) {
@@ -195,6 +213,14 @@ internal class ShareComposeStore(
         is ShareAction.UpdateOrganizations -> currentState.copy(
             allOrganizations = action.organizations
         )
+        is ShareAction.SetupShareableOrganizations -> currentState.copy(
+            shareableOrganizations = action.organizations,
+            selectedOrganizationIds = action.selectedOrganizationIds,
+            isLoadingShareableOrganizations = false,
+        )
+        is ShareAction.UpdateSelectedOrganizations -> currentState.copy(
+            selectedOrganizationIds = action.organizationIds,
+        )
         is ShareAction.UpdateCurrentTime -> currentState.copy(
             currentTime = action.time
         )
@@ -205,10 +231,16 @@ internal class ShareComposeStore(
             rewardChallengeId = action.challengeId,
             isRewardInProgress = action.isInProgress,
         )
-        is ShareAction.Reset -> ShareState(currentTime = currentState.currentTime)
+        is ShareAction.Reset -> ShareState(
+            currentTime = currentState.currentTime,
+            shareableOrganizations = currentState.shareableOrganizations,
+            selectedOrganizationIds = currentState.selectedOrganizationIds,
+            isLoadingShareableOrganizations = false,
+        )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
+        LOAD_ORGANIZATIONS,
         LINK_ORGANIZATION,
         LINK_DATA,
         SHARE_ACTION,

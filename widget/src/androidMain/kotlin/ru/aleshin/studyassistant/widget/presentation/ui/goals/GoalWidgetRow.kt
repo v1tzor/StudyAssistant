@@ -42,8 +42,10 @@ import ru.aleshin.studyassistant.widget.domain.entities.goal.WidgetGoalStatus
 import ru.aleshin.studyassistant.widget.presentation.models.GoalWidgetItemUi
 import ru.aleshin.studyassistant.widget.presentation.theme.compatCornerBackground
 import ru.aleshin.studyassistant.widget.presentation.theme.formatWidgetDuration
+import ru.aleshin.studyassistant.widget.presentation.theme.tintedSubjectColor
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetDimensions
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetShapes
+import ru.aleshin.studyassistant.widget.presentation.theme.widgetAccents
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetString
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetTypography
 import ru.aleshin.studyassistant.widget.presentation.utils.WidgetSizeClass
@@ -62,12 +64,13 @@ fun GoalWidgetRow(
     val padding = if (compact) WidgetDimensions.spacingExtraSmall else WidgetDimensions.spacingSmall
     val statusColor = goal.status.statusColor()
     val goalColor = goal.color?.let { ColorProvider(Color(it)) } ?: GlanceTheme.colors.primary
+    val container = goal.color?.let { tintedSubjectColor(it) } ?: GlanceTheme.colors.primaryContainer
 
     Column(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(WidgetDimensions.goalRowHeight)
-            .compatCornerBackground(GlanceTheme.colors.surfaceVariant, WidgetShapes.LARGE)
+            .compatCornerBackground(container, WidgetShapes.LARGE)
             .clickable(action)
             .padding(padding),
     ) {
@@ -125,7 +128,7 @@ fun GoalWidgetRow(
                     },
                 ),
             color = statusColor,
-            backgroundColor = GlanceTheme.colors.secondaryContainer,
+            backgroundColor = GlanceTheme.colors.surfaceVariant,
         )
     }
 }
@@ -146,8 +149,11 @@ private fun GoalType.fallbackTitle(): String = widgetString(
 )
 
 @Composable
-private fun WidgetGoalStatus.statusColor(): ColorProvider = when (this) {
-    WidgetGoalStatus.ACTIVE -> GlanceTheme.colors.primary
-    WidgetGoalStatus.ACHIEVED -> GlanceTheme.colors.tertiary
-    WidgetGoalStatus.COMPLETED -> GlanceTheme.colors.secondary
+private fun WidgetGoalStatus.statusColor(): ColorProvider {
+    val accents = widgetAccents()
+    return when (this) {
+        WidgetGoalStatus.ACTIVE -> GlanceTheme.colors.primary
+        WidgetGoalStatus.ACHIEVED -> accents.green
+        WidgetGoalStatus.COMPLETED -> accents.orange
+    }
 }

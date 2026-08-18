@@ -16,10 +16,6 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.layouts
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +27,6 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
-import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportContentState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportLoadingSection
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportReviewSection
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views.ImportSourceSection
@@ -62,55 +57,44 @@ internal fun ImportExpandedLayout(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopStart,
     ) {
-        AnimatedContent(
-            targetState = when {
-                state.isAnalysisInProgress -> ImportContentState.LOADING
-                state.isApplied -> ImportContentState.SUCCESS
-                state.session != null -> ImportContentState.REVIEW
-                else -> ImportContentState.SOURCE
-            },
-            transitionSpec = { fadeIn().togetherWith(fadeOut()) },
-            contentKey = { contentState -> contentState },
-        ) { contentState ->
-            when (contentState) {
-                ImportContentState.SOURCE -> ImportSourceSection(
-                    modifier = Modifier
-                        .widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth)
-                        .fillMaxWidth(),
-                    state = state,
-                    enabled = !state.isAnalysisInProgress,
-                    horizontalPadding = AdaptiveLayoutDefaults.ExpandedHorizontalPadding,
-                    onSelectPhoto = onSelectPhoto,
-                    onTakePhoto = onTakePhoto,
-                    onNoteChanged = onNoteChanged,
-                    onOrganizationSelect = onOrganizationSelect,
-                    onAddOrganization = onAddOrganization,
-                    onExtract = onExtract,
-                )
-                ImportContentState.LOADING -> ImportLoadingSection(
-                    modifier = Modifier.fillMaxSize(),
-                    startedAt = state.analysisStartedAt,
-                )
-                ImportContentState.REVIEW -> ImportReviewSection(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    horizontalPadding = AdaptiveLayoutDefaults.ExpandedHorizontalPadding,
-                    useSplitCatalogs = true,
-                    onClassClick = onClassClick,
-                    onReorderDayClasses = onReorderDayClasses,
-                    onSubjectClick = onSubjectClick,
-                    onTeacherClick = onTeacherClick,
-                    onAddSubject = onAddSubject,
-                    onAddTeacher = onAddTeacher,
-                )
-                ImportContentState.SUCCESS -> ImportSuccessSection(
-                    modifier = Modifier
-                        .widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth)
-                        .fillMaxWidth(),
-                    centered = false,
-                    onDone = onDone,
-                )
-            }
+        when {
+            state.isAnalysisInProgress -> ImportLoadingSection(
+                modifier = Modifier.fillMaxSize(),
+                startedAt = state.analysisStartedAt,
+            )
+            state.isApplied -> ImportSuccessSection(
+                modifier = Modifier
+                    .widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth)
+                    .fillMaxWidth(),
+                centered = false,
+                onDone = onDone,
+            )
+            state.session != null -> ImportReviewSection(
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                horizontalPadding = AdaptiveLayoutDefaults.ExpandedHorizontalPadding,
+                useSplitCatalogs = true,
+                onClassClick = onClassClick,
+                onReorderDayClasses = onReorderDayClasses,
+                onSubjectClick = onSubjectClick,
+                onTeacherClick = onTeacherClick,
+                onAddSubject = onAddSubject,
+                onAddTeacher = onAddTeacher,
+            )
+            else -> ImportSourceSection(
+                modifier = Modifier
+                    .widthIn(max = AdaptiveLayoutDefaults.MediumContentMaxWidth)
+                    .fillMaxWidth(),
+                state = state,
+                enabled = !state.isAnalysisInProgress,
+                horizontalPadding = AdaptiveLayoutDefaults.ExpandedHorizontalPadding,
+                onSelectPhoto = onSelectPhoto,
+                onTakePhoto = onTakePhoto,
+                onNoteChanged = onNoteChanged,
+                onOrganizationSelect = onOrganizationSelect,
+                onAddOrganization = onAddOrganization,
+                onExtract = onExtract,
+            )
         }
     }
 }

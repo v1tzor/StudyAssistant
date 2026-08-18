@@ -19,14 +19,15 @@ package ru.aleshin.studyassistant.preview.impl.presentation.ui.intro.views
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.ai_intro_body
+import ru.aleshin.studyassistant.preview.impl.resources.ai_intro_highlight
+import ru.aleshin.studyassistant.preview.impl.resources.ai_intro_title
 import ru.aleshin.studyassistant.preview.impl.resources.analytics_intro_body
 import ru.aleshin.studyassistant.preview.impl.resources.analytics_intro_title
 import ru.aleshin.studyassistant.preview.impl.resources.il_analytics
 import ru.aleshin.studyassistant.preview.impl.resources.il_organizations
 import ru.aleshin.studyassistant.preview.impl.resources.il_sharing
 import ru.aleshin.studyassistant.preview.impl.resources.il_study
-import ru.aleshin.studyassistant.preview.impl.resources.organization_intro_body
-import ru.aleshin.studyassistant.preview.impl.resources.organization_intro_title
 import ru.aleshin.studyassistant.preview.impl.resources.sharing_intro_body
 import ru.aleshin.studyassistant.preview.impl.resources.sharing_intro_title
 import ru.aleshin.studyassistant.preview.impl.resources.study_intro_body
@@ -39,6 +40,7 @@ internal enum class IntroPage(
     val headline: StringResource,
     val body: StringResource,
     val illustration: DrawableResource,
+    val highlight: StringResource? = null,
 ) {
     STUDY(
         headline = Res.string.study_intro_title,
@@ -50,10 +52,11 @@ internal enum class IntroPage(
         body = Res.string.analytics_intro_body,
         illustration = Res.drawable.il_analytics,
     ),
-    ORGANIZATIONS(
-        headline = Res.string.organization_intro_title,
-        body = Res.string.organization_intro_body,
+    AGENT(
+        headline = Res.string.ai_intro_title,
+        body = Res.string.ai_intro_body,
         illustration = Res.drawable.il_organizations,
+        highlight = Res.string.ai_intro_highlight,
     ),
     SHARING(
         headline = Res.string.sharing_intro_title,

@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,10 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -244,7 +243,7 @@ internal fun ImportReviewSection(
 ) {
     val session = state.session ?: return
     val coroutineScope = rememberCoroutineScope()
-    val schedulesRowState = rememberLazyListState()
+    val schedulesScrollState = rememberScrollState()
     val usedSubjectIds = remember(session.classes) {
         session.classes.mapNotNull(ScheduleImportClassUi::subjectId).toSet()
     }
@@ -307,9 +306,9 @@ internal fun ImportReviewSection(
                 onClassClick = onClassClick,
                 onReorderDayClasses = onReorderDayClasses,
                 onWeekSelected = {
-                    coroutineScope.launch { schedulesRowState.animateScrollToItem(0) }
+                    coroutineScope.launch { schedulesScrollState.animateScrollTo(0) }
                 },
-                schedulesRowState = schedulesRowState,
+                schedulesScrollState = schedulesScrollState,
             )
         }
         if (useSplitCatalogs) {
@@ -376,7 +375,7 @@ internal fun ImportWeekSection(
     onClassClick: (UID) -> Unit,
     onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onWeekSelected: () -> Unit,
-    schedulesRowState: LazyListState,
+    schedulesScrollState: ScrollState,
 ) {
     var selectedWeek by rememberSaveable { mutableIntStateOf(NumberOfWeekItem.ONE.isoWeekNumber) }
     Column(
@@ -402,15 +401,14 @@ internal fun ImportWeekSection(
                 },
             )
         }
-        LazyRow(
-            modifier = Modifier.fillMaxWidth().height(300.dp),
-            state = schedulesRowState,
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(320.dp)
+                .horizontalScroll(schedulesScrollState),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(
-                items = DayOfWeek.entries,
-                key = { dayOfWeek -> dayOfWeek.isoDayNumber },
-            ) { dayOfWeek ->
+            DayOfWeek.entries.forEach { dayOfWeek ->
                 val dayClasses = classes.filter { classModel ->
                     classModel.dayOfWeek == dayOfWeek.isoDayNumber && classModel.repeatWeek == selectedWeek
                 }
@@ -547,10 +545,6 @@ internal fun ImportSuccessSection(
             Text(stringResource(Res.string.schedule_import_done_button))
         }
     }
-}
-
-internal enum class ImportContentState {
-    SOURCE, LOADING, REVIEW, SUCCESS
 }
 
 internal const val SOURCE_HEADER_KEY = "import_source_header"

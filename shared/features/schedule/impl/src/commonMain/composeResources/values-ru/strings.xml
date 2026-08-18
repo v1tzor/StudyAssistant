@@ -82,8 +82,11 @@
     <string name="schedule_reward_unavailable_error">Реклама сейчас недоступна. Попробуйте ещё раз позже.</string>
     <string name="reject_shared_schedule_button_title">Отклонить</string>
     <string name="create_share_title">Передать расписание</string>
-    <string name="create_share_description">Создайте временный код. В него войдут расписание и связанные учебные данные без профиля и аккаунта.</string>
+    <string name="create_share_description">Выберите организации и создайте временный код. В него войдёт только их расписание — без профиля и аккаунта.</string>
     <string name="create_share_button_title">Создать код</string>
+    <string name="share_organizations_title">Какими организациями поделиться</string>
+    <string name="share_organizations_empty">Нет занятий в текущем расписании — сначала заполните неделю.</string>
+    <string name="share_organization_main_label">Основная</string>
     <string name="receive_share_title">Получить расписание</string>
     <string name="share_code_label">Код обмена</string>
     <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>

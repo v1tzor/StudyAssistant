@@ -42,10 +42,13 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.widget.R
 import ru.aleshin.studyassistant.widget.presentation.models.HomeworkWidgetItemUi
 import ru.aleshin.studyassistant.widget.presentation.theme.compatCornerBackground
+import ru.aleshin.studyassistant.widget.presentation.theme.tintedSubjectColor
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetDimensions
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetShapes
+import ru.aleshin.studyassistant.widget.presentation.theme.widgetAccents
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetString
 import ru.aleshin.studyassistant.widget.presentation.theme.widgetTypography
+import ru.aleshin.studyassistant.widget.presentation.ui.common.WidgetStatusChip
 import ru.aleshin.studyassistant.widget.presentation.utils.WidgetSizeClass
 
 /**
@@ -60,11 +63,14 @@ fun HomeworkWidgetRow(
     val compact = sizeClass.width == WidgetSizeClass.Width.COMPACT ||
         sizeClass.height == WidgetSizeClass.Height.COMPACT
     val padding = if (compact) WidgetDimensions.spacingExtraSmall else WidgetDimensions.spacingSmall
-    val subjectColor = homework.subjectColor?.let { ColorProvider(Color(it)) }
-        ?: GlanceTheme.colors.outline
-    val background = homework.subjectColor?.let {
-        ColorProvider(Color(it).copy(alpha = 0.14f))
-    } ?: GlanceTheme.colors.surfaceVariant
+    val palette = homework.status.colorPalette()
+    val subjectColor = homework.subjectColor?.let { ColorProvider(Color(it)) } ?: palette.accent
+    val background = homework.subjectColor?.let { tintedSubjectColor(it) } ?: palette.container
+    val contentColor = if (homework.subjectColor != null) {
+        GlanceTheme.colors.onSurface
+    } else {
+        palette.onContainer
+    }
 
     Row(
         modifier = GlanceModifier
@@ -92,16 +98,27 @@ fun HomeworkWidgetRow(
                     modifier = GlanceModifier.defaultWeight(),
                     text = homework.subjectName ?: widgetString(R.string.widget_no_subject),
                     maxLines = 1,
-                    style = GlanceTheme.widgetTypography().label.copy(
-                        color = GlanceTheme.colors.onSurface,
-                    ),
+                    style = GlanceTheme.widgetTypography().label.copy(color = contentColor),
                 )
-                Image(
-                    modifier = GlanceModifier.size(WidgetDimensions.iconSmall),
-                    provider = ImageProvider(homework.status.iconResource()),
-                    contentDescription = homeworkStatusTitle(homework.status),
-                    colorFilter = ColorFilter.tint(homework.status.statusColor()),
-                )
+                if (!compact) {
+                    Spacer(GlanceModifier.width(WidgetDimensions.spacingExtraSmall))
+                    WidgetStatusChip(
+                        title = homeworkStatusTitle(homework.status),
+                        container = palette.accent,
+                        content = if (homework.status == HomeworkStatus.SKIPPED) {
+                            palette.onContainer
+                        } else {
+                            ColorProvider(Color.White)
+                        },
+                    )
+                } else {
+                    Image(
+                        modifier = GlanceModifier.size(WidgetDimensions.iconSmall),
+                        provider = ImageProvider(homework.status.iconResource()),
+                        contentDescription = homeworkStatusTitle(homework.status),
+                        colorFilter = ColorFilter.tint(palette.accent),
+                    )
+                }
             }
             Spacer(GlanceModifier.height(WidgetDimensions.spacingExtraSmall))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -109,18 +126,21 @@ fun HomeworkWidgetRow(
                     icon = R.drawable.ic_widget_book,
                     count = homework.theoreticalTasksCount,
                     description = widgetString(R.string.widget_theory_description),
+                    tint = contentColor,
                 )
                 Spacer(GlanceModifier.width(WidgetDimensions.spacingSmall))
                 HomeworkStat(
                     icon = R.drawable.ic_widget_tasks,
                     count = homework.practicalTasksCount,
                     description = widgetString(R.string.widget_practice_description),
+                    tint = contentColor,
                 )
                 Spacer(GlanceModifier.width(WidgetDimensions.spacingSmall))
                 HomeworkStat(
                     icon = R.drawable.ic_widget_presentation,
                     count = homework.presentationTasksCount,
                     description = widgetString(R.string.widget_presentation_description),
+                    tint = contentColor,
                 )
             }
         }
@@ -128,21 +148,24 @@ fun HomeworkWidgetRow(
 }
 
 @Composable
-private fun HomeworkStat(icon: Int, count: Int, description: String) {
+private fun HomeworkStat(
+    icon: Int,
+    count: Int,
+    description: String,
+    tint: ColorProvider,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
             modifier = GlanceModifier.size(WidgetDimensions.iconSmall),
             provider = ImageProvider(icon),
             contentDescription = description,
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+            colorFilter = ColorFilter.tint(tint),
         )
         Spacer(GlanceModifier.width(WidgetDimensions.spacingExtraSmall))
         Text(
             text = count.toString(),
             maxLines = 1,
-            style = GlanceTheme.widgetTypography().body.copy(
-                color = GlanceTheme.colors.onSurface,
-            ),
+            style = GlanceTheme.widgetTypography().body.copy(color = tint),
         )
     }
 }
@@ -154,12 +177,42 @@ private fun HomeworkStatus.iconResource(): Int = when (this) {
 }
 
 @Composable
-private fun HomeworkStatus.statusColor(): ColorProvider = when (this) {
-    HomeworkStatus.COMPLETE -> GlanceTheme.colors.tertiary
-    HomeworkStatus.WAIT -> GlanceTheme.colors.secondary
-    HomeworkStatus.IN_FUTURE -> GlanceTheme.colors.primary
-    HomeworkStatus.SKIPPED, HomeworkStatus.NOT_COMPLETE -> GlanceTheme.colors.error
+private fun HomeworkStatus.colorPalette(): HomeworkStatusPalette {
+    val accents = widgetAccents()
+    return when (this) {
+        HomeworkStatus.COMPLETE -> HomeworkStatusPalette(
+            accent = accents.green,
+            container = accents.greenContainer,
+            onContainer = accents.onGreenContainer,
+        )
+        HomeworkStatus.WAIT -> HomeworkStatusPalette(
+            accent = accents.orange,
+            container = accents.orangeContainer,
+            onContainer = accents.onOrangeContainer,
+        )
+        HomeworkStatus.IN_FUTURE -> HomeworkStatusPalette(
+            accent = GlanceTheme.colors.primary,
+            container = GlanceTheme.colors.primaryContainer,
+            onContainer = GlanceTheme.colors.onPrimaryContainer,
+        )
+        HomeworkStatus.NOT_COMPLETE -> HomeworkStatusPalette(
+            accent = accents.red,
+            container = accents.redContainer,
+            onContainer = accents.onRedContainer,
+        )
+        HomeworkStatus.SKIPPED -> HomeworkStatusPalette(
+            accent = accents.yellow,
+            container = accents.yellowContainer,
+            onContainer = accents.onYellowContainer,
+        )
+    }
 }
+
+private data class HomeworkStatusPalette(
+    val accent: ColorProvider,
+    val container: ColorProvider,
+    val onContainer: ColorProvider,
+)
 
 @Composable
 private fun homeworkStatusTitle(status: HomeworkStatus): String = widgetString(
