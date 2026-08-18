@@ -35,12 +35,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -64,14 +64,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
-import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.functional.Constants.Placeholder
+import ru.aleshin.studyassistant.core.ui.resources.cancel_title
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
 import ru.aleshin.studyassistant.tasks.impl.presentation.mappers.mapToMessage
@@ -95,7 +94,6 @@ import ru.aleshin.studyassistant.tasks.impl.resources.copy_share_link_title
 import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_expires_at_label
 import ru.aleshin.studyassistant.tasks.impl.resources.homework_share_ready_title
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
 
 /**
  * @author Stanislav Aleshin on 03.07.2024
@@ -107,7 +105,7 @@ internal fun HomeworksContent(
 ) {
     val store = homeworksComponent.store
     val state by store.stateAsState()
-    val coreCancelTitle = stringResource(CoreRes.string.core_cancel_title)
+    val coreCancelTitle = stringResource(CoreRes.string.cancel_title)
     val listState = rememberLazyListState()
     val snackbarState = remember { SnackbarHostState() }
     val layoutMode = currentWindowAdaptiveInfoV2().fetchOverviewLayoutMode()
@@ -188,7 +186,7 @@ internal fun HomeworksContent(
             FloatingActionButton(
                 onClick = { store.dispatchEvent(HomeworksEvent.AddHomeworkInEditor) },
                 shape = MaterialTheme.shapes.large,
-                backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -245,14 +243,9 @@ internal fun HomeworksContent(
                     withDismissAction = true,
                 )
             }
-
             is HomeworksEffect.ScrollToDate -> {
-                delay(100L)
-                val selectedDateIndex = state.homeworks.toList().indexOfFirst {
-                    effect.targetDate.equalsDay(it.first)
-                }
-                if (selectedDateIndex != -1) {
-                    listState.animateScrollToItem(selectedDateIndex)
+                if (effect.index != -1) {
+                    listState.animateScrollToItem(effect.index)
                 }
             }
         }

@@ -79,6 +79,12 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title
+import ru.aleshin.studyassistant.core.ui.resources.today_title
+import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.HomeworksCompleteBadge
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
@@ -90,12 +96,6 @@ import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.none_tasks_title
 import ru.aleshin.studyassistant.tasks.impl.resources.share_homeworks_button_title
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
-import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
-import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
-import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
-import ru.aleshin.studyassistant.core.ui.resources.today_title as core_today_title
-import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title as core_tomorrow_title
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -303,9 +303,9 @@ private fun DailyHomeworksViewHeader(
                 }
                 withStyle(style = MaterialTheme.typography.titleSmall.toSpanStyle()) {
                     if (targetDate.equalsDay(currentDate)) {
-                        append(stringResource(CoreRes.string.core_today_title))
+                        append(stringResource(CoreRes.string.today_title))
                     } else if (targetDate.equalsDay(currentDate.shiftDay(1))) {
-                        append(stringResource(CoreRes.string.core_tomorrow_title))
+                        append(stringResource(CoreRes.string.tomorrow_title))
                     } else {
                         append(targetDate.dateTime().dayOfWeek.mapToSting())
                     }
@@ -469,7 +469,7 @@ private fun ShortHomeworkViewContent(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = subject ?: stringResource(CoreRes.string.core_none_title),
+                text = subject ?: stringResource(CoreRes.string.none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -522,15 +522,15 @@ private fun ShortHomeworkViewContent(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             ShortHomeworkTaskCountView(
-                painter = painterResource(CoreRes.drawable.core_ic_book_study),
+                painter = painterResource(CoreRes.drawable.ic_book_study),
                 count = theoreticalTasks.fetchAllTasks().size,
             )
             ShortHomeworkTaskCountView(
-                painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+                painter = painterResource(CoreRes.drawable.ic_tasks_circular),
                 count = practicalTasks.fetchAllTasks().size,
             )
             ShortHomeworkTaskCountView(
-                painter = painterResource(CoreRes.drawable.core_ic_presentation),
+                painter = painterResource(CoreRes.drawable.ic_presentation),
                 count = presentationTasks.fetchAllTasks().size,
             )
         }

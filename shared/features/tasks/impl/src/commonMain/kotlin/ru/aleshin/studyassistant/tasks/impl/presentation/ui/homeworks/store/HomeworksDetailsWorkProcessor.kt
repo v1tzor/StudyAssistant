@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.store
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.Instant
@@ -24,9 +25,11 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.EffectResul
 import ru.aleshin.studyassistant.core.common.architecture.store.work.FlowWorkProcessor
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkCommand
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.presentation.mappers.tasks.mapToDomain
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.GoalsInteractor
 import ru.aleshin.studyassistant.tasks.impl.domain.interactors.HomeworksInteractor
@@ -43,6 +46,7 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.models.tasks.convertToB
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksAction
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksEffect
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.homeworks.contract.HomeworksOutput
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * @author Stanislav Aleshin on 27.06.2024.
@@ -51,6 +55,7 @@ internal interface HomeworksDetailsWorkProcessor :
     FlowWorkProcessor<HomeworksDetailsWorkCommand, HomeworksAction, HomeworksEffect, HomeworksOutput> {
 
     class Base(
+        private val dateManager: DateManager,
         private val homeworksInteractor: HomeworksInteractor,
         private val scheduleInteractor: ScheduleInteractor,
         private val shareInteractor: ShareHomeworksInteractor,
@@ -58,11 +63,7 @@ internal interface HomeworksDetailsWorkProcessor :
     ) : HomeworksDetailsWorkProcessor {
 
         override suspend fun work(command: HomeworksDetailsWorkCommand) = when (command) {
-            is HomeworksDetailsWorkCommand.LoadHomeworks -> loadHomeworksWork(
-                command.timeRange,
-                command.scrollDate
-            )
-
+            is HomeworksDetailsWorkCommand.LoadHomeworks -> loadHomeworksWork(command.timeRange, command.scrollDate)
             is HomeworksDetailsWorkCommand.LoadActiveSchedule -> loadActiveScheduleWork(command.currentDate)
             is HomeworksDetailsWorkCommand.UpdateHomework -> updateHomeworkWork(command.homework)
             is HomeworksDetailsWorkCommand.ShareHomeworks -> shareHomeworksWork(command.selection)
@@ -70,26 +71,29 @@ internal interface HomeworksDetailsWorkProcessor :
             is HomeworksDetailsWorkCommand.DeleteGoal -> deleteGoalWork(command.goal)
         }
 
-        private fun loadHomeworksWork(timeRange: TimeRange, scrollDate: Instant?) =
-            flow<HomeworksWorkResult> {
-                var isScrolled = false
-                homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collectAndHandle(
-                    onLeftAction = {
-                        emit(ActionResult(HomeworksAction.UpdateLoading(false)))
-                        emit(EffectResult(HomeworksEffect.ShowError(it)))
-                    },
-                    onRightAction = { homeworks ->
-                        val homeworksMap = homeworks.mapValues { it.value.mapToUi() }
-                        emit(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
-                        if (scrollDate != null && !isScrolled) {
-                            emit(EffectResult(HomeworksEffect.ScrollToDate(scrollDate)))
-                            isScrolled = true
-                        }
-                    },
-                )
-            }.onStart {
-                emit(ActionResult(HomeworksAction.UpdateLoading(true)))
-            }
+        private fun loadHomeworksWork(timeRange: TimeRange, scrollDate: Instant?) = flow<HomeworksWorkResult> {
+            var isScrolled = false
+            val scrollDate = scrollDate ?: dateManager.fetchBeginningCurrentInstant()
+
+            homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collectAndHandle(
+                onLeftAction = {
+                    emit(ActionResult(HomeworksAction.UpdateLoading(false)))
+                    emit(EffectResult(HomeworksEffect.ShowError(it)))
+                },
+                onRightAction = { homeworks ->
+                    val homeworksMap = homeworks.mapValues { it.value.mapToUi() }
+                    emit(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))
+                    if (!isScrolled) {
+                        val selectedDateIndex = homeworksMap.toList().indexOfFirst { scrollDate.equalsDay(it.first) }
+                        delay(200.milliseconds)
+                        emit(EffectResult(HomeworksEffect.ScrollToDate(selectedDateIndex)))
+                        isScrolled = true
+                    }
+                },
+            )
+        }.onStart {
+            emit(ActionResult(HomeworksAction.UpdateLoading(true)))
+        }
 
         private fun loadActiveScheduleWork(currentDate: Instant) = flow<HomeworksWorkResult> {
             scheduleInteractor.fetchScheduleByDate(currentDate).collectAndHandle(
@@ -134,14 +138,10 @@ internal interface HomeworksDetailsWorkProcessor :
 }
 
 internal sealed class HomeworksDetailsWorkCommand : WorkCommand {
-    data class LoadHomeworks(val timeRange: TimeRange, val scrollDate: Instant? = null) :
-        HomeworksDetailsWorkCommand()
-
+    data class LoadHomeworks(val timeRange: TimeRange, val scrollDate: Instant? = null) : HomeworksDetailsWorkCommand()
     data class LoadActiveSchedule(val currentDate: Instant) : HomeworksDetailsWorkCommand()
     data class UpdateHomework(val homework: HomeworkDetailsUi) : HomeworksDetailsWorkCommand()
-    data class ShareHomeworks(val selection: HomeworkShareSelectionUi) :
-        HomeworksDetailsWorkCommand()
-
+    data class ShareHomeworks(val selection: HomeworkShareSelectionUi) : HomeworksDetailsWorkCommand()
     data class ScheduleGoal(val goalCreateModel: GoalCreateModelUi) : HomeworksDetailsWorkCommand()
     data class DeleteGoal(val goal: GoalShortUi) : HomeworksDetailsWorkCommand()
 }

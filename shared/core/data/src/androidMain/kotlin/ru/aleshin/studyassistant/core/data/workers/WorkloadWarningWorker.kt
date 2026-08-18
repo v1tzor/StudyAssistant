@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.getString
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.R
 import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
@@ -37,7 +38,6 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
-import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.domain.entities.analytics.DailyWorkload
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository

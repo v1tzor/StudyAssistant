@@ -70,7 +70,7 @@ internal sealed class HomeworksEvent : StoreEvent {
 
 internal sealed class HomeworksEffect : StoreEffect {
     data class ShowError(val failures: TasksFailures) : HomeworksEffect()
-    data class ScrollToDate(val targetDate: Instant) : HomeworksEffect()
+    data class ScrollToDate(val index: Int) : HomeworksEffect()
 }
 
 internal sealed class HomeworksAction : StoreAction {

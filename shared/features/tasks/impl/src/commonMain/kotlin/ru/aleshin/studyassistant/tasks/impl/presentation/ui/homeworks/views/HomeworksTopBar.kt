@@ -32,14 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc
+import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarButton
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.tasks.impl.resources.Res
 import ru.aleshin.studyassistant.tasks.impl.resources.current_time_range_desc
 import ru.aleshin.studyassistant.tasks.impl.resources.homeworks_header
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.back_icon_desc as core_back_icon_desc
-import ru.aleshin.studyassistant.core.ui.resources.ic_calendar_today as core_ic_calendar_today
 
 /**
  * @author Stanislav Aleshin on 03.07.2024.
@@ -57,13 +57,13 @@ internal fun HomeworksTopBar(
         IconButton(onClick = onBackClick) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(CoreRes.string.core_back_icon_desc),
+                contentDescription = stringResource(CoreRes.string.back_icon_desc),
             )
         }
     }
     val actions: @Composable () -> Unit = {
         TopAppBarButton(
-            imagePainter = painterResource(CoreRes.drawable.core_ic_calendar_today),
+            imagePainter = painterResource(CoreRes.drawable.ic_calendar_today),
             imageDescription = stringResource(Res.string.current_time_range_desc),
             onButtonClick = onCurrentTimeRangeClick,
         )

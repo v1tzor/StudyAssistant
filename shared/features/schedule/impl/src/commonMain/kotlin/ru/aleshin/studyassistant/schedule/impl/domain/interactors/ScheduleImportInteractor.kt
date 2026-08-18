@@ -159,6 +159,14 @@ internal interface ScheduleImportInteractor {
 
             val currentTime = dateManager.fetchCurrentInstant()
             val updatedAt = currentTime.toEpochMilliseconds()
+            val updatedOrganization = importHandler.mergeOrganizationPlaces(
+                organization = organization,
+                session = session,
+                updatedAt = updatedAt,
+            )
+            if (updatedOrganization != organization) {
+                organizationsRepository.addOrUpdateOrganization(updatedOrganization)
+            }
             val employeesToPersist = session.employees.filter { employee ->
                 employee.uid !in session.originalEmployeeIds || employee.uid in session.dirtyEmployeeIds
             }
@@ -195,14 +203,14 @@ internal interface ScheduleImportInteractor {
                             Class(
                                 uid = randomUUID(),
                                 scheduleId = scheduleId,
-                                organization = organization.convertToShort(),
+                                organization = updatedOrganization.convertToShort(),
                                 eventType = classModel.eventType ?: subject?.eventType ?: EventType.CLASS,
                                 subject = subject,
                                 customData = null,
                                 teacher = teacher,
                                 office = classModel.office.trim(),
                                 location = classModel.location?.trim()?.takeIf(String::isNotEmpty)?.let { value ->
-                                    ContactInfo(value = value)
+                                    ContactInfo(label = value, value = value)
                                 },
                                 timeRange = TimeRange(
                                     from = currentTime.startThisDay().setHoursAndMinutes(start),

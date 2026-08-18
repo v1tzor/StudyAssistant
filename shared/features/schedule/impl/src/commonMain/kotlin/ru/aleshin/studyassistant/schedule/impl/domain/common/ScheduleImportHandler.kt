@@ -54,6 +54,11 @@ internal interface ScheduleImportHandler {
         repeatWeek: Int,
         orderedIds: List<UID>,
     ): ScheduleImportSession
+    fun mergeOrganizationPlaces(
+        organization: Organization,
+        session: ScheduleImportSession,
+        updatedAt: Long,
+    ): Organization
 
     class Base(
         private val validator: ScheduleImportValidator,
@@ -276,6 +281,45 @@ internal interface ScheduleImportHandler {
             )
         }
 
+        override fun mergeOrganizationPlaces(
+            organization: Organization,
+            session: ScheduleImportSession,
+            updatedAt: Long,
+        ): Organization {
+            val importedOffices = buildList {
+                session.classes.filter(ScheduleImportClass::included).forEach { classModel ->
+                    classModel.office.trim().takeIf(String::isNotEmpty)?.let(::add)
+                }
+                session.subjects.forEach { subject ->
+                    subject.office.trim().takeIf(String::isNotEmpty)?.let(::add)
+                }
+            }.distinct()
+            val importedLocationValues = buildList {
+                session.classes.filter(ScheduleImportClass::included).forEach { classModel ->
+                    classModel.location?.trim()?.takeIf(String::isNotEmpty)?.let(::add)
+                }
+                session.subjects.forEach { subject ->
+                    subject.location?.value?.trim()?.takeIf(String::isNotEmpty)?.let(::add)
+                }
+            }.distinct()
+            val existingOffices = organization.offices.map(String::trim).toSet()
+            val existingLocationValues = organization.locations.map { location ->
+                location.value.trim()
+            }.toSet()
+            val offices = organization.offices + importedOffices.filter { office -> office !in existingOffices }
+            val locations = organization.locations + importedLocationValues
+                .filter { value -> value !in existingLocationValues }
+                .map { value -> ContactInfo(label = value, value = value) }
+            if (offices == organization.offices && locations == organization.locations) {
+                return organization
+            }
+            return organization.copy(
+                offices = offices,
+                locations = locations,
+                updatedAt = updatedAt,
+            )
+        }
+
         private fun normalizeClassNumbers(
             classes: List<ScheduleImportClass>,
         ): List<ScheduleImportClass> {
@@ -417,7 +461,7 @@ internal interface ScheduleImportHandler {
             return when {
                 parts.isEmpty() -> Triple(raw, null, null)
                 parts.size == 1 -> Triple(parts[0], null, null)
-                parts.size == 2 -> Triple(parts[1], parts[0], null)
+                parts.size == 2 -> Triple(parts[0], null, parts[1])
                 else -> Triple(parts[1], parts[0], parts.drop(2).joinToString(" "))
             }
         }

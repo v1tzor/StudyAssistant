@@ -71,10 +71,8 @@ internal class HomeworksComposeStore(
                     )
                     sendAction(HomeworksAction.UpdateDates(currentDate, targetTimeRange))
                     launchBackgroundWork(BackgroundKey.LOAD_HOMEWORKS) {
-                        val scrollDate =
-                            event.inputData.targetDate?.mapEpochTimeToInstant() ?: currentDate
-                        val command =
-                            HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange, scrollDate)
+                        val scrollDate = event.inputData.targetDate?.mapEpochTimeToInstant() ?: currentDate
+                        val command = HomeworksDetailsWorkCommand.LoadHomeworks(targetTimeRange, scrollDate)
                         workProcessor.work(command).collectAndHandleWork()
                     }
                 } else {
@@ -246,20 +244,16 @@ internal class HomeworksComposeStore(
             homeworks = action.homeworks,
             isLoading = false,
         )
-
         is HomeworksAction.UpdateActiveSchedule -> currentState.copy(
             activeSchedule = action.activeSchedule,
         )
-
         is HomeworksAction.UpdateDates -> currentState.copy(
             currentDate = action.currentDate,
             selectedTimeRange = action.selectedTimeRange,
         )
-
         is HomeworksAction.UpdateHomeworkShareLink -> currentState.copy(
             homeworkShareLink = action.link,
         )
-
         is HomeworksAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )

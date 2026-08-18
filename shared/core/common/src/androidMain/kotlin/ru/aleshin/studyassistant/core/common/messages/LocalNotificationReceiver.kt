@@ -51,8 +51,7 @@ class LocalNotificationReceiver : BroadcastReceiver() {
             val notificationCreator = context.let { NotificationCreator.Base(it) }
             val mainActivityUri = Uri.parse(Constants.App.OPEN_APP_DEEPLINK)
             val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
-            val pContentIntent =
-                PendingIntent.getActivity(context, notificationId, contentIntent, FLAG_IMMUTABLE)
+            val pContentIntent = PendingIntent.getActivity(context, notificationId, contentIntent, FLAG_IMMUTABLE)
             val isOngoing = intent.getBooleanExtra(ONGOING_KEY, false)
             val endTime = intent.getLongExtra(END_TIME_KEY, 0L)
             if (isOngoing && endTime <= System.currentTimeMillis()) {

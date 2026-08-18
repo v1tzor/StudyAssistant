@@ -27,6 +27,7 @@ import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.getString
 import org.kodein.di.instance
+import ru.aleshin.studyassistant.core.common.R
 import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
@@ -38,7 +39,6 @@ import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationStyles
-import ru.aleshin.studyassistant.core.data.R
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -91,8 +91,7 @@ class HomeworksReminderWorker(
         val recommendationBodySuffix = getString(CoreRes.string.core_homeworks_recommendation_body_suffix)
         val mainActivityUri = Constants.App.OPEN_APP_DEEPLINK.toUri()
         val contentIntent = Intent(ACTION_VIEW, mainActivityUri)
-        val pContentIntent =
-            PendingIntent.getActivity(context, HOMEWORKS_NOTIFICATION_ID, contentIntent, FLAG_IMMUTABLE)
+        val pContentIntent = PendingIntent.getActivity(context, HOMEWORKS_NOTIFICATION_ID, contentIntent, FLAG_IMMUTABLE)
         if (nearestHomeworks.isNotEmpty()) {
             val subjects = nearestHomeworks.mapNotNull { it.subject?.name }.distinct()
             val notify = notificationCreator.createNotify(

@@ -87,6 +87,12 @@ import ru.aleshin.studyassistant.core.domain.entities.tasks.HomeworkStatus
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.tasks.HomeworkTaskComponentUi
 import ru.aleshin.studyassistant.core.ui.mappers.mapToSting
+import ru.aleshin.studyassistant.core.ui.resources.ic_book_study
+import ru.aleshin.studyassistant.core.ui.resources.ic_presentation
+import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular
+import ru.aleshin.studyassistant.core.ui.resources.none_title
+import ru.aleshin.studyassistant.core.ui.resources.today_title
+import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
@@ -101,12 +107,6 @@ import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.CompactHomewo
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.DeleteGoalWarningDialog
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.common.GoalCreatorDialog
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.ic_book_study as core_ic_book_study
-import ru.aleshin.studyassistant.core.ui.resources.ic_presentation as core_ic_presentation
-import ru.aleshin.studyassistant.core.ui.resources.ic_tasks_circular as core_ic_tasks_circular
-import ru.aleshin.studyassistant.core.ui.resources.none_title as core_none_title
-import ru.aleshin.studyassistant.core.ui.resources.today_title as core_today_title
-import ru.aleshin.studyassistant.core.ui.resources.tomorrow_title as core_tomorrow_title
 
 /**
  * @author Stanislav Aleshin on 29.06.2024.
@@ -134,12 +134,10 @@ internal fun DailyHomeworksDetailsView(
     ) {
         val homeworks = dailyHomeworks.homeworks
         val completedHomeworks = remember(homeworks) {
-            homeworks.getOrElse(HomeworkStatus.COMPLETE) { emptyList() } +
-                    homeworks.getOrElse(HomeworkStatus.SKIPPED) { emptyList() }
+            homeworks.getOrElse(HomeworkStatus.COMPLETE) { emptyList() } + homeworks.getOrElse(HomeworkStatus.SKIPPED) { emptyList() }
         }
         val runningHomeworks = remember(homeworks) {
-            homeworks.getOrElse(HomeworkStatus.WAIT) { emptyList() } +
-                    homeworks.getOrElse(HomeworkStatus.IN_FUTURE) { emptyList() }
+            homeworks.getOrElse(HomeworkStatus.WAIT) { emptyList() } + homeworks.getOrElse(HomeworkStatus.IN_FUTURE) { emptyList() }
         }
         val errorHomeworks = remember(homeworks) {
             homeworks.getOrElse(HomeworkStatus.NOT_COMPLETE) { emptyList() }
@@ -339,17 +337,17 @@ private fun DailyHomeworksViewHeader(
                 ) {
                     append(" • ")
                     if (targetDate.equalsDay(currentDate)) {
-                        append(stringResource(CoreRes.string.core_today_title))
+                        append(stringResource(CoreRes.string.today_title))
                     } else if (targetDate.equalsDay(currentDate.shiftDay(1))) {
-                        append(stringResource(CoreRes.string.core_tomorrow_title))
+                        append(stringResource(CoreRes.string.tomorrow_title))
                     } else {
-                        val format =
-                            DateTimeComponents.Formats.dayMonthFormat()
+                        val format = DateTimeComponents.Formats.dayMonthFormat()
                         append(targetDate.formatByTimeZone(format))
                     }
                 }
             },
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Box {
             IconButton(
@@ -528,7 +526,7 @@ private fun ShortHomeworkViewContent(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = subject ?: stringResource(CoreRes.string.core_none_title),
+                text = subject ?: stringResource(CoreRes.string.none_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -583,15 +581,15 @@ private fun ShortHomeworkViewContent(
         if (status == HomeworkStatus.COMPLETE || status == HomeworkStatus.SKIPPED) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(CoreRes.drawable.core_ic_book_study),
+                    painter = painterResource(CoreRes.drawable.ic_book_study),
                     count = theoreticalTasks.fetchAllTasks().size,
                 )
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+                    painter = painterResource(CoreRes.drawable.ic_tasks_circular),
                     count = practicalTasks.fetchAllTasks().size,
                 )
                 ShortHomeworkTaskCountView(
-                    painter = painterResource(CoreRes.drawable.core_ic_presentation),
+                    painter = painterResource(CoreRes.drawable.ic_presentation),
                     count = presentationTasks.fetchAllTasks().size,
                 )
             }
@@ -599,19 +597,19 @@ private fun ShortHomeworkViewContent(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (theoreticalTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(CoreRes.drawable.core_ic_book_study),
+                        icon = painterResource(CoreRes.drawable.ic_book_study),
                         tasks = theoreticalTasks,
                     )
                 }
                 if (practicalTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(CoreRes.drawable.core_ic_tasks_circular),
+                        icon = painterResource(CoreRes.drawable.ic_tasks_circular),
                         tasks = practicalTasks,
                     )
                 }
                 if (presentationTasks.isNotEmpty()) {
                     CompactHomeworkTaskView(
-                        icon = painterResource(CoreRes.drawable.core_ic_presentation),
+                        icon = painterResource(CoreRes.drawable.ic_presentation),
                         tasks = presentationTasks,
                     )
                 }

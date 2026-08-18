@@ -103,17 +103,17 @@ internal fun ImportTeacherEditorSheet(
             )
             InfoTextField(
                 modifier = Modifier.padding(start = 16.dp, end = 24.dp),
-                value = secondName,
-                onValueChange = { value -> secondName = value },
-                label = stringResource(Res.string.schedule_import_second_name_label),
+                value = patronymic,
+                onValueChange = { value -> patronymic = value },
+                label = stringResource(Res.string.schedule_import_patronymic_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
                 containerColor = sheetContainerColor,
             )
             InfoTextField(
                 modifier = Modifier.padding(start = 16.dp, end = 24.dp),
-                value = patronymic,
-                onValueChange = { value -> patronymic = value },
-                label = stringResource(Res.string.schedule_import_patronymic_label),
+                value = secondName,
+                onValueChange = { value -> secondName = value },
+                label = stringResource(Res.string.schedule_import_second_name_label),
                 leadingInfoIcon = painterResource(CoreRes.drawable.core_ic_employee),
                 containerColor = sheetContainerColor,
             )

@@ -53,6 +53,11 @@ android {
         val myTrackerKey = localProperties.getProperty("myTrackerKey")
 
         buildConfigField("String", "MY_TRACKER_KEY", "\"$myTrackerKey\"")
+        buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
+        buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
+        buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
+        buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
+        buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
     }
 
     signingConfigs {
@@ -81,21 +86,10 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
-
-            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
-            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
-            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
         }
         getByName("debug") {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
-            buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
-            buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
-            buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
         }
     }
 
@@ -118,7 +112,6 @@ android {
 
     androidResources {
         localeFilters += listOf("en", "ru")
-        ignoreAssetsPattern = "service-account-file.json"
     }
 
     buildFeatures {

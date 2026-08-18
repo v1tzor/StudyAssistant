@@ -51,13 +51,13 @@ internal object ScheduleExtractionJsonSchema {
                 buildJsonObject {
                     put(
                         "title",
-                        nullableString("Optional short title of the timetable if clearly visible."),
+                        nullableString("Optional short title of the timetable if clearly visible"),
                     )
                     put(
                         "entries",
                         buildJsonObject {
                             put("type", JsonPrimitive("array"))
-                            put("description", JsonPrimitive("Extracted classes and events in chronological order within each week and day."))
+                            put("description", JsonPrimitive("Extracted classes and events in chronological order within each week and day"))
                             put("items", entrySchema())
                         },
                     )
@@ -77,7 +77,7 @@ internal object ScheduleExtractionJsonSchema {
                     put(
                         "repeatWeek",
                         integer(
-                            description = "Numbered week in 1..numberOfWeeks. One visible week uses 1.",
+                            description = "Numbered week in 1..numberOfWeeks. One visible week uses 1",
                             minimum = 1,
                             maximum = 3,
                         ),
@@ -85,7 +85,7 @@ internal object ScheduleExtractionJsonSchema {
                     put(
                         "dayOfWeek",
                         integer(
-                            description = "Monday=1 ... Sunday=7.",
+                            description = "Monday=1 ... Sunday=7",
                             minimum = 1,
                             maximum = 7,
                         ),
@@ -93,23 +93,23 @@ internal object ScheduleExtractionJsonSchema {
                     put(
                         "classNumber",
                         nullableInteger(
-                            description = "Lesson/period index in the day (1, 2, 3, 4, ...). Null if no period number is visible. Never a school grade or group such as 9А.",
+                            description = "Lesson/period index in the day (1, 2, 3, 4, ...). Null if no period number is visible. Never a school grade or group such as 9А",
                             minimum = 1,
                             maximum = 30,
                         ),
                     )
                     put(
                         "startTime",
-                        nullableString("Start time in HH:mm if visible. Null if only a lesson number is shown."),
+                        nullableString("Start time in HH:mm if visible. Null if only a lesson number is shown"),
                     )
                     put(
                         "endTime",
-                        nullableString("End time in HH:mm if visible. Null if only a lesson number is shown."),
+                        nullableString("End time in HH:mm if visible. Null if only a lesson number is shown"),
                     )
-                    put("subject", nullableString("Subject or event name from the same visual block."))
+                    put("subject", nullableString("Subject or event name from the same visual block"))
                     put("eventType", eventTypeSchema())
-                    put("teacher", nullableString("Teacher name if clearly shown for this event."))
-                    put("office", nullableString("Room, office or classroom if clearly shown for this event."))
+                    put("teacher", nullableString("Teacher name if clearly shown for this event. Formats: LastName FirstName Patronymic OR FirstName Patronymic OR FirstName"))
+                    put("office", nullableString("Room, office or classroom if clearly shown for this event"))
                 },
             )
             put(
@@ -153,7 +153,7 @@ internal object ScheduleExtractionJsonSchema {
             )
             put(
                 "description",
-                JsonPrimitive("Event type only when clearly indicated. Otherwise null."),
+                JsonPrimitive("Event type only when clearly indicated. Otherwise null"),
             )
         }
     }
