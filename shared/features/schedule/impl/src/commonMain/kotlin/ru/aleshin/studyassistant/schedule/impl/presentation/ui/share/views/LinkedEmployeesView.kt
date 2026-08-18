@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -158,9 +157,15 @@ internal fun EmployeeLinkerBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: (EmployeeUi?) -> Unit,
 ) {
-    val selectedEmployee by derivedStateOf { employees.find { it.uid == selected?.uid } }
-    val teachers by remember { derivedStateOf { employees.filter { it.post == EmployeePost.TEACHER } } }
-    val otherEmployee by remember { derivedStateOf { employees.filter { it.post != EmployeePost.TEACHER } } }
+    val selectedEmployee = remember(employees, selected) {
+        employees.find { it.uid == selected?.uid }
+    }
+    val teachers = remember(employees) {
+        employees.filter { it.post == EmployeePost.TEACHER }
+    }
+    val otherEmployee = remember(employees) {
+        employees.filter { it.post != EmployeePost.TEACHER }
+    }
     var selectedTeacher by remember { mutableStateOf(selectedEmployee) }
 
     BaseSelectorBottomSheet(

@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.subjects.mapToLocalData
 import ru.aleshin.studyassistant.core.data.mappers.users.mapToLocalData
 import ru.aleshin.studyassistant.core.data.utils.share.ShareCode
+import ru.aleshin.studyassistant.core.data.utils.withValidInstallation
 import ru.aleshin.studyassistant.core.database.datasource.shared.ScheduleShareLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
@@ -45,10 +46,12 @@ internal class ScheduleShareRepositoryImpl(
 ) : ScheduleShareRepository {
 
     override suspend fun createShare(share: ScheduleShare): ShareLink {
-        val link = remoteDataSource.createShare(
-            share = share.mapToRemoteData(),
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        val link = installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.createShare(
+                share = share.mapToRemoteData(),
+                installationToken = token,
+            )
+        }
         val code = ShareCode.format(normalizeCode(link.code))
         return ShareLink(
             code = code,
@@ -59,10 +62,12 @@ internal class ScheduleShareRepositoryImpl(
     }
 
     override suspend fun claimShare(code: String): ScheduleShareClaim {
-        val claim = remoteDataSource.claimShare(
-            code = normalizeCode(code),
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        val claim = installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.claimShare(
+                code = normalizeCode(code),
+                installationToken = token,
+            )
+        }
         return ScheduleShareClaim(
             claimId = claim.claimToken,
             share = claim.share.mapToDomain(),
@@ -70,14 +75,21 @@ internal class ScheduleShareRepositoryImpl(
     }
 
     override suspend fun confirmShare(claim: ScheduleShareClaim) {
-        remoteDataSource.confirmShare(
-            claimToken = claim.claimId,
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.confirmShare(
+                claimToken = claim.claimId,
+                installationToken = token,
+            )
+        }
     }
 
     override suspend fun releaseShare(claim: ScheduleShareClaim) {
-        remoteDataSource.releaseShare(claim.claimId)
+        installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.releaseShare(
+                claimToken = claim.claimId,
+                installationToken = token,
+            )
+        }
     }
 
     override suspend fun importShare(

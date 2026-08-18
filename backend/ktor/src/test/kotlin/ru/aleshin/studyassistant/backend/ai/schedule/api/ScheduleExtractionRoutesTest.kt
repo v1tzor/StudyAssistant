@@ -153,12 +153,8 @@ class ScheduleExtractionRoutesTest {
                                     eventType = ScheduleEventType.LECTURE,
                                     teacher = null,
                                     office = "101",
-                                    location = null,
-                                    organization = null,
-                                    notes = null,
                                 ),
                             ),
-                            unparsedLines = emptyList(),
                         ),
                     )
                 }
@@ -189,6 +185,7 @@ class ScheduleExtractionRoutesTest {
                 quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
+                reservationGeneration = 1,
             )
         }
 
@@ -196,6 +193,7 @@ class ScheduleExtractionRoutesTest {
             installationHash: ByteArray,
             messageId: UUID,
             succeeded: Boolean,
+            reservationGeneration: Int,
             now: Instant,
         ) {
             finalizedResults += succeeded

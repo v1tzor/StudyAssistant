@@ -61,6 +61,10 @@ internal interface HomeworkInteractor {
         }
 
         override suspend fun deleteHomework(targetId: UID) = eitherWrapper.wrap {
+            val linkedGoal = goalsRepository.fetchGoalByContentId(targetId).first()
+            if (linkedGoal != null) {
+                goalsRepository.deleteGoal(linkedGoal.uid)
+            }
             homeworksRepository.deleteHomework(targetId)
         }
     }

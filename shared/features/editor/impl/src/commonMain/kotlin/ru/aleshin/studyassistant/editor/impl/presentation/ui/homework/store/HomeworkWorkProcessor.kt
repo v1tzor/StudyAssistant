@@ -160,7 +160,10 @@ internal interface HomeworkWorkProcessor :
             val targetDate = date ?: dateManager.fetchBeginningCurrentInstant()
             linkingClassInteractor.fetchFreeClassesForHomework(subjectId, targetDate)
                 .collectAndHandle(
-                    onLeftAction = { emit(OutputResult(HomeworkOutput.NavigateToBack)) },
+                    onLeftAction = {
+                        emit(ActionResult(HomeworkAction.UpdateClassesLoading(false)))
+                        emit(EffectResult(HomeworkEffect.ShowError(it)))
+                    },
                     onRightAction = { classes ->
                         val classesForLinked = classes.mapValues { entry ->
                             entry.value.map { it.mapToUi() }

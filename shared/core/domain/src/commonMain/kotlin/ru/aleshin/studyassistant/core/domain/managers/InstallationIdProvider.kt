@@ -21,4 +21,5 @@ package ru.aleshin.studyassistant.core.domain.managers
  */
 interface InstallationIdProvider {
     suspend fun fetchInstallationId(): String
+    suspend fun refreshInstallationId(): String = fetchInstallationId()
 }

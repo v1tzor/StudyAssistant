@@ -59,12 +59,8 @@ class ScheduleExtractionResponseMapper {
                         },
                         teacher = entry.teacher,
                         office = entry.office,
-                        location = entry.location,
-                        organization = entry.organization,
-                        notes = entry.notes,
                     )
                 },
-                unparsedLines = draft.unparsedLines,
             ),
             quotaRemaining = quota.remaining,
             quotaLimit = quota.limit,

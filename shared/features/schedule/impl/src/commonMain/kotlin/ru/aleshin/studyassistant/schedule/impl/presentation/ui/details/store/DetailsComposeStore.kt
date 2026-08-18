@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
@@ -61,12 +62,23 @@ internal class DetailsComposeStore(
     ) {
         when (event) {
             is DetailsEvent.Started -> with(state) {
+                val currentDate = dateManager.fetchBeginningCurrentInstant()
+                sendAction(DetailsAction.UpdateCurrentDate(currentDate))
+                launchBackgroundWork(BackgroundKey.CURRENT_DATE) {
+                    var observedDate = currentDate
+                    dateManager.minuteTicker().collect {
+                        val today = dateManager.fetchBeginningCurrentInstant()
+                        if (!today.equalsDay(observedDate)) {
+                            observedDate = today
+                            sendAction(DetailsAction.UpdateCurrentDate(today))
+                        }
+                    }
+                }
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
                     if (selectedWeek != null) {
                         val command = DetailsWorkCommand.LoadWeekSchedule(selectedWeek)
                         workProcessor.work(command).collectAndHandleWork()
                     } else {
-                        val currentDate = dateManager.fetchBeginningCurrentInstant()
                         val week = currentDate.dateTime().weekTimeRange()
                         sendAction(DetailsAction.UpdateSelectedWeek(week))
                         val command = DetailsWorkCommand.LoadWeekSchedule(week)
@@ -161,13 +173,16 @@ internal class DetailsComposeStore(
         is DetailsAction.UpdateViewType -> currentState.copy(
             scheduleView = action.scheduleView,
         )
+        is DetailsAction.UpdateCurrentDate -> currentState.copy(
+            currentDate = action.date,
+        )
         is DetailsAction.UpdateLoading -> currentState.copy(
             isLoading = action.isLoading,
         )
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_SCHEDULE
+        LOAD_SCHEDULE, CURRENT_DATE
     }
 
     class Factory(

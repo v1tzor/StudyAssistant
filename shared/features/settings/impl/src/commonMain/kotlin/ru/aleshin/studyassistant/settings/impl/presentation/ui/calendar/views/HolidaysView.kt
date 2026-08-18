@@ -50,6 +50,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -160,6 +161,7 @@ internal fun HolidaysView(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         holidays.forEach { holiday ->
+                            key(holiday.start to holiday.end) {
                             var holidaysEditorState by remember { mutableStateOf(false) }
 
                             HolidayViewItem(
@@ -194,6 +196,7 @@ internal fun HolidaysView(
                                         holidaysEditorState = false
                                     },
                                 )
+                            }
                             }
                         }
                         var holidaysCreatorState by remember { mutableStateOf(false) }

@@ -44,7 +44,7 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance()) }
     bindSingleton<ScheduleInteractor> {  ScheduleInteractor.Base(instance(), instance(), instance(), instance())  }
     bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<GoalsInteractor> {  GoalsInteractor.Base(instance(), instance(), instance(), instance(), instance())  }
+    bindSingleton<GoalsInteractor> {  GoalsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance())  }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
 }

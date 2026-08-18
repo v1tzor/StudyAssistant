@@ -16,10 +16,6 @@
 
 package ru.aleshin.studyassistant.editor.impl.presentation.ui.common
 
-import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
-import ru.aleshin.studyassistant.core.ui.resources.specify_title as core_specify_title
-import ru.aleshin.studyassistant.editor.impl.resources.*
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ScrollState
@@ -53,6 +49,7 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,16 +60,24 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
+import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.core.ui.mappers.toMinutesOrHoursTitle
 import ru.aleshin.studyassistant.core.ui.theme.material.endSide
 import ru.aleshin.studyassistant.core.ui.theme.material.full
 import ru.aleshin.studyassistant.core.ui.theme.material.startSide
 import ru.aleshin.studyassistant.core.ui.views.SwipeToDismissBackground
 import ru.aleshin.studyassistant.core.ui.views.dialog.DurationPickerDialog
-import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.NumberDropdownMenu
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.NumberedDurationCreatorDropdownMenu
+import ru.aleshin.studyassistant.editor.impl.resources.Res
+import ru.aleshin.studyassistant.editor.impl.resources.add_title
+import ru.aleshin.studyassistant.editor.impl.resources.all_title
+import ru.aleshin.studyassistant.editor.impl.resources.duration_title
+import ru.aleshin.studyassistant.editor.impl.resources.except_title
+import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
+import ru.aleshin.studyassistant.core.ui.resources.specify_title as core_specify_title
 
 /**
  * @author Stanislav Aleshin on 14.07.2024.
@@ -281,6 +286,7 @@ private fun SpecificNumberedDurationsSection(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         specificDurations.sortedBy { it.number }.forEach { numberedDuration ->
+            key(numberedDuration.number) {
             Column {
                 var isOpenNumberChooserMenu by remember { mutableStateOf(false) }
                 var durationPickerDialogState by remember { mutableStateOf(false) }
@@ -317,6 +323,7 @@ private fun SpecificNumberedDurationsSection(
                         }
                     )
                 }
+            }
             }
         }
     }

@@ -273,14 +273,14 @@ private fun DetailsEmployeeViewContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (subjects.isNotEmpty()) {
-                items(subjects) { subject ->
+                items(subjects, key = { subject -> subject.uid }) { subject ->
                     EmployeeSubjectView(
                         color = Color(subject.color),
                         text = subject.name,
                     )
                 }
             } else {
-                item {
+                item(key = EMPTY_EMPLOYEE_SUBJECTS_KEY) {
                     NoneEmployeeSubjectView()
                 }
             }
@@ -325,3 +325,5 @@ private fun DetailsEmployeeViewTrailing(
         }
     }
 }
+
+private const val EMPTY_EMPLOYEE_SUBJECTS_KEY = "empty_employee_subjects"

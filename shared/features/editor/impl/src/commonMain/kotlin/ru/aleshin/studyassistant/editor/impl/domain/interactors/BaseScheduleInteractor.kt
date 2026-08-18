@@ -58,14 +58,16 @@ internal interface BaseScheduleInteractor {
             timeRange: TimeRange,
             week: NumberOfRepeatWeek,
         ) = eitherWrapper.wrapFlow {
-            val weekDaySchedules = mutableMapOf<DayOfWeek, BaseSchedule>()
             val schedulesByVersion = scheduleRepository.fetchSchedulesByVersion(timeRange, week)
 
             return@wrapFlow schedulesByVersion.map { rawSchedules ->
+                val weekDaySchedules = linkedMapOf<DayOfWeek, BaseSchedule>()
                 rawSchedules.forEach { schedule ->
-                    weekDaySchedules[schedule.dayOfWeek] = schedule.copy(
-                        classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
-                    ).withClassNumbers()
+                    if (schedule.dayOfWeek !in weekDaySchedules) {
+                        weekDaySchedules[schedule.dayOfWeek] = schedule.copy(
+                            classes = schedule.classes.sortedBy { it.timeRange.from.dateTime().time },
+                        ).withClassNumbers()
+                    }
                 }
 
                 BaseWeekSchedule(

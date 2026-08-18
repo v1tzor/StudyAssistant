@@ -322,7 +322,7 @@ internal interface AiToolCallProcessor {
                 if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
 
                 todoRepository.addOrUpdateTodo(completedTodo)
-                todoReminderManager.scheduleReminders(todo.uid, todo.name, todo.deadline, todo.notifications)
+                todoReminderManager.clearAllReminders(todo.uid)
             } else {
                 val reopenedTodo = todo.copy(
                     isDone = false,
@@ -334,7 +334,7 @@ internal interface AiToolCallProcessor {
                 }
 
                 todoRepository.addOrUpdateTodo(reopenedTodo)
-                todoReminderManager.clearAllReminders(todo.uid)
+                todoReminderManager.scheduleReminders(reopenedTodo.uid, reopenedTodo.name, reopenedTodo.deadline, reopenedTodo.notifications)
             }
 
             return AiToolResultMapper.success("todo_completion_updated")
@@ -344,6 +344,9 @@ internal interface AiToolCallProcessor {
             val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
             if (todoRepository.fetchTodoById(todoId).first() == null) {
                 return AiToolResultMapper.error("todo_not_found")
+            }
+            dailyGoalsRepository.fetchGoalByContentId(todoId).first()?.let { goal ->
+                dailyGoalsRepository.deleteGoal(goal.uid)
             }
             todoReminderManager.clearAllReminders(todoId)
             todoRepository.deleteTodo(todoId)
@@ -482,6 +485,9 @@ internal interface AiToolCallProcessor {
                 ?: return AiToolResultMapper.error("homework_required")
             if (homeworksRepository.fetchHomeworkById(homeworkId).first() == null) {
                 return AiToolResultMapper.error("homework_not_found")
+            }
+            dailyGoalsRepository.fetchGoalByContentId(homeworkId).first()?.let { goal ->
+                dailyGoalsRepository.deleteGoal(goal.uid)
             }
             homeworksRepository.deleteHomework(homeworkId)
             return AiToolResultMapper.success("homework_deleted")
@@ -959,12 +965,7 @@ internal interface AiToolCallProcessor {
                             todoRepository.addOrUpdateTodo(
                                 todo.copy(isDone = true, completeDate = currentTime, updatedAt = updatedAt),
                             )
-                            todoReminderManager.scheduleReminders(
-                                todo.uid,
-                                todo.name,
-                                todo.deadline,
-                                todo.notifications,
-                            )
+                            todoReminderManager.clearAllReminders(todo.uid)
                         }
                     }
                 }
@@ -979,10 +980,18 @@ internal interface AiToolCallProcessor {
                     }
                     GoalType.TODO -> current.contentTodo?.let { t ->
                         todoRepository.fetchTodoById(t.uid).first()?.let { todo ->
-                            todoRepository.addOrUpdateTodo(
-                                todo.copy(isDone = false, completeDate = null, updatedAt = updatedAt),
+                            val reopenedTodo = todo.copy(
+                                isDone = false,
+                                completeDate = null,
+                                updatedAt = updatedAt,
                             )
-                            todoReminderManager.clearAllReminders(todo.uid)
+                            todoRepository.addOrUpdateTodo(reopenedTodo)
+                            todoReminderManager.scheduleReminders(
+                                reopenedTodo.uid,
+                                reopenedTodo.name,
+                                reopenedTodo.deadline,
+                                reopenedTodo.notifications,
+                            )
                         }
                     }
                 }

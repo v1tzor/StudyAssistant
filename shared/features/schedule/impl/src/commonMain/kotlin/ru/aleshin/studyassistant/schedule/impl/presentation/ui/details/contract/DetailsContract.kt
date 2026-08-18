@@ -71,6 +71,7 @@ internal sealed class DetailsAction : StoreAction {
     ) : DetailsAction()
     data class UpdateSelectedWeek(val week: TimeRange?) : DetailsAction()
     data class UpdateViewType(val scheduleView: WeekScheduleViewType) : DetailsAction()
+    data class UpdateCurrentDate(val date: Instant) : DetailsAction()
     data class UpdateLoading(val isLoading: Boolean) : DetailsAction()
 }
 

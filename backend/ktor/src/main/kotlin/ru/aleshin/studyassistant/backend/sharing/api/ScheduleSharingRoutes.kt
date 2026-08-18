@@ -101,6 +101,9 @@ fun Route.scheduleSharingRoutes(
         }
 
         post("/release") {
+            call.requireInstallationToken(
+                credentialService = credentialService,
+            )
             call.requireJsonContentType()
             val request = call.receive<ReleaseScheduleShareRequest>()
 

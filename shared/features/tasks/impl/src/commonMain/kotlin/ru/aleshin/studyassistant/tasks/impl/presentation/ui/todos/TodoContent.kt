@@ -189,10 +189,8 @@ private fun BaseTodoContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (state.completedTodos.isNotEmpty()) {
-                    items(Constants.Placeholder.TODOS) {
-                        TodoViewItemPlaceholder()
-                    }
+                items(Constants.Placeholder.TODOS) {
+                    TodoViewItemPlaceholder()
                 }
             }
         }

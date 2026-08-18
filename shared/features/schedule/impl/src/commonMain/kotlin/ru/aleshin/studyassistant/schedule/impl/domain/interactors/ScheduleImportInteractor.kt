@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.domain.interactors
 
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
@@ -40,10 +41,13 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.convertToSho
 import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportRequest
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.EmployeeRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleImportRepository
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
@@ -90,6 +94,9 @@ internal interface ScheduleImportInteractor {
         private val subjectsRepository: SubjectsRepository,
         private val employeeRepository: EmployeeRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val adRewardRepository: AdRewardRepository,
         private val imageCompressor: ImageCompressor,
         private val deviceInfoProvider: DeviceInfoProvider,
@@ -146,6 +153,7 @@ internal interface ScheduleImportInteractor {
             rewardChallengeId: String,
         ) = eitherWrapper.wrapUnit {
             if (!validator.isSessionValid(session)) throw ScheduleImportException.InvalidDraft
+            adRewardRepository.completeChallenge(rewardChallengeId)
             val organization = organizationsRepository.fetchOrganizationById(session.organizationId).first()
                 ?: throw ScheduleImportException.NoOrganization
 
@@ -206,8 +214,31 @@ internal interface ScheduleImportInteractor {
                         createdAt = updatedAt,
                     ).copy(uid = scheduleId)
                 }
+            deprecateCurrentSchedules(currentTime)
             baseScheduleRepository.addOrUpdateSchedulesGroup(schedules)
-            runCatching { adRewardRepository.completeChallenge(rewardChallengeId) }
+            restartClassReminders()
+        }
+
+        private suspend fun deprecateCurrentSchedules(currentInstant: Instant) {
+            val currentWeek = dateManager.fetchCurrentWeek()
+            val currentSchedules = baseScheduleRepository.fetchSchedulesByVersion(currentWeek, null).first()
+            if (currentSchedules.isEmpty()) return
+            val deprecatedSchedules = currentSchedules.map { schedule ->
+                schedule.copy(
+                    dateVersion = schedule.dateVersion.makeDeprecated(currentInstant),
+                    classes = schedule.classes.map { classModel -> classModel.copy(uid = randomUUID()) },
+                    updatedAt = currentInstant.toEpochMilliseconds(),
+                )
+            }
+            baseScheduleRepository.addOrUpdateSchedulesGroup(deprecatedSchedules)
+        }
+
+        private suspend fun restartClassReminders() {
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
+            startClassesReminderManager.startOrRetryReminderService()
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
+            }
         }
     }
 }

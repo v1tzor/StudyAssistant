@@ -85,6 +85,7 @@ class AiQuotaRepositoryImpl(
             .select(
                 AiRequestsTable.inFlight,
                 AiRequestsTable.executionCount,
+                AiRequestsTable.reservationGeneration,
                 AiRequestsTable.requestHash,
                 AiRequestsTable.lastExecutionHash,
                 AiRequestsTable.succeeded,
@@ -185,6 +186,7 @@ class AiQuotaRepositoryImpl(
             val activeAttempts = existingRequest[AiRequestsTable.inFlight]
                 .takeUnless { stale }
                 ?: 0
+            val nextGeneration = existingRequest[AiRequestsTable.reservationGeneration] + 1
 
             AiRequestsTable.update(
                 where = {
@@ -194,6 +196,7 @@ class AiQuotaRepositoryImpl(
             ) {
                 it[inFlight] = activeAttempts + 1
                 it[executionCount] = existingRequest[AiRequestsTable.executionCount] + 1
+                it[reservationGeneration] = nextGeneration
                 it[AiRequestsTable.requestHash] = requestHash
                 it[lastExecutionHash] = executionHash
                 it[responsePayload] = null
@@ -209,6 +212,7 @@ class AiQuotaRepositoryImpl(
                 ),
                 resetAt = resetAt,
                 isNewMessage = false,
+                reservationGeneration = nextGeneration,
             )
         }
 
@@ -239,6 +243,7 @@ class AiQuotaRepositoryImpl(
             it[AiRequestsTable.usageDate] = usageDate
             it[AiRequestsTable.executionCount] = 1
             it[AiRequestsTable.inFlight] = 1
+            it[AiRequestsTable.reservationGeneration] = 1
             it[AiRequestsTable.succeeded] = false
             it[AiRequestsTable.createdAt] = now.atOffset(ZoneOffset.UTC)
             it[AiRequestsTable.updatedAt] = now.atOffset(ZoneOffset.UTC)
@@ -252,6 +257,7 @@ class AiQuotaRepositoryImpl(
             ),
             resetAt = resetAt,
             isNewMessage = true,
+            reservationGeneration = 1,
         )
     }
 
@@ -259,6 +265,7 @@ class AiQuotaRepositoryImpl(
         installationHash: ByteArray,
         messageId: UUID,
         succeeded: Boolean,
+        reservationGeneration: Int,
         now: Instant,
     ) = dbQuery {
         lockInstallation(installationHash = installationHash)
@@ -267,6 +274,7 @@ class AiQuotaRepositoryImpl(
             .select(
                 AiRequestsTable.usageDate,
                 AiRequestsTable.inFlight,
+                AiRequestsTable.reservationGeneration,
                 AiRequestsTable.succeeded,
             )
             .where {
@@ -277,7 +285,26 @@ class AiQuotaRepositoryImpl(
             .singleOrNull()
             ?: return@dbQuery
 
-        val remainingAttempts = (request[AiRequestsTable.inFlight] - 1).coerceAtLeast(0)
+        val currentGeneration = request[AiRequestsTable.reservationGeneration]
+        val currentInFlight = request[AiRequestsTable.inFlight]
+        if (reservationGeneration != currentGeneration) {
+            if (currentInFlight > 1) {
+                AiRequestsTable.update(
+                    where = {
+                        (AiRequestsTable.installationHash eq installationHash) and
+                            (AiRequestsTable.messageId eq messageId)
+                    },
+                ) {
+                    it[inFlight] = currentInFlight - 1
+                    if (succeeded) {
+                        it[AiRequestsTable.succeeded] = true
+                    }
+                }
+            }
+            return@dbQuery
+        }
+
+        val remainingAttempts = (currentInFlight - 1).coerceAtLeast(0)
         val hasSucceeded = request[AiRequestsTable.succeeded] || succeeded
 
         if (remainingAttempts == 0 && !hasSucceeded) {

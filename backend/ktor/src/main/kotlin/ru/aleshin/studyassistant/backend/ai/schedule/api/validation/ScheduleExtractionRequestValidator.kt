@@ -46,6 +46,7 @@ class ScheduleExtractionRequestValidator(
             detectedMime != declaredMime ||
             imageBytes.size < ScheduleImageDecoder.MIN_IMAGE_BYTES ||
             imageBytes.size > config.maxScheduleImageBytes ||
+            !ScheduleImageGuard.hasSafeDimensions(imageBytes) ||
             note.length > config.maxScheduleNoteCharacters ||
             !LOCALE_PATTERN.matches(locale) ||
             Locale.forLanguageTag(locale).language.isBlank() ||

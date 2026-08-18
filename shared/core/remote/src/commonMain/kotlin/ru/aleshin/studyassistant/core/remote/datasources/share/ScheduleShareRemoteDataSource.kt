@@ -37,7 +37,7 @@ interface ScheduleShareRemoteDataSource {
 
     suspend fun claimShare(code: String, installationToken: String): ScheduleShareClaimPojo
     suspend fun confirmShare(claimToken: String, installationToken: String)
-    suspend fun releaseShare(claimToken: String)
+    suspend fun releaseShare(claimToken: String, installationToken: String)
 
     class Base(
         private val api: BackendShareApi,
@@ -75,8 +75,11 @@ interface ScheduleShareRemoteDataSource {
             )
         }
 
-        override suspend fun releaseShare(claimToken: String) {
-            api.releaseSchedule(claimToken = claimToken)
+        override suspend fun releaseShare(claimToken: String, installationToken: String) {
+            api.releaseSchedule(
+                claimToken = claimToken,
+                installationToken = installationToken,
+            )
         }
     }
 }

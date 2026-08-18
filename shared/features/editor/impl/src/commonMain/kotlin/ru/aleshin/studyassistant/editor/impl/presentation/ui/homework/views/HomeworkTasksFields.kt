@@ -71,8 +71,8 @@ internal fun HomeworkTasksFields(
 ) {
     val focusManager = LocalFocusManager.current
     var editableTheory by remember { mutableStateOf(theoreticalTasks) }
-    var editablePresentations by remember { mutableStateOf(practicalTasks) }
-    var editablePractice by remember { mutableStateOf(presentationsTasks) }
+    var editablePractice by remember { mutableStateOf(practicalTasks) }
+    var editablePresentations by remember { mutableStateOf(presentationsTasks) }
 
     Column(
         modifier = modifier.padding(start = 16.dp, end = 24.dp),

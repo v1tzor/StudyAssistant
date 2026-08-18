@@ -21,10 +21,12 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
+import ru.aleshin.studyassistant.core.common.exceptions.InvalidInstallationException
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardException
 import ru.aleshin.studyassistant.core.remote.ktor.NetworkConnectionChecker
 import ru.aleshin.studyassistant.core.remote.ktor.StudyAssistantKtor
@@ -105,6 +107,11 @@ interface AdRewardRemoteApi {
                 val error = runCatching {
                     json.decodeFromString<BackendApiErrorPojo>(responseBody)
                 }.getOrNull()
+                if (error?.errorCode == "invalid_installation" ||
+                    response.status == HttpStatusCode.Unauthorized
+                ) {
+                    throw InvalidInstallationException()
+                }
                 if (error?.errorCode == "reward_unavailable") {
                     throw AdRewardException.Unavailable()
                 }

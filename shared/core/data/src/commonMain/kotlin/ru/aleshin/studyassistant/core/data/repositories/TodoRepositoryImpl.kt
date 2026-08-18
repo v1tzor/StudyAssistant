@@ -74,7 +74,7 @@ class TodoRepositoryImpl(
 
     override suspend fun fetchOverdueTodos(currentDate: Instant): Flow<List<Todo>> {
         return localDataSource.fetchOverdueTodos(
-            currentDate.endThisDay().toEpochMilliseconds()
+            currentDate.startThisDay().toEpochMilliseconds()
         ).map { todos -> todos.map { it.mapToDomain() } }
     }
 

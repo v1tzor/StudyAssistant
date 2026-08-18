@@ -70,7 +70,7 @@ class HomeworksRepositoryImpl(
 
     override suspend fun fetchOverdueHomeworks(currentDate: Instant): Flow<List<Homework>> {
         return localDataSource.fetchOverdueHomeworksDetails(
-            currentDate.endThisDay().toEpochMilliseconds()
+            currentDate.startThisDay().toEpochMilliseconds()
         ).map { homeworks -> homeworks.map { it.mapToDomain() } }
     }
 

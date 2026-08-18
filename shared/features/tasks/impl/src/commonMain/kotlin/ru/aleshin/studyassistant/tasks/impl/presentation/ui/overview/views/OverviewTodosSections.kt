@@ -112,7 +112,7 @@ internal fun OverviewTodosInProgressSection(
             targetState = isLoading,
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
-            if (!isLoading) {
+            if (!loading) {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -234,7 +234,7 @@ internal fun OverviewTodosErrorSection(
             targetState = isLoading,
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
-            if (!isLoading) {
+            if (!loading) {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -353,7 +353,7 @@ internal fun OverviewTodosCompletedSection(
             targetState = isLoading,
             animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         ) { loading ->
-            if (!isLoading) {
+            if (!loading) {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp),

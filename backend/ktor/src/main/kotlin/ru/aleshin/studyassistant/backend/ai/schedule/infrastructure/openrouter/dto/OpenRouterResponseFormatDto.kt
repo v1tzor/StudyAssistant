@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,4 +25,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpenRouterResponseFormatDto(
     val type: String,
+    @SerialName("json_schema")
+    val jsonSchema: OpenRouterJsonSchemaDto? = null,
 )

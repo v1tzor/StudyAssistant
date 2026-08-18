@@ -25,5 +25,4 @@ import kotlinx.serialization.Serializable
 data class DeepSeekScheduleDraftDto(
     val title: String? = null,
     val entries: List<DeepSeekScheduleDraftEntryDto>,
-    val unparsedLines: List<String> = emptyList(),
 )

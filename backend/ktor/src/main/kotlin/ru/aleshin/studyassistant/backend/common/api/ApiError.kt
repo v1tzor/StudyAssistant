@@ -41,6 +41,11 @@ class InvalidRequestException : ApiException(
     errorCode = "invalid",
 )
 
+class InvalidInstallationException : ApiException(
+    status = HttpStatusCode.Unauthorized,
+    errorCode = "invalid_installation",
+)
+
 class PayloadTooLargeApiException : ApiException(
     status = HttpStatusCode.PayloadTooLarge,
     errorCode = "too_large",

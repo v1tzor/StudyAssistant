@@ -72,7 +72,10 @@ internal interface WeekScheduleWorkProcessor :
             val weekTimeRange = currentDateTime.weekTimeRange()
 
             scheduleInteractor.fetchWeekScheduleByVersion(weekTimeRange, week).collectAndHandle(
-                onLeftAction = { emit(EffectResult(WeekScheduleEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(ActionResult(WeekScheduleAction.UpdateLoading(false)))
+                    emit(EffectResult(WeekScheduleEffect.ShowError(it)))
+                },
                 onRightAction = { baseWeekSchedule ->
                     val weekSchedule = baseWeekSchedule.mapToUi()
                     emit(ActionResult(WeekScheduleAction.UpdateScheduleData(week, weekSchedule)))

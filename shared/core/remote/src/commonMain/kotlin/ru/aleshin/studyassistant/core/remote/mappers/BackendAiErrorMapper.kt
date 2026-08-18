@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.remote.mappers
 
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.exceptions.InvalidInstallationException
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.remote.models.backend.BackendApiErrorPojo
 
@@ -37,8 +38,10 @@ internal fun mapBackendAiError(
         "quota" -> AiServiceException.QuotaExceeded(error.quotaResetAt)
         "rate_limit" -> AiServiceException.RateLimited(error.retryAt)
         "invalid", "too_large" -> AiServiceException.InvalidRequest()
+        "invalid_installation" -> InvalidInstallationException()
         "server_unavailable" -> AiServiceException.ServerUnavailable()
         else -> when (status) {
+            HttpStatusCode.Unauthorized -> InvalidInstallationException()
             HttpStatusCode.BadRequest,
             HttpStatusCode.PayloadTooLarge -> AiServiceException.InvalidRequest()
             HttpStatusCode.TooManyRequests -> AiServiceException.RateLimited()

@@ -49,7 +49,7 @@ internal class DailyScheduleComposeStore(
 ) {
 
     override fun initialize(input: DailyScheduleInput, isRestore: Boolean) {
-        dispatchEvent(DailyScheduleEvent.Started(input))
+        dispatchEvent(DailyScheduleEvent.Started(input, isRestore))
     }
 
     override suspend fun WorkScope<DailyScheduleState, DailyScheduleAction, DailyScheduleEffect, DailyScheduleOutput>.handleEvent(
@@ -58,9 +58,20 @@ internal class DailyScheduleComposeStore(
         when (event) {
             is DailyScheduleEvent.Started -> with(event.inputData) {
                 sendAction(DailyScheduleAction.UpdateTargetDate(date.mapEpochTimeToInstant()))
+                val restoredCustomScheduleId = state.customSchedule?.uid
+                val restoredBaseScheduleId = state.baseSchedule?.uid
+                val resolvedCustomScheduleId = if (event.isRestore) {
+                    restoredCustomScheduleId ?: customScheduleId
+                } else {
+                    customScheduleId
+                }
+                val resolvedBaseScheduleId = if (event.isRestore) {
+                    restoredBaseScheduleId ?: baseScheduleId
+                } else {
+                    baseScheduleId
+                }
                 launchBackgroundWork(BackgroundKey.SCHEDULES_WORK) {
-                    val command =
-                        DailyScheduleWorkCommand.LoadSchedules(baseScheduleId, customScheduleId)
+                    val command = DailyScheduleWorkCommand.LoadSchedules(resolvedBaseScheduleId, resolvedCustomScheduleId)
                     workProcessor.work(command).collectAndHandleWork()
                 }
                 launchBackgroundWork(BackgroundKey.LOAD_SETTINGS) {
@@ -72,8 +83,7 @@ internal class DailyScheduleComposeStore(
             is DailyScheduleEvent.CreateCustomSchedule -> with(state()) {
                 launchBackgroundWork(BackgroundKey.SCHEDULES_WORK) {
                     val targetDate = checkNotNull(targetDate)
-                    val command =
-                        DailyScheduleWorkCommand.CreateCustomSchedule(targetDate, baseSchedule)
+                    val command = DailyScheduleWorkCommand.CreateCustomSchedule(targetDate, baseSchedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -89,8 +99,7 @@ internal class DailyScheduleComposeStore(
             is DailyScheduleEvent.SwapClasses -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command =
-                        DailyScheduleWorkCommand.SwapClasses(event.from, event.to, schedule)
+                    val command = DailyScheduleWorkCommand.SwapClasses(event.from, event.to, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -106,8 +115,7 @@ internal class DailyScheduleComposeStore(
             is DailyScheduleEvent.FastEditClassesDuration -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command =
-                        DailyScheduleWorkCommand.UpdateClassesDuration(event.durations, schedule)
+                    val command = DailyScheduleWorkCommand.UpdateClassesDuration(event.durations, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
@@ -115,8 +123,7 @@ internal class DailyScheduleComposeStore(
             is DailyScheduleEvent.FastEditBreaksDuration -> with(state()) {
                 launchBackgroundWork(BackgroundKey.EDIT_ACTION) {
                     val schedule = checkNotNull(customSchedule)
-                    val command =
-                        DailyScheduleWorkCommand.UpdateBreaksDuration(event.durations, schedule)
+                    val command = DailyScheduleWorkCommand.UpdateBreaksDuration(event.durations, schedule)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }

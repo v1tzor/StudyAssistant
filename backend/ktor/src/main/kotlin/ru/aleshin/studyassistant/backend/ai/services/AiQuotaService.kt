@@ -56,6 +56,7 @@ class AiQuotaService(
         installationToken: String,
         messageId: UUID,
         succeeded: Boolean,
+        reservationGeneration: Int,
     ) {
         val installationHash = installationHasher.hash(installationToken = installationToken)
 
@@ -63,6 +64,7 @@ class AiQuotaService(
             installationHash = installationHash,
             messageId = messageId,
             succeeded = succeeded,
+            reservationGeneration = reservationGeneration,
             now = clock.instant(),
         )
     }

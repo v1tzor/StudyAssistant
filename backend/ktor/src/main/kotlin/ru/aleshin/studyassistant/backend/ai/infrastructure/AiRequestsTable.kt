@@ -32,6 +32,7 @@ object AiRequestsTable : Table(name = "ai_requests") {
     val usageDate = date("usage_date")
     val executionCount = integer("execution_count")
     val inFlight = integer("in_flight")
+    val reservationGeneration = integer("reservation_generation")
     val succeeded = bool("succeeded")
     val responsePayload = binary("response_payload").nullable()
     val responseNonce = binary("response_nonce").nullable()

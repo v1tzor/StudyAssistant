@@ -33,5 +33,5 @@ internal data class ScheduleImportSession(
     val originalEmployeeIds: Set<UID>,
     val dirtySubjectIds: Set<UID> = emptySet(),
     val dirtyEmployeeIds: Set<UID> = emptySet(),
-    val unparsedLines: List<String>,
+    val unparsedLines: List<String> = emptyList(),
 )

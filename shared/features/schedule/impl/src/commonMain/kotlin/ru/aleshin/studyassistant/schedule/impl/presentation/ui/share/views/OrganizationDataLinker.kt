@@ -129,7 +129,7 @@ private fun OrganizationsSelectorSection(
                     pageSpacing = 16.dp,
                 ) { organizationIndex ->
                     var openOrganizationLinkerSheet by remember { mutableStateOf(false) }
-                    val linkData = organizationsLinkData[organizationIndex]
+                    val linkData = organizationsLinkData.getOrNull(organizationIndex) ?: return@HorizontalPager
 
                     SharedOrganizationView(
                         isLinked = linkData.linkedOrganization != null,

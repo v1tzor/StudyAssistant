@@ -147,18 +147,13 @@ internal interface BaseClassInteractor {
                 val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
                 val mondayDate = currentDate.dateOfWeekDay(DayOfWeek.MONDAY)
 
-                val updatedClassId: UID
+                val updatedClassId = classId
                 val oldModel = schedule.classes.find { it.uid == classId }
                 val actualClasses = schedule.classes.toMutableList().apply {
-                    if (classModel.subject?.uid != oldModel?.subject?.uid ||
-                        classModel.organization.uid != oldModel?.organization?.uid
-                    ) {
-                        updatedClassId = randomUUID()
-                        remove(oldModel)
-                        add(classModel.copy(uid = updatedClassId))
-                    } else {
-                        updatedClassId = classId
+                    if (oldModel != null) {
                         set(indexOf(oldModel), classModel)
+                    } else {
+                        add(classModel)
                     }
                 }
 

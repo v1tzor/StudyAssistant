@@ -16,9 +16,12 @@
 
 package ru.aleshin.studyassistant.backend.ai.schedule.api.validation
 
+import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleImageDecoder
+import ru.aleshin.studyassistant.backend.ai.schedule.testPngWithDeclaredSize
 import ru.aleshin.studyassistant.backend.ai.schedule.testScheduleExtractionRequestDto
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
+import java.util.Base64
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -60,6 +63,21 @@ class ScheduleExtractionRequestValidatorTest {
         assertFailsWith<InvalidRequestException> {
             validator.validate(
                 request = testScheduleExtractionRequestDto().copy(imageMimeType = "image/png"),
+            )
+        }
+    }
+
+    @Test
+    fun oversizedDeclaredImageShouldFailBeforeQuota() {
+        val imageBytes = testPngWithDeclaredSize(width = 20_000, height = 20_000)
+        assertFailsWith<InvalidRequestException> {
+            validator.validate(
+                request = testScheduleExtractionRequestDto(
+                    imageBytes = imageBytes,
+                ).copy(
+                    imageMimeType = ScheduleImageDecoder.IMAGE_PNG,
+                    imageBase64 = Base64.getEncoder().encodeToString(imageBytes),
+                ),
             )
         }
     }

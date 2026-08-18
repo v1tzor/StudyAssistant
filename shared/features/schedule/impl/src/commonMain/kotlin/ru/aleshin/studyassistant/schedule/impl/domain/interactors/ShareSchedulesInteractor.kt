@@ -20,6 +20,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.extractAllItem
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
@@ -44,8 +45,11 @@ import ru.aleshin.studyassistant.core.domain.entities.share.ScheduleShareClaim
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareLink
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
+import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.AdRewardRepository
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
+import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ProfileRepository
 import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepository
@@ -101,6 +105,9 @@ internal interface ShareSchedulesInteractor {
         private val organizationRepository: OrganizationsRepository,
         private val baseSchedulesRepository: BaseScheduleRepository,
         private val adRewardRepository: AdRewardRepository,
+        private val notificationSettingsRepository: NotificationSettingsRepository,
+        private val startClassesReminderManager: StartClassesReminderManager,
+        private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
@@ -244,7 +251,9 @@ internal interface ShareSchedulesInteractor {
                     subjectIds = idMappings.subjectIds,
                     teacherIds = idMappings.teacherIds,
                 )
+                deprecateCurrentSchedules(dateManager.fetchCurrentInstant())
                 shareRepository.importShare(organizations, schedules)
+                restartClassReminders()
                 imported = true
                 withContext(NonCancellable) {
                     shareRepository.confirmShare(claim)
@@ -256,6 +265,30 @@ internal interface ShareSchedulesInteractor {
                     }
                 }
                 throw error
+            }
+        }
+
+        private suspend fun deprecateCurrentSchedules(currentInstant: Instant) {
+            val currentSchedules = baseSchedulesRepository.fetchSchedulesByVersion(
+                version = dateManager.fetchCurrentWeek(),
+                numberOfWeek = null,
+            ).first()
+            if (currentSchedules.isEmpty()) return
+            val deprecatedSchedules = currentSchedules.map { schedule ->
+                schedule.copy(
+                    dateVersion = schedule.dateVersion.makeDeprecated(currentInstant),
+                    classes = schedule.classes.map { classModel -> classModel.copy(uid = randomUUID()) },
+                    updatedAt = currentInstant.toEpochMilliseconds(),
+                )
+            }
+            baseSchedulesRepository.addOrUpdateSchedulesGroup(deprecatedSchedules)
+        }
+
+        private suspend fun restartClassReminders() {
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
+            startClassesReminderManager.startOrRetryReminderService()
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
             }
         }
 

@@ -48,9 +48,9 @@ data class TimeRange(
 
     fun timeEquals(other: TimeRange?): Boolean {
         val fromTime = from.dateTime().time
-        val endTime = from.dateTime().time
+        val endTime = to.dateTime().time
         val otherFromTime = other?.from?.dateTime()?.time
-        val otherEndTime = other?.from?.dateTime()?.time
+        val otherEndTime = other?.to?.dateTime()?.time
 
         return fromTime.epochTimeDuration() == otherFromTime?.epochTimeDuration() &&
             endTime.epochTimeDuration() == otherEndTime?.epochTimeDuration()

@@ -56,12 +56,18 @@ internal val domainModule = DI.Module("Domain") {
             instance(),
             instance(),
             instance(),
+            instance(),
+            instance(),
+            instance(),
         )
     }
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<ScheduleImportInteractor> {
         ScheduleImportInteractor.Base(
+            instance(),
+            instance(),
+            instance(),
             instance(),
             instance(),
             instance(),

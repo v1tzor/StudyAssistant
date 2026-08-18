@@ -30,6 +30,10 @@ struct ComposeView: UIViewControllerRepresentable {
                 scheduleImportRewardedId: adUnitId(
                     key: "YandexScheduleRewardedId",
                     demo: "demo-rewarded-yandex"
+                ),
+                aiScheduleAnalysisRewardedId: adUnitId(
+                    key: "YandexScheduleAiRewardedId",
+                    demo: "demo-rewarded-yandex"
                 )
             )
         )

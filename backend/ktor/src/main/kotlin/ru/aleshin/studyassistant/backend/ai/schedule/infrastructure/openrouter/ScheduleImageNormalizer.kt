@@ -17,6 +17,8 @@
 package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter
 
 import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleImageDecoder
+import ru.aleshin.studyassistant.backend.ai.schedule.api.validation.ScheduleImageGuard
+import ru.aleshin.studyassistant.backend.common.api.InvalidRequestException
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -34,14 +36,12 @@ import kotlin.math.roundToInt
 class ScheduleImageNormalizer {
 
     fun normalize(imageBytes: ByteArray, mimeType: String): NormalizedScheduleImage {
+        ScheduleImageGuard.requireSafeDimensions(imageBytes)
         val image = runCatching {
             ImageIO.read(ByteArrayInputStream(imageBytes))
         }.getOrNull()
         if (image == null || image.width <= 0 || image.height <= 0) {
-            return NormalizedScheduleImage(
-                bytes = imageBytes,
-                mimeType = mimeType,
-            )
+            throw InvalidRequestException()
         }
 
         val longSide = max(image.width, image.height)

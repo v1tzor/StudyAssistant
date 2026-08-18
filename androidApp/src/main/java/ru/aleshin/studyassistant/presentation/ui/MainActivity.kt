@@ -29,7 +29,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import com.arkivanov.decompose.defaultComponentContext
 import org.jetbrains.compose.resources.stringResource
 import org.kodein.di.instance
@@ -57,7 +57,7 @@ class MainActivity : FlavorMainActivity() {
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
         )
 
         mainComponent = componentFactory.createComponent(
@@ -95,7 +95,7 @@ class MainActivity : FlavorMainActivity() {
             }
         }
 
-        SideEffect {
+        LaunchedEffect(Unit) {
             if (!isAllowPermission(Manifest.permission.POST_NOTIFICATIONS)) {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -105,17 +105,13 @@ class MainActivity : FlavorMainActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleDeepLink(intent)
+        intent.dataString?.let(DeepLinkUrl::fromString)?.let { deepLink ->
+            if (::mainComponent.isInitialized) mainComponent.onDeepLink(deepLink)
+        }
     }
 
     override fun onPause() {
         WidgetsUpdateScheduler.enqueueImmediate(this)
         super.onPause()
-    }
-
-    private fun handleDeepLink(intent: Intent) {
-        if (::mainComponent.isInitialized) {
-            intent.dataString?.let(DeepLinkUrl::fromString)?.let(mainComponent::handleDeepLink)
-        }
     }
 }

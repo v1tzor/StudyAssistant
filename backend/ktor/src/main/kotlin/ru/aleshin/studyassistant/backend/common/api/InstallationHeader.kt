@@ -28,7 +28,7 @@ fun ApplicationCall.requireInstallationToken(
     val token = request.headers[INSTALLATION_TOKEN_HEADER]?.trim()
 
     if (token == null || !credentialService.isValid(token)) {
-        throw InvalidRequestException()
+        throw InvalidInstallationException()
     }
 
     return token

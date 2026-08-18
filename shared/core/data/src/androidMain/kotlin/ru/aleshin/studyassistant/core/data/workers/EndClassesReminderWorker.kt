@@ -22,17 +22,12 @@ import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.getString
-import org.kodein.di.DI
-import org.kodein.di.DirectDIAware
-import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.coreCommonModule
+import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.data.managers.reminders.NotificationScheduler
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
@@ -49,13 +44,8 @@ import ru.aleshin.studyassistant.core.ui.resources.end_classes_reminder_title as
 class EndClassesReminderWorker(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), DirectDIAware {
+) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
 
-    override val directDI = DI.direct {
-        bindProvider<Context> { applicationContext }
-        bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
-        importAll(coreCommonModule, coreDataModule)
-    }
     private val notificationScheduler = instance<NotificationScheduler>()
     private val dateManager = instance<DateManager>()
     private val calendarSettingsRepository = instance<CalendarSettingsRepository>()

@@ -159,6 +159,7 @@ class AiCompletionService(
                     installationToken = installationToken,
                     messageId = command.messageId,
                     succeeded = succeeded,
+                    reservationGeneration = reservation.reservationGeneration,
                 )
             }
         }

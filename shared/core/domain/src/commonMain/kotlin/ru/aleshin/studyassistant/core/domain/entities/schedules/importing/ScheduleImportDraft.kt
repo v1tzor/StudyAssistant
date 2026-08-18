@@ -24,6 +24,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ScheduleImportDraft(
     val title: String?,
-    val entries: List<ScheduleImportEntry>,
-    val unparsedLines: List<String>,
+    val entries: List<ScheduleImportEntry>
 )

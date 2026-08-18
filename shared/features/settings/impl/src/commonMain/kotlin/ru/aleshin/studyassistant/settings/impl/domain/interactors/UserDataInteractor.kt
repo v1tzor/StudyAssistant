@@ -60,7 +60,10 @@ internal interface UserDataInteractor {
             startClassesReminderManager.stopReminderService(organizationIds.toList())
             endClassesReminderManager.stopReminderService(organizationIds.toList())
             startClassesReminderManager.startOrRetryReminderService()
-            endClassesReminderManager.startOrRetryReminderService()
+            val notificationSettings = notificationSettingsRepository.fetchSettings().first()
+            if (notificationSettings.endOfClasses) {
+                endClassesReminderManager.startOrRetryReminderService()
+            }
         }
 
         override suspend fun deleteAllUserData() = eitherWrapper.wrapUnit {

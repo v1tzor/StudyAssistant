@@ -64,7 +64,6 @@ class DeepSeekScheduleExtractionMapperTest {
                 "\"repeatWeek\":1,\"dayOfWeek\":1,\"classNumber\":1," +
                 "\"startTime\":\"09:00\",\"endTime\":\"10:30\"," +
                 "\"subject\":\"Mathematics\",\"eventType\":\"LECTURE\"," +
-                "\"teacher\":null,\"office\":\"101\",\"location\":null," +
-                "\"organization\":null,\"notes\":null}],\"unparsedLines\":[]}"
+                "\"teacher\":null,\"office\":\"101\"}]}"
     }
 }

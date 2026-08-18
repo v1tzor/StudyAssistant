@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -100,7 +101,6 @@ private fun EmployeeCompactLayout(
         if (loading) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = listState,
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 items(Placeholder.EMPLOYEES_OR_SUBJECTS) {
@@ -132,20 +132,22 @@ private fun EmployeeCompactLayout(
                         )
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             alphabeticEmployees.second.forEach { employee ->
-                                DetailsEmployeeViewItem(
-                                    avatar = employee.data.avatar,
-                                    post = employee.data.post,
-                                    firstName = employee.data.firstName,
-                                    secondName = employee.data.secondName,
-                                    patronymic = employee.data.patronymic,
-                                    subjects = employee.subjects,
-                                    isHavePhone = employee.data.phones.isNotEmpty(),
-                                    isHaveEmail = employee.data.emails.isNotEmpty(),
-                                    isHaveWebsite = employee.data.webs.isNotEmpty(),
-                                    onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
-                                    onEdit = { onEditEmployee(employee.data.uid) },
-                                    onDelete = { onDeleteEmployee(employee.data.uid) }
-                                )
+                                key(employee.data.uid) {
+                                    DetailsEmployeeViewItem(
+                                        avatar = employee.data.avatar,
+                                        post = employee.data.post,
+                                        firstName = employee.data.firstName,
+                                        secondName = employee.data.secondName,
+                                        patronymic = employee.data.patronymic,
+                                        subjects = employee.subjects,
+                                        isHavePhone = employee.data.phones.isNotEmpty(),
+                                        isHaveEmail = employee.data.emails.isNotEmpty(),
+                                        isHaveWebsite = employee.data.webs.isNotEmpty(),
+                                        onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
+                                        onEdit = { onEditEmployee(employee.data.uid) },
+                                        onDelete = { onDeleteEmployee(employee.data.uid) },
+                                    )
+                                }
                             }
                         }
                     }
@@ -192,7 +194,6 @@ private fun EmployeeExpandedLayout(
             if (loading) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.SpaceExtraLarge),
                 ) {
                     items(Placeholder.EMPLOYEES_OR_SUBJECTS) {
@@ -233,22 +234,24 @@ private fun EmployeeExpandedLayout(
                                         horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
                                     ) {
                                         rowEmployees.forEach { employee ->
-                                            Box(modifier = Modifier.weight(1f)) {
-                                                DetailsEmployeeViewItem(
-                                                    useExpandedStyle = true,
-                                                    avatar = employee.data.avatar,
-                                                    post = employee.data.post,
-                                                    firstName = employee.data.firstName,
-                                                    secondName = employee.data.secondName,
-                                                    patronymic = employee.data.patronymic,
-                                                    subjects = employee.subjects,
-                                                    isHavePhone = employee.data.phones.isNotEmpty(),
-                                                    isHaveEmail = employee.data.emails.isNotEmpty(),
-                                                    isHaveWebsite = employee.data.webs.isNotEmpty(),
-                                                    onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
-                                                    onEdit = { onEditEmployee(employee.data.uid) },
-                                                    onDelete = { onDeleteEmployee(employee.data.uid) },
-                                                )
+                                            key(employee.data.uid) {
+                                                Box(modifier = Modifier.weight(1f)) {
+                                                    DetailsEmployeeViewItem(
+                                                        useExpandedStyle = true,
+                                                        avatar = employee.data.avatar,
+                                                        post = employee.data.post,
+                                                        firstName = employee.data.firstName,
+                                                        secondName = employee.data.secondName,
+                                                        patronymic = employee.data.patronymic,
+                                                        subjects = employee.subjects,
+                                                        isHavePhone = employee.data.phones.isNotEmpty(),
+                                                        isHaveEmail = employee.data.emails.isNotEmpty(),
+                                                        isHaveWebsite = employee.data.webs.isNotEmpty(),
+                                                        onOpenProfile = { onOpenEmployeeProfile(employee.data.uid) },
+                                                        onEdit = { onEditEmployee(employee.data.uid) },
+                                                        onDelete = { onDeleteEmployee(employee.data.uid) },
+                                                    )
+                                                }
                                             }
                                         }
                                         if (rowEmployees.size == 1) {

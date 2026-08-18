@@ -30,8 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
 import ru.aleshin.studyassistant.core.ui.resources.date_picker_dialog_header as core_date_picker_dialog_header
@@ -56,9 +55,7 @@ fun BaseDatePickerDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirmDate(
-                        state.selectedDateMillis?.mapEpochTimeToInstant()?.startThisDay()
-                    )
+                    onConfirmDate(state.selectedDateMillis?.utcEpochDateToLocalStartOfDay())
                 }
             ) {
                 Text(

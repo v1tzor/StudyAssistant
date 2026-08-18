@@ -41,15 +41,12 @@ class DeepSeekScheduleExtractionMapper(
 
         if (
             response.entries.size > config.maxScheduleEntries ||
-            response.unparsedLines.size > config.maxScheduleUnparsedLines ||
-            response.title.isOversized() ||
-            response.unparsedLines.any { line -> line.isOversized() }
+            response.title.isOversized()
         ) {
             return null
         }
 
         val title = response.title.normalizedField()
-        val unparsedLines = response.unparsedLines.mapNotNull { line -> line.normalizedField() }
         val entries = response.entries.map { entry ->
             val fields = listOf(
                 entry.startTime,
@@ -58,9 +55,6 @@ class DeepSeekScheduleExtractionMapper(
                 entry.eventType,
                 entry.teacher,
                 entry.office,
-                entry.location,
-                entry.organization,
-                entry.notes,
             )
             if (fields.any { field -> field.isOversized() }) {
                 return null
@@ -96,16 +90,12 @@ class DeepSeekScheduleExtractionMapper(
                     ?.let { value -> ScheduleEventType.entries.find { it.name == value } },
                 teacher = entry.teacher.normalizedField(),
                 office = entry.office.normalizedField(),
-                location = entry.location.normalizedField(),
-                organization = entry.organization.normalizedField(),
-                notes = entry.notes.normalizedField(),
             )
         }
 
         return ScheduleDraft(
             title = title,
             entries = entries,
-            unparsedLines = unparsedLines,
         )
     }
 

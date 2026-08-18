@@ -60,7 +60,10 @@ internal interface OverviewWorkProcessor :
         private fun loadScheduleWork(date: Instant) = flow<OverviewWorkResult> {
             emit(ActionResult(OverviewAction.UpdateSelectedDate(date)))
             scheduleInteractor.fetchDetailsScheduleByDate(date).collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(ActionResult(OverviewAction.UpdateScheduleLoading(false)))
+                    emit(EffectResult(OverviewEffect.ShowError(it)))
+                },
                 onRightAction = { overview ->
                     val action = OverviewAction.UpdateSchedule(
                         schedule = overview.schedule.mapToUi(),
@@ -75,7 +78,10 @@ internal interface OverviewWorkProcessor :
 
         private fun loadAnalysisWork(week: TimeRange) = flow<OverviewWorkResult> {
             analysisInteractor.fetchWeekAnalysis(week).collectAndHandle(
-                onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(ActionResult(OverviewAction.UpdateAnalyticsLoading(false)))
+                    emit(EffectResult(OverviewEffect.ShowError(it)))
+                },
                 onRightAction = { weekAnalysis ->
                     val analysis = weekAnalysis.map { it.mapToUi() }
                     emit(ActionResult(OverviewAction.UpdateAnalysis(analysis)))

@@ -136,10 +136,11 @@ interface DailyGoalsLocalDataSource {
                 flowOf(emptyList())
             } else {
                 val organizationsIds = goals.mapNotNull { it.contentOrganizationId }.toSet()
+                val contentIds = goals.map { goal -> goal.contentId }.toSet()
                 val fromDeadline = goals.minOf { it.contentDeadline ?: 0 }
                 val toDeadline = goals.maxOf { it.contentDeadline ?: Long.MAX_VALUE }
 
-                val todosMapFlow = todoQueries.fetchTodosByTimeRange(fromDeadline, toDeadline)
+                val todosMapFlow = todoQueries.fetchTodosByIds(contentIds)
                     .mapToListFlow(coroutineContext) { it.mapToBase() }
                     .map { todos -> todos.associateBy { it.uid } }
 

@@ -34,11 +34,14 @@ import ru.aleshin.studyassistant.preview.api.PreviewConfig
 @Serializable
 data class MainState(
     val generalSettings: GeneralSettingsUi = GeneralSettingsUi(),
+    val pendingDeepLink: DeepLinkUrl? = null,
+    val isInitialNavigationDone: Boolean = false,
 ) : StoreState
 
 sealed class MainEvent : StoreEvent {
-    data object Init : MainEvent()
-    data object ExecuteNavigation : MainEvent()
+    data class Init(val input: MainInput, val isRestore: Boolean) : MainEvent()
+    data class ProcessDeepLink(val deepLinkUrl: DeepLinkUrl) : MainEvent()
+    data object OpenApp : MainEvent()
 }
 
 sealed class MainEffect : StoreEffect {
@@ -47,6 +50,8 @@ sealed class MainEffect : StoreEffect {
 
 sealed class MainAction : StoreAction {
     data class UpdateSettings(val settings: GeneralSettingsUi) : MainAction()
+    data class UpdatePendingDeepLink(val deepLinkUrl: DeepLinkUrl?) : MainAction()
+    data class UpdateInitialNavigationDone(val isDone: Boolean) : MainAction()
 }
 
 data class MainInput(

@@ -21,6 +21,7 @@ import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.schedules.mapToRemote
+import ru.aleshin.studyassistant.core.data.utils.withValidInstallation
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportDraft
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportRequest
@@ -39,10 +40,12 @@ internal class ScheduleImportRepositoryImpl(
 
     override suspend fun extractDraft(request: ScheduleImportRequest): ScheduleImportDraft {
         try {
-            return remoteDataSource.extract(
-                request = request.mapToRemote(),
-                installationToken = installationIdProvider.fetchInstallationId(),
-            ).also { response ->
+            return installationIdProvider.withValidInstallation { token ->
+                remoteDataSource.extract(
+                    request = request.mapToRemote(),
+                    installationToken = token,
+                )
+            }.also { response ->
                 settingsHandler.updateQuota(
                     remaining = response.quotaRemaining,
                     limit = response.quotaLimit,

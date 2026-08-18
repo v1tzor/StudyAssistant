@@ -15,13 +15,25 @@
  */
 
 import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
+import kotlin.time.Clock
 
+/**
+ * @author Stanislav Aleshin on 18.08.2026.
+ */
 class DeepLinkReceiver {
     private var consumer: ((DeepLinkUrl) -> Unit)? = null
     private var pendingUrl: DeepLinkUrl? = null
+    private var lastOpenedUrl: DeepLinkUrl? = null
+    private var lastOpenedAtEpochMs: Long = 0L
 
     fun open(url: String) {
         val deepLink = DeepLinkUrl.fromString(url)
+        val nowMs = Clock.System.now().toEpochMilliseconds()
+        if (deepLink == lastOpenedUrl && nowMs - lastOpenedAtEpochMs < DEDUP_WINDOW_MS) {
+            return
+        }
+        lastOpenedUrl = deepLink
+        lastOpenedAtEpochMs = nowMs
         consumer?.invoke(deepLink) ?: run { pendingUrl = deepLink }
     }
 
@@ -29,5 +41,9 @@ class DeepLinkReceiver {
         this.consumer = consumer
         pendingUrl?.let(consumer)
         pendingUrl = null
+    }
+
+    private companion object {
+        const val DEDUP_WINDOW_MS = 1_500L
     }
 }

@@ -24,15 +24,10 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import org.kodein.di.DI
-import org.kodein.di.DirectDIAware
-import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.coreCommonModule
+import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.managers.DateManager
-import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
-import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
@@ -45,13 +40,8 @@ import ru.aleshin.studyassistant.core.domain.repositories.NotificationSettingsRe
 class NotificationRescheduleWorker(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), DirectDIAware {
+) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
 
-    override val directDI = DI.direct {
-        bindProvider<Context> { applicationContext }
-        bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
-        importAll(coreCommonModule, coreDataModule)
-    }
     private val notificationSettingsRepository = instance<NotificationSettingsRepository>()
     private val startClassesReminderManager = instance<StartClassesReminderManager>()
     private val endClassesReminderManager = instance<EndClassesReminderManager>()

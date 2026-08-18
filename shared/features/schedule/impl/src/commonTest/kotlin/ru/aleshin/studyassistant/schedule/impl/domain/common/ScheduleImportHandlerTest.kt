@@ -50,8 +50,7 @@ internal class ScheduleImportHandlerTest {
             entries = listOf(
                 entry(subject = "Mathematics", teacher = "Petrov Ivan", startTime = "8.00", endTime = "8:45"),
                 entry(subject = "Physics", teacher = "Sidorova Anna", startTime = "9:00", endTime = "9:45"),
-            ),
-            unparsedLines = listOf("note"),
+            )
         )
 
         val session = composer.handleDraft(draft, organization)
@@ -86,7 +85,6 @@ internal class ScheduleImportHandlerTest {
                 entry(subject = "Robotics", startTime = "11:00", endTime = "11:45"),
                 entry(subject = "Choir", startTime = "12:00", endTime = "12:45"),
             ),
-            unparsedLines = emptyList(),
         )
 
         val session = composer.handleDraft(draft, organization())
@@ -108,7 +106,6 @@ internal class ScheduleImportHandlerTest {
             draft = ScheduleImportDraft(
                 title = null,
                 entries = listOf(entry(subject = "Mathematics", startTime = "08:00", endTime = "08:45")),
-                unparsedLines = emptyList(),
             ),
             organization = organization,
         )
@@ -133,7 +130,6 @@ internal class ScheduleImportHandlerTest {
             draft = ScheduleImportDraft(
                 title = null,
                 entries = listOf(entry(subject = "Math", teacher = "Petrov Ivan", startTime = "08:00", endTime = "08:45")),
-                unparsedLines = emptyList(),
             ),
             organization = organization,
         )
@@ -156,7 +152,6 @@ internal class ScheduleImportHandlerTest {
             draft = ScheduleImportDraft(
                 title = null,
                 entries = listOf(entry(subject = "Math", teacher = "Petrov Ivan", startTime = "08:00", endTime = "08:45")),
-                unparsedLines = emptyList(),
             ),
             organization = organization,
         )
@@ -183,8 +178,7 @@ internal class ScheduleImportHandlerTest {
                 title = null,
                 entries = listOf(
                     entry(subject = "физика", teacher = "сидорова анна ивановна", startTime = "08:00", endTime = "08:45"),
-                ),
-                unparsedLines = emptyList(),
+                )
             ),
             organization = organization(),
         )
@@ -206,8 +200,7 @@ internal class ScheduleImportHandlerTest {
                 entries = listOf(
                     entry(subject = "Math", startTime = "08:00", endTime = "08:45"),
                     entry(subject = "Physics", startTime = "09:00", endTime = "09:45"),
-                ),
-                unparsedLines = emptyList(),
+                )
             ),
             organization = organization,
         )
@@ -233,7 +226,6 @@ internal class ScheduleImportHandlerTest {
                     entry(subject = "Math", startTime = "08:00", endTime = "08:45"),
                     entry(subject = "Physics", startTime = "09:00", endTime = "09:45"),
                 ),
-                unparsedLines = emptyList(),
             ),
             organization = organization(),
         )
@@ -251,7 +243,6 @@ internal class ScheduleImportHandlerTest {
             draft = ScheduleImportDraft(
                 title = null,
                 entries = listOf(entry(subject = "Physics", startTime = "08:00", endTime = "08:45")),
-                unparsedLines = emptyList(),
             ),
             organization = organization(),
         )
@@ -271,7 +262,6 @@ internal class ScheduleImportHandlerTest {
                 entries = listOf(
                     entry(subject = "Physics", teacher = "Sidorova Anna", startTime = "08:00", endTime = "08:45"),
                 ),
-                unparsedLines = emptyList(),
             ),
             organization = organization(),
         )

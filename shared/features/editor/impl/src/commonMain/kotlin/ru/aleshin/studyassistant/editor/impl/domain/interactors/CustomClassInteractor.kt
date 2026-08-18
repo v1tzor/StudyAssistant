@@ -91,19 +91,14 @@ internal interface CustomClassInteractor {
             classModel: Class,
             schedule: CustomSchedule,
         ) = eitherWrapper.wrap {
-            val updatedClassId: UID
+            val updatedClassId = classModel.uid
             val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val oldModel = schedule.classes.find { it.uid == classModel.uid }
             val updatedClasses = schedule.classes.toMutableList().apply {
-                if (classModel.subject?.uid != oldModel?.subject?.uid ||
-                    classModel.organization.uid != oldModel?.organization?.uid
-                ) {
-                    updatedClassId = randomUUID()
-                    remove(oldModel)
-                    add(classModel.copy(uid = updatedClassId))
-                } else {
-                    updatedClassId = classModel.uid
+                if (oldModel != null) {
                     set(indexOf(oldModel), classModel)
+                } else {
+                    add(classModel)
                 }
             }
             val updatedSchedule = schedule.copy(classes = updatedClasses, updatedAt = updatedAt)

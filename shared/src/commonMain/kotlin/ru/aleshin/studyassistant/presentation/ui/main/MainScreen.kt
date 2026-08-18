@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,7 +35,6 @@ import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantTheme
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
 import ru.aleshin.studyassistant.presentation.mappers.mapToMessage
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
-import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
 import ru.aleshin.studyassistant.presentation.ui.main.store.MainComponent
 import ru.aleshin.studyassistant.presentation.ui.splash.SplashContent
 import ru.aleshin.studyassistant.presentation.ui.tabnavigation.TabsContent
@@ -80,9 +78,6 @@ fun MainScreen(
                 when (val instance = child.instance) {
                     is MainComponent.Child.SplashChild -> {
                         SplashContent()
-                        LaunchedEffect(child.configuration) {
-                            store.dispatchEvent(MainEvent.ExecuteNavigation)
-                        }
                     }
                     is MainComponent.Child.TabNavigationChild -> {
                         TabsContent(instance.component)
@@ -106,14 +101,14 @@ fun MainScreen(
                         instance.contentProvider.Content(Modifier)
                     }
                 }
+            }
 
-                store.handleEffects { effect ->
-                    when (effect) {
-                        is MainEffect.ShowError -> snackbarState.showSnackbar(
-                            message = effect.failures.mapToMessage(),
-                            duration = SnackbarDuration.Indefinite,
-                        )
-                    }
+            store.handleEffects { effect ->
+                when (effect) {
+                    is MainEffect.ShowError -> snackbarState.showSnackbar(
+                        message = effect.failures.mapToMessage(),
+                        duration = SnackbarDuration.Indefinite,
+                    )
                 }
             }
         }

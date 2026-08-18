@@ -55,7 +55,10 @@ internal interface DetailsWorkProcessor :
 
         private fun loadWeekScheduleWork(week: TimeRange) = flow<DetailsWorkResult> {
             scheduleInteractor.fetchDetailsWeekSchedule(week).collectAndHandle(
-                onLeftAction = { emit(EffectResult(DetailsEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(ActionResult(DetailsAction.UpdateLoading(false)))
+                    emit(EffectResult(DetailsEffect.ShowError(it)))
+                },
                 onRightAction = { overview ->
                     emit(
                         ActionResult(

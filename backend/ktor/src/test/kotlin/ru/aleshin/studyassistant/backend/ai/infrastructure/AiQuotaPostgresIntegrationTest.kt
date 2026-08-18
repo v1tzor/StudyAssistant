@@ -197,13 +197,13 @@ class AiQuotaPostgresIntegrationTest {
         val secondExecutionHash = randomHash()
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repository.reserve(
+        val firstReserve = repository.reserve(
             installationHash = installationHash,
             messageId = messageId,
             requestHash = requestHash,
             executionHash = firstExecutionHash,
             now = now,
-        )
+        ) as AiQuotaReservationResult.Reserved
         repository.saveResponse(
             installationHash = installationHash,
             messageId = messageId,
@@ -215,6 +215,7 @@ class AiQuotaPostgresIntegrationTest {
             installationHash = installationHash,
             messageId = messageId,
             succeeded = true,
+            reservationGeneration = firstReserve.reservationGeneration,
             now = now.plusSeconds(1),
         )
 
@@ -241,6 +242,7 @@ class AiQuotaPostgresIntegrationTest {
             installationHash = installationHash,
             messageId = messageId,
             succeeded = false,
+            reservationGeneration = nextExecution.reservationGeneration,
             now = now.plusSeconds(4),
         )
 
@@ -583,6 +585,7 @@ class AiQuotaPostgresIntegrationTest {
             installationHash = installationHash,
             messageId = messageId,
             succeeded = false,
+            reservationGeneration = first.reservationGeneration,
             now = now.plusSeconds(1),
         )
 
@@ -603,27 +606,29 @@ class AiQuotaPostgresIntegrationTest {
         val messageId = UUID.randomUUID()
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repository.reserve(
+        val firstAttempt = repository.reserve(
             installationHash = installationHash,
             messageId = messageId,
             now = now,
-        )
-        repository.reserve(
+        ) as AiQuotaReservationResult.Reserved
+        val secondAttempt = repository.reserve(
             installationHash = installationHash,
             messageId = messageId,
             now = now.plusSeconds(1),
-        )
+        ) as AiQuotaReservationResult.Reserved
 
         repository.finalize(
             installationHash = installationHash,
             messageId = messageId,
             succeeded = false,
+            reservationGeneration = firstAttempt.reservationGeneration,
             now = now.plusSeconds(2),
         )
         repository.finalize(
             installationHash = installationHash,
             messageId = messageId,
             succeeded = true,
+            reservationGeneration = secondAttempt.reservationGeneration,
             now = now.plusSeconds(3),
         )
 
@@ -638,6 +643,61 @@ class AiQuotaPostgresIntegrationTest {
     }
 
     @Test
+    fun lateFailedFinalizeAfterTimeoutMustNotDeleteNewReservation() = runBlocking {
+        val installationHash = randomHash()
+        val messageId = UUID.randomUUID()
+        val now = Instant.parse("2026-08-11T18:00:00Z")
+
+        val first = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            now = now,
+        ) as AiQuotaReservationResult.Reserved
+
+        val retry = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            now = now.plusSeconds(301),
+        ) as AiQuotaReservationResult.Reserved
+
+        repository.finalize(
+            installationHash = installationHash,
+            messageId = messageId,
+            succeeded = false,
+            reservationGeneration = first.reservationGeneration,
+            now = now.plusSeconds(302),
+        )
+
+        val stillCharged = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            now = now.plusSeconds(303),
+        ) as AiQuotaReservationResult.Reserved
+
+        assertEquals(1, first.quota.used)
+        assertEquals(false, retry.isNewMessage)
+        assertEquals(1, stillCharged.quota.used)
+        assertEquals(false, stillCharged.isNewMessage)
+
+        repository.finalize(
+            installationHash = installationHash,
+            messageId = messageId,
+            succeeded = false,
+            reservationGeneration = stillCharged.reservationGeneration,
+            now = now.plusSeconds(304),
+        )
+
+        val refunded = repository.reserve(
+            installationHash = installationHash,
+            messageId = messageId,
+            now = now.plusSeconds(305),
+        ) as AiQuotaReservationResult.Reserved
+
+        assertEquals(1, refunded.quota.used)
+        assertEquals(true, refunded.isNewMessage)
+    }
+
+    @Test
     fun failedAttemptsShouldStillReachExecutionLimit() = runBlocking {
         val installationHash = randomHash()
         val now = Instant.parse("2026-08-11T18:00:00Z")
@@ -646,17 +706,16 @@ class AiQuotaPostgresIntegrationTest {
             val messageId = UUID.randomUUID()
             val attemptTime = now.plusSeconds(index.toLong())
 
-            check(
-                repository.reserve(
-                    installationHash = installationHash,
-                    messageId = messageId,
-                    now = attemptTime,
-                ) is AiQuotaReservationResult.Reserved,
-            )
+            val reserved = repository.reserve(
+                installationHash = installationHash,
+                messageId = messageId,
+                now = attemptTime,
+            ) as AiQuotaReservationResult.Reserved
             repository.finalize(
                 installationHash = installationHash,
                 messageId = messageId,
                 succeeded = false,
+                reservationGeneration = reserved.reservationGeneration,
                 now = attemptTime,
             )
         }
@@ -677,15 +736,16 @@ class AiQuotaPostgresIntegrationTest {
         val createdAt = Instant.parse("2026-08-08T18:00:00Z")
         val cleanupAt = Instant.parse("2026-08-12T18:00:00Z")
 
-        repository.reserve(
+        val reserved = repository.reserve(
             installationHash = installationHash,
             messageId = messageId,
             now = createdAt,
-        )
+        ) as AiQuotaReservationResult.Reserved
         repository.finalize(
             installationHash = installationHash,
             messageId = messageId,
             succeeded = true,
+            reservationGeneration = reserved.reservationGeneration,
             now = createdAt,
         )
         transaction(db = databaseFactory.database) {

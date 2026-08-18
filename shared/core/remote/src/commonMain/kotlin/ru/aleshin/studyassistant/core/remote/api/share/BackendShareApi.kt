@@ -92,10 +92,11 @@ class BackendShareApi(
         }
     }
 
-    suspend fun releaseSchedule(claimToken: String) {
+    suspend fun releaseSchedule(claimToken: String, installationToken: String) {
         executeWithoutResponse(
             path = StudyAssistantKtor.Backend.SCHEDULE_SHARE_RELEASE,
             request = ClaimTokenRequestPojo(claimToken = claimToken),
+            installationToken = installationToken,
         )
     }
 

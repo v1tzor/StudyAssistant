@@ -32,4 +32,5 @@ data class OpenRouterChatRequestDto(
     @SerialName("max_tokens")
     val maxTokens: Int,
     val stream: Boolean = false,
+    val provider: OpenRouterProviderPreferencesDto? = null,
 )

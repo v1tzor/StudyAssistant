@@ -36,6 +36,7 @@ import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTimeDetails
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType.HOMEWORK
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalType.TODO
+import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
@@ -55,6 +56,7 @@ internal interface GoalsInteractor {
     ): FlowDomainResult<TasksFailures, Map<Instant, DailyGoalsProgress>>
 
     suspend fun updateGoals(goals: List<Goal>): UnitDomainResult<TasksFailures>
+    suspend fun completeElapsedGoals(date: Instant): UnitDomainResult<TasksFailures>
     suspend fun completeOrCancelGoal(goal: Goal): UnitDomainResult<TasksFailures>
     suspend fun deleteGoal(goal: GoalShort): UnitDomainResult<TasksFailures>
 
@@ -62,6 +64,7 @@ internal interface GoalsInteractor {
         private val goalsRepository: DailyGoalsRepository,
         private val homeworksRepository: HomeworksRepository,
         private val todoRepository: TodoRepository,
+        private val todoReminderManager: TodoReminderManager,
         private val dateManager: DateManager,
         private val eitherWrapper: TasksEitherWrapper,
     ) : GoalsInteractor {
@@ -142,8 +145,6 @@ internal interface GoalsInteractor {
                         GoalTime.None -> GoalTimeDetails.None
                     }
 
-                    if (makeItDone) completeOrCancelGoal(this)
-
                     return@mapWith GoalDetails(
                         uid = uid,
                         contentType = contentType,
@@ -154,8 +155,8 @@ internal interface GoalsInteractor {
                         desiredTime = desiredTime,
                         time = goalTimeDetails,
                         completeAfterTimeElapsed = completeAfterTimeElapsed,
-                        isDone = if (makeItDone) true else isDone,
-                        completeDate = if (makeItDone) currentTime else completeDate,
+                        isDone = isDone,
+                        completeDate = completeDate,
                         updatedAt = updatedAt,
                     )
                 }.sortedBy { goal ->
@@ -187,6 +188,21 @@ internal interface GoalsInteractor {
                 }
             }
 
+        override suspend fun completeElapsedGoals(date: Instant) = eitherWrapper.wrapUnit {
+            val currentTime = dateManager.fetchCurrentInstant()
+            val goals = goalsRepository.fetchDailyGoalsByDate(date).first()
+            goals.forEach { goal ->
+                if (goal.isDone || !goal.completeAfterTimeElapsed) return@forEach
+                val timer = goal.time as? GoalTime.Timer ?: return@forEach
+                if (!timer.isActive) return@forEach
+                val elapsed = currentTime.toEpochMilliseconds() - timer.startTimePoint.toEpochMilliseconds()
+                val leftTime = timer.targetTime - (timer.pastStopTime + elapsed)
+                if (leftTime <= 0) {
+                    persistCompletedGoal(goal, currentTime)
+                }
+            }
+        }
+
         override suspend fun updateGoals(goals: List<Goal>) = eitherWrapper.wrapUnit {
             val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             val updatedGoals = goals.map { it.copy(updatedAt = updatedAt) }
@@ -195,61 +211,10 @@ internal interface GoalsInteractor {
 
         override suspend fun completeOrCancelGoal(goal: Goal) = eitherWrapper.wrapUnit {
             val currentTime = dateManager.fetchCurrentInstant()
-            val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
             if (!goal.isDone) {
-                val completedGoal = goal.copy(
-                    time = when (goal.time) {
-                        is GoalTime.Stopwatch -> with(goal.time as GoalTime.Stopwatch) {
-                            val stopTime = startTimePoint.toEpochMilliseconds()
-                            val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
-                            return@with copy(
-                                pastStopTime = pastStopTime + timeAfterStop,
-                                isActive = false,
-                            )
-                        }
-
-                        is GoalTime.Timer -> with(goal.time as GoalTime.Timer) {
-                            val stopTime = startTimePoint.toEpochMilliseconds()
-                            val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
-                            return@with copy(
-                                pastStopTime = pastStopTime + timeAfterStop,
-                                isActive = false,
-                            )
-                        }
-
-                        is GoalTime.None -> GoalTime.None
-                    },
-                    isDone = true,
-                    completeDate = currentTime,
-                    updatedAt = updatedAt,
-                )
-                when (goal.contentType) {
-                    HOMEWORK -> goal.contentHomework?.let { goalHomework ->
-                        val actualHomework = homeworksRepository.fetchHomeworkById(goalHomework.uid)
-                        val completedHomework = actualHomework.first()?.copy(
-                            isDone = true,
-                            completeDate = currentTime,
-                            updatedAt = updatedAt,
-                        )
-                        if (completedHomework != null) {
-                            homeworksRepository.addOrUpdateHomework(completedHomework)
-                        }
-                    }
-
-                    TODO -> goal.contentTodo?.let { goalTodo ->
-                        val actualTodo = todoRepository.fetchTodoById(goalTodo.uid)
-                        val completedTodo = actualTodo.first()?.copy(
-                            isDone = true,
-                            completeDate = currentTime,
-                            updatedAt = updatedAt,
-                        )
-                        if (completedTodo != null) {
-                            todoRepository.addOrUpdateTodo(completedTodo)
-                        }
-                    }
-                }
-                goalsRepository.addOrUpdateGoal(completedGoal)
+                persistCompletedGoal(goal, currentTime)
             } else {
+                val updatedAt = currentTime.toEpochMilliseconds()
                 val canceledGoal = goal.copy(
                     time = when (goal.time) {
                         is GoalTime.Stopwatch -> (goal.time as GoalTime.Stopwatch).copy(
@@ -282,16 +247,16 @@ internal interface GoalsInteractor {
                             homeworksRepository.addOrUpdateHomework(completedHomework)
                         }
                     }
-
                     TODO -> goal.contentTodo?.let { goalTodo ->
                         val actualTodo = todoRepository.fetchTodoById(goalTodo.uid)
-                        val completedTodo = actualTodo.first()?.copy(
+                        val reopenedTodo = actualTodo.first()?.copy(
                             isDone = false,
                             completeDate = null,
                             updatedAt = updatedAt,
                         )
-                        if (completedTodo != null) {
-                            todoRepository.addOrUpdateTodo(completedTodo)
+                        if (reopenedTodo != null) {
+                            todoRepository.addOrUpdateTodo(reopenedTodo)
+                            todoReminderManager.scheduleReminders(reopenedTodo.uid, reopenedTodo.name, reopenedTodo.deadline, reopenedTodo.notifications)
                         }
                     }
                 }
@@ -305,12 +270,66 @@ internal interface GoalsInteractor {
             goalsRepository.deleteGoal(goal.uid)
             if (dailyGoals.size > 1) {
                 val updatedGoals = dailyGoals.filter { it.uid != goal.uid }.map { targetGoal ->
-                    val newNumber =
-                        if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
+                    val newNumber = if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
                     targetGoal.copy(number = newNumber, updatedAt = updatedAt)
                 }
                 goalsRepository.addDailyDailyGoals(updatedGoals)
             }
+        }
+
+        private suspend fun persistCompletedGoal(goal: Goal, currentTime: Instant) {
+            val updatedAt = currentTime.toEpochMilliseconds()
+            val completedGoal = goal.copy(
+                time = when (goal.time) {
+                    is GoalTime.Stopwatch -> with(goal.time as GoalTime.Stopwatch) {
+                        val stopTime = startTimePoint.toEpochMilliseconds()
+                        val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
+                        return@with copy(
+                            pastStopTime = pastStopTime + timeAfterStop,
+                            isActive = false,
+                        )
+                    }
+                    is GoalTime.Timer -> with(goal.time as GoalTime.Timer) {
+                        val stopTime = startTimePoint.toEpochMilliseconds()
+                        val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
+                        return@with copy(
+                            pastStopTime = pastStopTime + timeAfterStop,
+                            isActive = false,
+                        )
+                    }
+                    is GoalTime.None -> GoalTime.None
+                },
+                isDone = true,
+                completeDate = currentTime,
+                updatedAt = updatedAt,
+            )
+            when (goal.contentType) {
+                HOMEWORK -> goal.contentHomework?.let { goalHomework ->
+                    val actualHomework = homeworksRepository.fetchHomeworkById(goalHomework.uid)
+                    val completedHomework = actualHomework.first()?.copy(
+                        isDone = true,
+                        completeDate = currentTime,
+                        updatedAt = updatedAt,
+                    )
+                    if (completedHomework != null) {
+                        homeworksRepository.addOrUpdateHomework(completedHomework)
+                    }
+                }
+
+                TODO -> goal.contentTodo?.let { goalTodo ->
+                    val actualTodo = todoRepository.fetchTodoById(goalTodo.uid)
+                    val completedTodo = actualTodo.first()?.copy(
+                        isDone = true,
+                        completeDate = currentTime,
+                        updatedAt = updatedAt,
+                    )
+                    if (completedTodo != null) {
+                        todoRepository.addOrUpdateTodo(completedTodo)
+                        todoReminderManager.clearAllReminders(completedTodo.uid)
+                    }
+                }
+            }
+            goalsRepository.addOrUpdateGoal(completedGoal)
         }
     }
 }

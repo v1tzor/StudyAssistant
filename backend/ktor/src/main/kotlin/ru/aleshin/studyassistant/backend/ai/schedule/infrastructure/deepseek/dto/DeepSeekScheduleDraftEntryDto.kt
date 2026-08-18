@@ -32,7 +32,4 @@ data class DeepSeekScheduleDraftEntryDto(
     val eventType: String? = null,
     val teacher: String? = null,
     val office: String? = null,
-    val location: String? = null,
-    val organization: String? = null,
-    val notes: String? = null,
 )

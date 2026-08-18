@@ -22,7 +22,6 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
-import ru.aleshin.studyassistant.core.common.navigation.DeepLinkUrl
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainAction
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEffect
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
@@ -44,18 +43,15 @@ class MainComposeStore(
     coroutineManager = coroutineManager,
 ) {
 
-    private var initialDeepLinkUrl: DeepLinkUrl? = null
-
     override fun initialize(input: MainInput, isRestore: Boolean) {
-        initialDeepLinkUrl = input.deepLinkUrl
-        dispatchEvent(MainEvent.Init)
+        dispatchEvent(MainEvent.Init(input, isRestore))
     }
 
     override suspend fun WorkScope<MainState, MainAction, MainEffect, MainOutput>.handleEvent(
         event: MainEvent,
     ) {
         when (event) {
-            is MainEvent.Init -> {
+            is MainEvent.Init -> with(event) {
                 launchBackgroundWork(BackgroundKey.THEME) {
                     val command = MainWorkCommand.LoadThemeSettings
                     workProcessor.work(command).collectAndHandleWork()
@@ -64,20 +60,40 @@ class MainComposeStore(
                     val command = MainWorkCommand.UpdateReminderServices
                     workProcessor.work(command).collectAndHandleWork()
                 }
+                if (input.deepLinkUrl != null) {
+                    sendAction(MainAction.UpdatePendingDeepLink(input.deepLinkUrl))
+                }
+                if (!isRestore) {
+                    launchBackgroundWork(BackgroundKey.NAVIGATION) {
+                        val navigationCommand = MainWorkCommand.InitialNavigation
+                        workProcessor.work(navigationCommand).collectAndHandleWork()
+                        sendAction(MainAction.UpdateInitialNavigationDone(true))
+                        val pendingDeepLink = state().pendingDeepLink
+                        if (pendingDeepLink != null) {
+                            val deepLinkCommand = MainWorkCommand.ProcessDeepLink(pendingDeepLink)
+                            workProcessor.work(deepLinkCommand).collectAndHandleWork()
+                        }
+                    }
+                } else {
+                    sendAction(MainAction.UpdateInitialNavigationDone(true))
+                }
             }
-            is MainEvent.ExecuteNavigation -> {
+            is MainEvent.ProcessDeepLink -> {
+                sendAction(MainAction.UpdatePendingDeepLink(event.deepLinkUrl))
+                if (state().isInitialNavigationDone) {
+                    launchBackgroundWork(BackgroundKey.DEEP_LINK) {
+                        val command = MainWorkCommand.ProcessDeepLink(event.deepLinkUrl)
+                        workProcessor.work(command).collectAndHandleWork()
+                    }
+                }
+            }
+            is MainEvent.OpenApp -> {
                 launchBackgroundWork(BackgroundKey.NAVIGATION) {
-                    val command = MainWorkCommand.InitialNavigation(initialDeepLinkUrl)
+                    val command = MainWorkCommand.OpenApp(state().pendingDeepLink)
                     workProcessor.work(command).collectAndHandleWork()
                 }
             }
         }
-    }
-
-    private enum class BackgroundKey : BackgroundWorkKey {
-        THEME,
-        REMINDERS,
-        NAVIGATION,
     }
 
     override suspend fun reduce(
@@ -87,6 +103,16 @@ class MainComposeStore(
         is MainAction.UpdateSettings -> currentState.copy(
             generalSettings = action.settings,
         )
+        is MainAction.UpdatePendingDeepLink -> currentState.copy(
+            pendingDeepLink = action.deepLinkUrl,
+        )
+        is MainAction.UpdateInitialNavigationDone -> currentState.copy(
+            isInitialNavigationDone = action.isDone,
+        )
+    }
+
+    enum class BackgroundKey : BackgroundWorkKey {
+        THEME, REMINDERS, NAVIGATION, DEEP_LINK
     }
 
     class Factory(

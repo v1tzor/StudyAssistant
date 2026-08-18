@@ -55,12 +55,7 @@ interface TodoCompletionInteractor {
                 if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
 
                 todoRepository.addOrUpdateTodo(completedTodo)
-                todoReminderManager.scheduleReminders(
-                    todo.uid,
-                    todo.name,
-                    todo.deadline,
-                    todo.notifications,
-                )
+                todoReminderManager.clearAllReminders(todo.uid)
             } else {
                 val reopenedTodo = todo.copy(
                     isDone = false,
@@ -72,7 +67,7 @@ interface TodoCompletionInteractor {
                 }
 
                 todoRepository.addOrUpdateTodo(reopenedTodo)
-                todoReminderManager.clearAllReminders(todo.uid)
+                todoReminderManager.scheduleReminders(reopenedTodo.uid, reopenedTodo.name, reopenedTodo.deadline, reopenedTodo.notifications)
             }
         }
 
@@ -88,7 +83,6 @@ interface TodoCompletionInteractor {
                             isActive = false,
                         )
                     }
-
                     is GoalTime.Timer -> with(linkedGoal.time) {
                         val stopTime = startTimePoint.toEpochMilliseconds()
                         val timeAfterStop = currentTime.toEpochMilliseconds() - stopTime
@@ -116,13 +110,11 @@ interface TodoCompletionInteractor {
                         startTimePoint = currentTime,
                         isActive = false,
                     )
-
                     is GoalTime.Timer -> linkedGoal.time.copy(
                         pastStopTime = 0L,
                         startTimePoint = currentTime,
                         isActive = false,
                     )
-
                     is GoalTime.None -> GoalTime.None
                 },
                 isDone = false,

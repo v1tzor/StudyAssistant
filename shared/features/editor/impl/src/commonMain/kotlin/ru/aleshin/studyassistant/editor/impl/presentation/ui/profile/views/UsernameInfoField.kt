@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -80,11 +79,6 @@ internal fun UsernameInfoField(
                 }
             } else {
                 Row(modifier = Modifier.padding(end = 8.dp)) {
-                    Button(
-                        onClick = {}
-                    ) {
-                        Text("Привет это текст")
-                    }
                     IconButton(
                         modifier = Modifier.size(32.dp),
                         onClick = {

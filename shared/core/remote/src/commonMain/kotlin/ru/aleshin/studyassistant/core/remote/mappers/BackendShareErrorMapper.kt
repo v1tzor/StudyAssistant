@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.remote.mappers
 
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
+import ru.aleshin.studyassistant.core.common.exceptions.InvalidInstallationException
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
 import ru.aleshin.studyassistant.core.remote.models.shared.ShareErrorResponsePojo
 
@@ -42,7 +43,9 @@ internal fun mapBackendShareError(
         "too_large" -> ShareException.PayloadTooLarge()
         "rate_limit" -> ShareException.RateLimit()
         "share_limit" -> ShareException.ShareLimit()
+        "invalid_installation" -> InvalidInstallationException()
         else -> when (status) {
+            HttpStatusCode.Unauthorized -> InvalidInstallationException()
             HttpStatusCode.NotFound -> ShareException.InvalidCode()
             HttpStatusCode.Conflict -> ShareException.Claimed()
             HttpStatusCode.Gone -> ShareException.Consumed()

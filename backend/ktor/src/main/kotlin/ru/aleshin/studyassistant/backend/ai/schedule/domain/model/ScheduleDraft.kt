@@ -22,5 +22,4 @@ package ru.aleshin.studyassistant.backend.ai.schedule.domain.model
 data class ScheduleDraft(
     val title: String?,
     val entries: List<ScheduleDraftEntry>,
-    val unparsedLines: List<String>,
 )

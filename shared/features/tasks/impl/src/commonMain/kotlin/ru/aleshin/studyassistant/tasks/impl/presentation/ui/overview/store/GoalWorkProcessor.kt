@@ -92,6 +92,9 @@ internal interface GoalWorkProcessor :
                 },
             ).collect { workResult ->
                 emit(workResult)
+                goalsInteractor.completeElapsedGoals(selectedDate).handle(
+                    onLeftAction = { emit(EffectResult(OverviewEffect.ShowError(it))) },
+                )
             }
         }.onStart {
             emit(ActionResult(OverviewAction.UpdateGoalsLoading(true)))

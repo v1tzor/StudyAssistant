@@ -70,6 +70,7 @@ internal sealed class OverviewAction : StoreAction {
     ) : OverviewAction()
     data class UpdateAnalysis(val weekAnalysis: List<DailyAnalysisUi>) : OverviewAction()
     data class UpdateSelectedDate(val date: Instant) : OverviewAction()
+    data class UpdateCurrentDate(val date: Instant) : OverviewAction()
     data class UpdateScheduleLoading(val isLoading: Boolean) : OverviewAction()
     data class UpdateAnalyticsLoading(val isLoading: Boolean) : OverviewAction()
 }

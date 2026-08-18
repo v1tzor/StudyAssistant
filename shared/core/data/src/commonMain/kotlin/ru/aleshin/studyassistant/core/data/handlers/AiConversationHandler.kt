@@ -28,7 +28,6 @@ import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantResponse
 import ru.aleshin.studyassistant.core.domain.entities.ai.dropUnconfirmedMessages
-import ru.aleshin.studyassistant.core.domain.entities.ai.dropUntilConfirmedMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.optimisedMessagesForSend
 import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionRequestPojo
 
@@ -58,14 +57,11 @@ internal interface AiConversationHandler {
             if (messages.isNullOrEmpty()) throw NoSuchElementException()
 
             val lastMessage = messages.last { it !is AiAssistantMessage.SystemMessage }
-            val assistantMessage = when (lastMessage) {
+            return when (lastMessage) {
                 is AiAssistantMessage.UserMessage,
-                is AiAssistantMessage.ToolMessage -> complete(messages)
-                else -> messages.dropUntilConfirmedMessage { message ->
-                    localDataSource.deleteChatMessage(message.id)
-                }
+                is AiAssistantMessage.ToolMessage -> complete(messages) as? AiAssistantMessage.AssistantMessage
+                else -> null
             }
-            return assistantMessage as? AiAssistantMessage.AssistantMessage
         }
 
         override suspend fun sendUserMessage(
@@ -133,6 +129,14 @@ internal interface AiConversationHandler {
                 "create_class",
                 "update_class",
                 "delete_class",
+                "create_goal",
+                "update_goal",
+                "complete_goal",
+                "delete_goal",
+                "create_subject",
+                "update_subject",
+                "create_employee",
+                "update_employee",
                 "get_organizations",
                 "get_subjects",
                 "get_employees",
@@ -140,6 +144,7 @@ internal interface AiConversationHandler {
                 "get_todos",
                 "get_homeworks",
                 "get_overdue_homeworks",
+                "get_goals",
                 "get_classes_by_date",
                 "get_classes_by_range",
                 "get_near_class",

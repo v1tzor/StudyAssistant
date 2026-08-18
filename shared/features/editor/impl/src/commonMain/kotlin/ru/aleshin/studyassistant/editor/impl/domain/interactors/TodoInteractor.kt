@@ -69,6 +69,10 @@ internal interface TodoInteractor {
         }
 
         override suspend fun deleteTodo(targetId: UID) = eitherWrapper.wrapUnit {
+            val linkedGoal = goalsRepository.fetchGoalByContentId(targetId).first()
+            if (linkedGoal != null) {
+                goalsRepository.deleteGoal(linkedGoal.uid)
+            }
             todoRepository.deleteTodo(targetId)
             todoReminderManager.clearAllReminders(targetId)
         }

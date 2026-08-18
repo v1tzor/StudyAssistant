@@ -50,7 +50,9 @@ interface MainWorkProcessor :
 
         override suspend fun work(command: MainWorkCommand) = when (command) {
             is MainWorkCommand.LoadThemeSettings -> loadThemeWork()
-            is MainWorkCommand.InitialNavigation -> initialNavigationWork(command.deepLinkUrl)
+            is MainWorkCommand.InitialNavigation -> initialNavigationWork()
+            is MainWorkCommand.ProcessDeepLink -> processDeepLinkWork(command.deepLinkUrl)
+            is MainWorkCommand.OpenApp -> openAppWork(command.pendingDeepLink)
             is MainWorkCommand.UpdateReminderServices -> updateReminderServicesWork()
         }
 
@@ -64,35 +66,53 @@ interface MainWorkProcessor :
         }
 
         @OptIn(ExperimentalTime::class)
-        private fun initialNavigationWork(
-            deepLinkUrl: DeepLinkUrl?,
-        ) = flow {
+        private fun initialNavigationWork() = flow {
             val result = delayedAction(SPLASH_NAV) {
-                if (deepLinkUrl != null) {
-                    OutputResult(MainOutput.NavigateToDeepLink(deepLinkUrl))
-                } else {
-                    settingsInteractor.fetchSettings().firstHandleAndGet(
-                        onLeftAction = { failure ->
-                            emit(EffectResult(MainEffect.ShowError(failure)))
-                            OutputResult(MainOutput.NavigateToApp)
-                        },
-                        onRightAction = { settings ->
-                            val output = if (!settings.isSetup) {
-                                val startConfig = if (settings.isFirstStart) {
-                                    PreviewConfig.Intro
-                                } else {
-                                    PreviewConfig.Setup
-                                }
-                                MainOutput.NavigateToPreview(startConfig)
+                settingsInteractor.fetchSettings().firstHandleAndGet(
+                    onLeftAction = { failure ->
+                        emit(EffectResult(MainEffect.ShowError(failure)))
+                        OutputResult(MainOutput.NavigateToPreview(PreviewConfig.Intro))
+                    },
+                    onRightAction = { settings ->
+                        val output = if (!settings.isSetup) {
+                            val startConfig = if (settings.isFirstStart) {
+                                PreviewConfig.Intro
                             } else {
-                                MainOutput.NavigateToApp
+                                PreviewConfig.Setup
                             }
-                            OutputResult(output)
-                        },
-                    )
-                }
+                            MainOutput.NavigateToPreview(startConfig)
+                        } else {
+                            MainOutput.NavigateToApp
+                        }
+                        OutputResult(output)
+                    },
+                )
             }
             emit(result)
+        }
+
+        private fun processDeepLinkWork(deepLinkUrl: DeepLinkUrl) = flow {
+            emit(ActionResult(MainAction.UpdatePendingDeepLink(deepLinkUrl)))
+            settingsInteractor.fetchSettings().firstHandleAndGet(
+                onLeftAction = { failure ->
+                    emit(EffectResult(MainEffect.ShowError(failure)))
+                },
+                onRightAction = { settings ->
+                    if (settings.isSetup) {
+                        emit(ActionResult(MainAction.UpdatePendingDeepLink(null)))
+                        emit(OutputResult(MainOutput.NavigateToDeepLink(deepLinkUrl)))
+                    }
+                },
+            )
+        }
+
+        private fun openAppWork(pendingDeepLink: DeepLinkUrl?) = flow {
+            if (pendingDeepLink != null) {
+                emit(ActionResult(MainAction.UpdatePendingDeepLink(null)))
+                emit(OutputResult(MainOutput.NavigateToDeepLink(pendingDeepLink)))
+            } else {
+                emit(OutputResult(MainOutput.NavigateToApp))
+            }
         }
 
         private fun updateReminderServicesWork() = flow {
@@ -105,6 +125,8 @@ interface MainWorkProcessor :
 
 sealed class MainWorkCommand : WorkCommand {
     data object LoadThemeSettings : MainWorkCommand()
-    data class InitialNavigation(val deepLinkUrl: DeepLinkUrl?) : MainWorkCommand()
+    data object InitialNavigation : MainWorkCommand()
+    data class ProcessDeepLink(val deepLinkUrl: DeepLinkUrl) : MainWorkCommand()
+    data class OpenApp(val pendingDeepLink: DeepLinkUrl?) : MainWorkCommand()
     data object UpdateReminderServices : MainWorkCommand()
 }

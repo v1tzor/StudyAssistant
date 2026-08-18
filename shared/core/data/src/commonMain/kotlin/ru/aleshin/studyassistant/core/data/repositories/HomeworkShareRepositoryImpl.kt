@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.data.mappers.share.mapToDomain
 import ru.aleshin.studyassistant.core.data.mappers.share.mapToRemoteData
 import ru.aleshin.studyassistant.core.data.mappers.tasks.mapToLocalData
 import ru.aleshin.studyassistant.core.data.utils.share.ShareCode
+import ru.aleshin.studyassistant.core.data.utils.withValidInstallation
 import ru.aleshin.studyassistant.core.database.datasource.shared.HomeworkShareLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.share.HomeworkShare
 import ru.aleshin.studyassistant.core.domain.entities.share.ShareException
@@ -42,10 +43,12 @@ internal class HomeworkShareRepositoryImpl(
 ) : HomeworkShareRepository {
 
     override suspend fun createShare(share: HomeworkShare): ShareLink {
-        val link = remoteDataSource.createShare(
-            share = share.mapToRemoteData(),
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        val link = installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.createShare(
+                share = share.mapToRemoteData(),
+                installationToken = token,
+            )
+        }
         val code = ShareCode.format(normalizeCode(link.code))
         return ShareLink(
             code = code,
@@ -56,10 +59,12 @@ internal class HomeworkShareRepositoryImpl(
     }
 
     override suspend fun fetchShare(code: String): HomeworkShare {
-        return remoteDataSource.fetchShare(
-            code = normalizeCode(code),
-            installationToken = installationIdProvider.fetchInstallationId(),
-        ).mapToDomain()
+        return installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.fetchShare(
+                code = normalizeCode(code),
+                installationToken = token,
+            )
+        }.mapToDomain()
     }
 
     override suspend fun isShareImported(code: String): Boolean {

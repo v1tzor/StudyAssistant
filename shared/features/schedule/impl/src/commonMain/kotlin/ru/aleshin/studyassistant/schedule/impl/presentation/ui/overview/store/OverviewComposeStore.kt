@@ -23,6 +23,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.communicators.St
 import ru.aleshin.studyassistant.core.common.architecture.store.work.BackgroundWorkKey
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
+import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.isCurrentWeek
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
@@ -61,6 +62,17 @@ internal class OverviewComposeStore(
         when (event) {
             is OverviewEvent.Started -> with(state) {
                 val currentDate = dateManager.fetchBeginningCurrentInstant()
+                sendAction(OverviewAction.UpdateCurrentDate(currentDate))
+                launchBackgroundWork(BackgroundKey.CURRENT_DATE) {
+                    var observedDate = currentDate
+                    dateManager.minuteTicker().collect {
+                        val today = dateManager.fetchBeginningCurrentInstant()
+                        if (!today.equalsDay(observedDate)) {
+                            observedDate = today
+                            sendAction(OverviewAction.UpdateCurrentDate(today))
+                        }
+                    }
+                }
                 val date = selectedDate ?: currentDate
                 launchBackgroundWork(BackgroundKey.LOAD_SCHEDULE) {
                     val command = OverviewWorkCommand.LoadSchedule(date)
@@ -161,6 +173,9 @@ internal class OverviewComposeStore(
         is OverviewAction.UpdateSelectedDate -> currentState.copy(
             selectedDate = action.date,
         )
+        is OverviewAction.UpdateCurrentDate -> currentState.copy(
+            currentDate = action.date,
+        )
         is OverviewAction.UpdateScheduleLoading -> currentState.copy(
             isScheduleLoading = action.isLoading,
         )
@@ -170,7 +185,7 @@ internal class OverviewComposeStore(
     }
 
     enum class BackgroundKey : BackgroundWorkKey {
-        LOAD_ANALYSIS, LOAD_SCHEDULE, HOMEWORK_ACTION,
+        LOAD_ANALYSIS, LOAD_SCHEDULE, HOMEWORK_ACTION, CURRENT_DATE,
     }
 
     class Factory(

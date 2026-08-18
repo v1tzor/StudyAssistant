@@ -112,8 +112,7 @@ internal interface ScheduleImportHandler {
                 subjects = subjects.toList(),
                 employees = employees.toList(),
                 originalSubjectIds = organization.subjects.map(Subject::uid).toSet(),
-                originalEmployeeIds = organization.employee.map(Employee::uid).toSet(),
-                unparsedLines = draft.unparsedLines,
+                originalEmployeeIds = organization.employee.map(Employee::uid).toSet()
             )
         }
 

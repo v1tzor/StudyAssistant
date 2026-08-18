@@ -26,11 +26,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.getString
-import org.kodein.di.DI
-import org.kodein.di.DirectDIAware
-import org.kodein.di.bindProvider
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.di.coreCommonModule
+import ru.aleshin.studyassistant.core.common.di.MainDirectDIAware
 import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
@@ -41,9 +38,7 @@ import ru.aleshin.studyassistant.core.common.notifications.NotificationCreator
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationCategory
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationPriority
 import ru.aleshin.studyassistant.core.common.notifications.parameters.NotificationStyles
-import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.data.R
-import ru.aleshin.studyassistant.core.data.di.coreDataModule
 import ru.aleshin.studyassistant.core.domain.entities.tasks.Homework
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
@@ -59,13 +54,8 @@ import ru.aleshin.studyassistant.core.ui.resources.homeworks_reminder_title as c
 class HomeworksReminderWorker(
     private val context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters), DirectDIAware {
+) : CoroutineWorker(context, workerParameters), MainDirectDIAware {
 
-    override val directDI = DI.direct {
-        bindProvider<Context> { applicationContext }
-        bindProvider<CrashlyticsService> { CrashlyticsService.Empty() }
-        importAll(coreCommonModule, coreDataModule)
-    }
     private val dateManager = instance<DateManager>()
     private val notificationCreator = instance<NotificationCreator>()
     private val homeworksRepository = instance<HomeworksRepository>()

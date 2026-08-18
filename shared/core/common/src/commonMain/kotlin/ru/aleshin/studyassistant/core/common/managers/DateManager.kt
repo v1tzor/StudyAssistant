@@ -30,8 +30,10 @@ import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.extensions.toMinutes
 import ru.aleshin.studyassistant.core.common.extensions.weekTimeRange
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * @author Stanislav Aleshin on 12.06.2023.
@@ -47,6 +49,7 @@ interface DateManager {
     fun calculateLeftTime(endTime: LocalTime): Long
     fun calculateProgress(startTime: Instant, endTime: Instant): Float
     fun secondTicker(): Flow<Unit>
+    fun minuteTicker(): Flow<Instant>
 
     class Base(
         private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
@@ -57,6 +60,16 @@ interface DateManager {
             while (true) {
                 emit(Unit)
                 delay(1000)
+            }
+        }.flowOn(workDispatchersProvider.defaultDispatcher)
+
+        private val minuteTicker = flow {
+            while (true) {
+                val currentDate = fetchCurrentInstant()
+                emit(currentDate)
+
+                val passedMinuteTime = floorMod(currentDate.toEpochMilliseconds(), Constants.Date.MILLIS_IN_MINUTE)
+                delay((Constants.Date.MILLIS_IN_MINUTE - passedMinuteTime).milliseconds)
             }
         }.flowOn(workDispatchersProvider.defaultDispatcher)
 
@@ -100,5 +113,9 @@ interface DateManager {
         }
 
         override fun secondTicker() = ticker
+
+        override fun minuteTicker() = minuteTicker
+
+        private fun floorMod(a: Long, b: Long): Long = ((a % b) + b) % b
     }
 }

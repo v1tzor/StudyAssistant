@@ -108,7 +108,7 @@ fun TimeRange.shiftWeek(
 }
 
 fun LocalDate.equalsDay(date: LocalDate?): Boolean {
-    return dayOfYear == date?.dayOfYear
+    return this == date
 }
 
 fun Instant.equalsDay(
@@ -167,7 +167,7 @@ fun LocalDateTime.setStartDay() = LocalDateTime(
 
 fun LocalDateTime.setEndDay() = LocalDateTime(
     date = date,
-    time = LocalTime(23, 59, 59, 59)
+    time = LocalTime(23, 59, 59, 999_999_999)
 )
 
 fun Instant.setHoursAndMinutes(
@@ -246,6 +246,16 @@ fun Long?.mapEpochTimeToInstantOrDefault(default: Instant): Instant {
 
 fun Long.mapEpochTimeToInstant(): Instant {
     return Instant.fromEpochMilliseconds(this)
+}
+
+fun Long.utcEpochDateToLocalStartOfDay(
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): Instant {
+    val utcDate = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
+    return LocalDateTime(
+        date = utcDate,
+        time = LocalTime(0, 0),
+    ).toInstant(timeZone)
 }
 
 fun Long.toSeconds(): Long {

@@ -137,16 +137,22 @@ internal fun OrganizationsContent(
                 coroutineScope.launch { snackbarState.showSnackbar(copyMessage) }
             },
             onShowAllEmployee = {
-                store.dispatchEvent(OrganizationsEvent.ClickShowAllEmployees(checkNotNull(organizationId)))
+                organizationId?.let { uid ->
+                    store.dispatchEvent(OrganizationsEvent.ClickShowAllEmployees(uid))
+                }
             },
             onShowEmployeeProfile = {
                 store.dispatchEvent(OrganizationsEvent.ClickEmployee(it))
             },
             onShowAllSubjects = {
-                store.dispatchEvent(OrganizationsEvent.ClickShowAllSubjects(checkNotNull(organizationId)))
+                organizationId?.let { uid ->
+                    store.dispatchEvent(OrganizationsEvent.ClickShowAllSubjects(uid))
+                }
             },
             onShowSubjectEditor = {
-                store.dispatchEvent(OrganizationsEvent.ClickEditSubject(it, checkNotNull(organizationId)))
+                organizationId?.let { uid ->
+                    store.dispatchEvent(OrganizationsEvent.ClickEditSubject(it, uid))
+                }
             }
         )
     }

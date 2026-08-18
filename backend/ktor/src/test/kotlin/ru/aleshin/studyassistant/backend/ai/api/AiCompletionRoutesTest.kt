@@ -103,7 +103,7 @@ class AiCompletionRoutesTest {
     }
 
     @Test
-    fun missingInstallationHeaderShouldReturnJsonBadRequest() = testApplication {
+    fun missingInstallationHeaderShouldReturnJsonUnauthorized() = testApplication {
         application {
             configureSerialization()
             configureStatusPages()
@@ -121,12 +121,12 @@ class AiCompletionRoutesTest {
             setBody(validRequestBody())
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("\"errorCode\":\"invalid\""))
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertTrue(response.bodyAsText().contains("\"errorCode\":\"invalid_installation\""))
     }
 
     @Test
-    fun malformedInstallationHeaderShouldReturnJsonBadRequestWithoutQuotaCall() = testApplication {
+    fun malformedInstallationHeaderShouldReturnJsonUnauthorizedWithoutQuotaCall() = testApplication {
         val repository = FakeAiQuotaRepository()
 
         application {
@@ -147,8 +147,8 @@ class AiCompletionRoutesTest {
             setBody(validRequestBody())
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("\"errorCode\":\"invalid\""))
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertTrue(response.bodyAsText().contains("\"errorCode\":\"invalid_installation\""))
         assertEquals(0, repository.reserveCalls)
     }
 
@@ -331,6 +331,7 @@ class AiCompletionRoutesTest {
                 quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
+                reservationGeneration = 1,
             )
         }
 
@@ -338,6 +339,7 @@ class AiCompletionRoutesTest {
             installationHash: ByteArray,
             messageId: UUID,
             succeeded: Boolean,
+            reservationGeneration: Int,
             now: Instant,
         ) {
             finalizedResults += succeeded

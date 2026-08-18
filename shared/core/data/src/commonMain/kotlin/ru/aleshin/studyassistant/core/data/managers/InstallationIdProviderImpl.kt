@@ -37,7 +37,15 @@ class InstallationIdProviderImpl(
         secureDataSource.fetchInstallationToken()
             ?.takeIf(INSTALLATION_CREDENTIAL_PATTERN::matches)
             ?.let { token -> return@withLock token }
-        remoteDataSource.register()
+        registerAndStore()
+    }
+
+    override suspend fun refreshInstallationId(): String = mutex.withLock {
+        registerAndStore()
+    }
+
+    private suspend fun registerAndStore(): String {
+        return remoteDataSource.register()
             .takeIf(INSTALLATION_CREDENTIAL_PATTERN::matches)
             ?.also { token -> secureDataSource.saveInstallationToken(token) }
             ?: throw InternetConnectionException()

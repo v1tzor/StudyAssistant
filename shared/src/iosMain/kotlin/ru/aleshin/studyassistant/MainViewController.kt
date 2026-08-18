@@ -46,7 +46,7 @@ fun MainViewController(
         componentFactory.createComponent(componentContext)
     }
     remember(mainComponent, deepLinkReceiver) {
-        deepLinkReceiver.attach(mainComponent::handleDeepLink)
+        deepLinkReceiver.attach(mainComponent::onDeepLink)
         Unit
     }
     PredictiveBackGestureOverlay(

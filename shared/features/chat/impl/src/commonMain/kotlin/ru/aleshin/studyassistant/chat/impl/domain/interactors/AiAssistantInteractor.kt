@@ -181,7 +181,7 @@ internal interface AiAssistantInteractor {
         }
 
         override suspend fun retryAttempt(chatId: UID) = eitherWrapper.wrapUnit {
-            val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId)
+            val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId) ?: return@wrapUnit
             handleMessage(chatId, assistantMessage, toolRound = 0)
         }
 

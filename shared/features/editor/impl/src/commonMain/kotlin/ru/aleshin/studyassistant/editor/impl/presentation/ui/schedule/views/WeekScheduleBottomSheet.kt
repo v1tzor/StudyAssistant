@@ -308,13 +308,14 @@ internal fun WeekScheduleBottomSheetContent(
         }
     }
 
-    if (scheduleIntervalsDialogState && dialogOrganization != null) {
+    val scheduleIntervalsOrganization = dialogOrganization
+    if (scheduleIntervalsDialogState && scheduleIntervalsOrganization != null) {
         ScheduleIntervalsDialog(
-            organization = dialogOrganization!!.shortName,
-            intervals = dialogOrganization!!.scheduleTimeIntervals,
+            organization = scheduleIntervalsOrganization.shortName,
+            intervals = scheduleIntervalsOrganization.scheduleTimeIntervals,
             onDismiss = { scheduleIntervalsDialogState = false },
             onConfirm = {
-                onUpdateOrganization(dialogOrganization!!.copy(scheduleTimeIntervals = it))
+                onUpdateOrganization(scheduleIntervalsOrganization.copy(scheduleTimeIntervals = it))
                 scheduleIntervalsDialogState = false
             },
         )

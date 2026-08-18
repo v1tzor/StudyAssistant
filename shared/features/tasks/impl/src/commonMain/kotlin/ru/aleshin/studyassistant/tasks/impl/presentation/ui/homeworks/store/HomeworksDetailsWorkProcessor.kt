@@ -74,7 +74,10 @@ internal interface HomeworksDetailsWorkProcessor :
             flow<HomeworksWorkResult> {
                 var isScrolled = false
                 homeworksInteractor.fetchHomeworksByTimeRange(timeRange).collectAndHandle(
-                    onLeftAction = { emit(EffectResult(HomeworksEffect.ShowError(it))) },
+                    onLeftAction = {
+                        emit(ActionResult(HomeworksAction.UpdateLoading(false)))
+                        emit(EffectResult(HomeworksEffect.ShowError(it)))
+                    },
                     onRightAction = { homeworks ->
                         val homeworksMap = homeworks.mapValues { it.value.mapToUi() }
                         emit(ActionResult(HomeworksAction.UpdateHomeworks(homeworksMap)))

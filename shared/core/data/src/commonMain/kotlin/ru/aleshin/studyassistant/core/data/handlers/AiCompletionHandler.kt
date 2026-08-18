@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.data.handlers
 
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
+import ru.aleshin.studyassistant.core.data.utils.withValidInstallation
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiServiceException
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
 import ru.aleshin.studyassistant.core.remote.datasources.ai.AiAssistantRemoteDataSource
@@ -38,13 +39,13 @@ internal interface AiCompletionHandler {
     ) : AiCompletionHandler {
 
         override suspend fun complete(request: AiCompletionRequestPojo): AiCompletionResponsePojo {
-            val installationId = installationIdProvider.fetchInstallationId()
-
             try {
-                return remoteDataSource.complete(
-                    request = request,
-                    installationToken = installationId,
-                ).also { result ->
+                return installationIdProvider.withValidInstallation { token ->
+                    remoteDataSource.complete(
+                        request = request,
+                        installationToken = token,
+                    )
+                }.also { result ->
                     settingsHandler.updateQuota(
                         remaining = result.quotaRemaining,
                         limit = result.quotaLimit,

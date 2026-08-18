@@ -21,7 +21,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
-import ru.aleshin.studyassistant.core.data.datasources.InstallationSecureDataSource
+import ru.aleshin.studyassistant.core.database.datasource.secure.InstallationSecureDataSource
 import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -71,6 +71,21 @@ class InstallationIdProviderImplTest {
         assertEquals(storedId, installationId)
         assertEquals(0, dataSource.saveCount)
         assertEquals(0, remoteDataSource.registerCount)
+    }
+
+    @Test
+    fun refreshInstallationIdReplacesStoredCredential() = runBlocking {
+        val dataSource = FakeInstallationSecureDataSource(token = INSTALLATION_CREDENTIAL)
+        val remoteDataSource = FakeInstallationRemoteDataSource(
+            credential = "v1.${"C".repeat(43)}.${"D".repeat(43)}",
+        )
+        val provider = InstallationIdProviderImpl(dataSource, remoteDataSource)
+
+        val refreshed = provider.refreshInstallationId()
+
+        assertEquals("v1.${"C".repeat(43)}.${"D".repeat(43)}", refreshed)
+        assertEquals(1, dataSource.saveCount)
+        assertEquals(1, remoteDataSource.registerCount)
     }
 
     private class FakeInstallationSecureDataSource(

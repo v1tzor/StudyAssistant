@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -112,9 +113,10 @@ internal fun SharedScheduleSection(
                     if (loading) {
                         SharedScheduleViewPlaceholder()
                     } else {
-                        val schedule = linkedSchedules.find { item ->
-                            item.dayOfWeek == dayOfWeek &&
-                                item.week.isoRepeatWeekNumber == numberOfWeek
+                        val schedule = remember(linkedSchedules, dayOfWeek, numberOfWeek) {
+                            linkedSchedules.find { item ->
+                                item.dayOfWeek == dayOfWeek && item.week.isoRepeatWeekNumber == numberOfWeek
+                            }
                         }
                         SharedScheduleView(
                             dayOfWeek = dayOfWeek,

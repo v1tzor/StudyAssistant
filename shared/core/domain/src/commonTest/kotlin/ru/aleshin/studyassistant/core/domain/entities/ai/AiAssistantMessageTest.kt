@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.domain.entities.ai
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -88,6 +89,71 @@ class AiAssistantMessageTest {
             listOf("system", "new-user", "tool-call", "tool-result", "final-assistant"),
             optimized.map(AiAssistantMessage::id),
         )
+    }
+
+    @Test
+    fun dropUnconfirmedMessages_dropsContentAssistantWithUnresolvedTools() = runBlocking {
+        val system = AiAssistantMessage.SystemMessage(
+            id = "system",
+            content = "system",
+            time = instant(0),
+        )
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "create a todo",
+            time = instant(1),
+        )
+        val assistant = AiAssistantMessage.AssistantMessage(
+            id = "assistant",
+            content = "I will create it",
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call-1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "create_todo", arguments = mapOf("name" to "Read")),
+                ),
+            ),
+        )
+        val dropped = mutableListOf<String>()
+
+        val kept = listOf(system, user, assistant).dropUnconfirmedMessages { message ->
+            dropped += message.id
+        }
+
+        assertEquals(listOf("system"), kept.map(AiAssistantMessage::id))
+        assertEquals(listOf("user", "assistant"), dropped)
+    }
+
+    @Test
+    fun dropUnconfirmedMessages_keepsResolvedToolTurn() = runBlocking {
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "classes",
+            time = instant(1),
+        )
+        val assistant = AiAssistantMessage.AssistantMessage(
+            id = "assistant",
+            content = null,
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call-1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_classes_by_date", arguments = emptyMap()),
+                ),
+            ),
+        )
+        val tool = AiAssistantMessage.ToolMessage(
+            id = "tool",
+            content = "[]",
+            time = instant(3),
+            toolCallId = "call-1",
+        )
+
+        val kept = listOf(user, assistant, tool).dropUnconfirmedMessages { }
+
+        assertEquals(listOf("user", "assistant", "tool"), kept.map(AiAssistantMessage::id))
     }
 
     private fun instant(epochSeconds: Long) = Instant.fromEpochSeconds(epochSeconds)

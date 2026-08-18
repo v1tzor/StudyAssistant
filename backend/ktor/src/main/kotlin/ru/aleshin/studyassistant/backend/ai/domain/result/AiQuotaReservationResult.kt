@@ -27,6 +27,7 @@ sealed interface AiQuotaReservationResult {
         val quota: AiQuota,
         val resetAt: Instant,
         val isNewMessage: Boolean,
+        val reservationGeneration: Int,
     ) : AiQuotaReservationResult
     data class QuotaExceeded(val quota: AiQuota, val resetAt: Instant) : AiQuotaReservationResult
     data class RateLimited(val retryAt: Instant?) : AiQuotaReservationResult

@@ -28,7 +28,13 @@ WHERE uid = ?;
 fetchTodosByTimeRange:
 SELECT *
 FROM todoEntity
-WHERE (deadline BETWEEN ? AND ? OR deadline IS NULL)
+WHERE deadline BETWEEN ? AND ?
+ORDER BY deadline DESC;
+
+fetchTodosByIds:
+SELECT *
+FROM todoEntity
+WHERE uid IN ?
 ORDER BY deadline DESC;
 
 fetchActiveTodos:

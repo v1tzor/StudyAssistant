@@ -41,8 +41,7 @@ internal fun ScheduleImportRequest.mapToRemote() = ScheduleExtractionRequestPojo
 
 internal fun ScheduleImportDraftPojo.mapToDomain() = ScheduleImportDraft(
     title = title,
-    entries = entries.map(ScheduleImportEntryPojo::mapToDomain),
-    unparsedLines = unparsedLines,
+    entries = entries.map(ScheduleImportEntryPojo::mapToDomain)
 )
 
 private fun ScheduleImportEntryPojo.mapToDomain() = ScheduleImportEntry(
@@ -55,7 +54,4 @@ private fun ScheduleImportEntryPojo.mapToDomain() = ScheduleImportEntry(
     eventType = eventType?.name?.let(ScheduleImportEventType::valueOf),
     teacher = teacher,
     office = office,
-    location = location,
-    organization = organization,
-    notes = notes,
 )

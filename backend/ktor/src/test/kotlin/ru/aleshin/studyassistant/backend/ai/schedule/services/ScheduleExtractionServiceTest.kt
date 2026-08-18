@@ -55,7 +55,6 @@ class ScheduleExtractionServiceTest {
                 draft = ScheduleDraft(
                     title = null,
                     entries = emptyList(),
-                    unparsedLines = emptyList(),
                 ),
             ),
         )
@@ -97,7 +96,6 @@ class ScheduleExtractionServiceTest {
                 draft = ScheduleDraft(
                     title = "Cached schedule",
                     entries = emptyList(),
-                    unparsedLines = emptyList(),
                 ),
             ),
         )
@@ -166,6 +164,7 @@ class ScheduleExtractionServiceTest {
                 quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
+                reservationGeneration = 1,
             )
         }
 
@@ -173,6 +172,7 @@ class ScheduleExtractionServiceTest {
             installationHash: ByteArray,
             messageId: UUID,
             succeeded: Boolean,
+            reservationGeneration: Int,
             now: Instant,
         ) {
             finalizedResults += succeeded

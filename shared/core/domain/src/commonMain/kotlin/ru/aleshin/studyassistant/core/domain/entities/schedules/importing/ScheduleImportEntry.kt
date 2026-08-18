@@ -35,9 +35,9 @@ data class ScheduleImportEntry(
     val teacher: String?,
     val teacherId: UID? = null,
     val office: String?,
-    val location: String?,
-    val organization: String?,
+    val location: String? = null,
+    val organization: String? = null,
     val organizationId: UID? = null,
-    val notes: String?,
+    val notes: String? = null,
     val included: Boolean = true,
 )

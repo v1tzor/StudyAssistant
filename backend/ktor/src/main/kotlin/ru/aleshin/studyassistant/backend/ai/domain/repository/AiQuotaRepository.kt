@@ -37,6 +37,7 @@ interface AiQuotaRepository {
         installationHash: ByteArray,
         messageId: UUID,
         succeeded: Boolean,
+        reservationGeneration: Int,
         now: Instant,
     )
 

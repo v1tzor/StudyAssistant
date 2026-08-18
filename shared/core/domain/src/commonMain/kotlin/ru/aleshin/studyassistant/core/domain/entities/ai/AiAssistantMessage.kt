@@ -115,29 +115,38 @@ private fun AiAssistantMessage.estimatedTokens(): Int {
 suspend fun List<AiAssistantMessage>.dropUnconfirmedMessages(
     onDrop: suspend (AiAssistantMessage) -> Unit,
 ): List<AiAssistantMessage> {
-    val messages = this.sortedBy { it.time }
-    if (size < 2) return messages
-    val confirmedMessages = buildList {
-        var isCleared = false
-        for (i in messages.lastIndex downTo 0 step 1) {
-            if (!isCleared) {
-                if (
-                    messages[i] is AiAssistantMessage.AssistantMessage &&
-                    !messages[i].content.isNullOrEmpty()
-                ) {
-                    isCleared = true
-                    add(messages[i])
-                } else if (messages[i] is AiAssistantMessage.SystemMessage) {
-                    add(messages[i])
-                } else {
-                    onDrop(messages[i])
-                }
-            } else {
-                add(messages[i])
-            }
+    val messages = this.sortedBy(AiAssistantMessage::time)
+    val keepUntil = messages.lastConfirmedTurnEndIndex()
+    return messages.mapIndexedNotNull { index, message ->
+        val keep = keepUntil != null && index <= keepUntil ||
+            message is AiAssistantMessage.SystemMessage
+        if (!keep) {
+            onDrop(message)
+            null
+        } else {
+            message
         }
     }
-    return confirmedMessages.reversed()
+}
+
+private fun List<AiAssistantMessage>.lastConfirmedTurnEndIndex(): Int? {
+    for (index in indices.reversed()) {
+        val assistant = this[index] as? AiAssistantMessage.AssistantMessage ?: continue
+        val calls = assistant.toolCalls.orEmpty()
+        if (calls.isEmpty()) return index
+
+        val callIds = calls.map(ToolCall::id).toSet()
+        val laterToolIds = drop(index + 1)
+            .filterIsInstance<AiAssistantMessage.ToolMessage>()
+            .mapTo(mutableSetOf(), AiAssistantMessage.ToolMessage::toolCallId)
+        if (callIds.any { callId -> callId !in laterToolIds }) continue
+
+        return indices.drop(index + 1).lastOrNull { laterIndex ->
+            val tool = this[laterIndex] as? AiAssistantMessage.ToolMessage
+            tool != null && tool.toolCallId in callIds
+        } ?: index
+    }
+    return null
 }
 
 /**

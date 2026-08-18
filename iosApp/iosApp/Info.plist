@@ -8,6 +8,8 @@
         <string></string>
         <key>YandexScheduleRewardedId</key>
         <string></string>
+        <key>YandexScheduleAiRewardedId</key>
+        <string></string>
         <key>YandexTasksBannerId</key>
         <string></string>
         <key>BGTaskSchedulerPermittedIdentifiers</key>

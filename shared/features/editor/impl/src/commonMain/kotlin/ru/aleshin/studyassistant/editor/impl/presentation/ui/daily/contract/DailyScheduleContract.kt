@@ -46,7 +46,7 @@ internal data class DailyScheduleState(
 ) : StoreState
 
 internal sealed class DailyScheduleEvent : StoreEvent {
-    data class Started(val inputData: DailyScheduleInput) : DailyScheduleEvent()
+    data class Started(val inputData: DailyScheduleInput, val isRestore: Boolean) : DailyScheduleEvent()
     data object CreateCustomSchedule : DailyScheduleEvent()
     data object DeleteCustomSchedule : DailyScheduleEvent()
     data class DeleteClass(val targetId: UID) : DailyScheduleEvent()

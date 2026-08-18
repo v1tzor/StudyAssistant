@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.core.data.repositories
 
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.data.handlers.AiSettingsHandler
+import ru.aleshin.studyassistant.core.data.utils.withValidInstallation
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
@@ -38,13 +39,15 @@ internal class AdRewardRepositoryImpl(
         purpose: AdRewardPurpose,
         subject: String?,
     ): AdRewardChallenge {
-        val response = remoteDataSource.createChallenge(
-            request = AdRewardChallengeRequestPojo(
-                purpose = purpose.value,
-                subject = subject,
-            ),
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        val response = installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.createChallenge(
+                request = AdRewardChallengeRequestPojo(
+                    purpose = purpose.value,
+                    subject = subject,
+                ),
+                installationToken = token,
+            )
+        }
         return AdRewardChallenge(
             id = response.id,
             purpose = AdRewardPurpose.entries.first { it.value == response.purpose },
@@ -53,10 +56,12 @@ internal class AdRewardRepositoryImpl(
     }
 
     override suspend fun completeChallenge(challengeId: String) {
-        val response = remoteDataSource.completeChallenge(
-            challengeId = challengeId,
-            installationToken = installationIdProvider.fetchInstallationId(),
-        )
+        val response = installationIdProvider.withValidInstallation { token ->
+            remoteDataSource.completeChallenge(
+                challengeId = challengeId,
+                installationToken = token,
+            )
+        }
         val quotaRemaining = response.quotaRemaining
         val quotaLimit = response.quotaLimit
         val rewardedResetsRemaining = response.rewardedResetsRemaining

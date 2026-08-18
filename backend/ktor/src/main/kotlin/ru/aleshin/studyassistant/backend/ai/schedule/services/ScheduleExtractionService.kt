@@ -145,6 +145,7 @@ class ScheduleExtractionService(
                     installationToken = installationToken,
                     messageId = command.requestId,
                     succeeded = succeeded,
+                    reservationGeneration = reservation.reservationGeneration,
                 )
             }
         }

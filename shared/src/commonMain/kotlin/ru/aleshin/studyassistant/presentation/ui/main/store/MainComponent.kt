@@ -37,6 +37,7 @@ import ru.aleshin.studyassistant.core.common.navigation.WidgetDeepLinkDestinatio
 import ru.aleshin.studyassistant.editor.api.EditorConfig
 import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.editor.api.EditorOutput
+import ru.aleshin.studyassistant.presentation.ui.main.contract.MainEvent
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainInput
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainOutput
 import ru.aleshin.studyassistant.presentation.ui.main.contract.MainState
@@ -88,7 +89,7 @@ abstract class MainComponent(
     abstract val stack: Value<ChildStack<*, Child>>
 
     abstract fun navigateToBack()
-    abstract fun handleDeepLink(deepLinkUrl: DeepLinkUrl)
+    abstract fun onDeepLink(deepLinkUrl: DeepLinkUrl)
 
     @Serializable
     sealed class Config {
@@ -170,8 +171,8 @@ abstract class MainComponent(
             stackNavigation.pop()
         }
 
-        override fun handleDeepLink(deepLinkUrl: DeepLinkUrl) {
-            stackNavigation.replaceAll(*resolveDeepLink(deepLinkUrl).toTypedArray())
+        override fun onDeepLink(deepLinkUrl: DeepLinkUrl) {
+            store.dispatchEvent(MainEvent.ProcessDeepLink(deepLinkUrl))
         }
 
         private fun resolveDeepLink(deepLinkUrl: DeepLinkUrl): List<Config> {
@@ -192,7 +193,7 @@ abstract class MainComponent(
                 is WidgetDeepLinkDestination.ScheduleEditor -> listOf(
                     TabNavigation(TabsConfig.Schedule(ScheduleConfig.Overview)),
                     Editor(
-                        EditorConfig.DailySchedule(
+                         startConfig = EditorConfig.DailySchedule(
                             date = widgetDestination.date,
                             customScheduleId = widgetDestination.customScheduleId,
                             baseScheduleId = widgetDestination.baseScheduleId,
@@ -202,7 +203,7 @@ abstract class MainComponent(
                 is WidgetDeepLinkDestination.HomeworkEditor -> listOf(
                     TabNavigation(TabsConfig.Tasks(TasksConfig.Homeworks())),
                     Editor(
-                        EditorConfig.Homework(
+                        startConfig = EditorConfig.Homework(
                             homeworkId = widgetDestination.homeworkId,
                             date = widgetDestination.date,
                             subjectId = widgetDestination.subjectId,
@@ -307,7 +308,7 @@ abstract class MainComponent(
                     stackNavigation.replaceAll(Preview(output.startConfig))
                 }
                 is MainOutput.NavigateToDeepLink -> {
-                    handleDeepLink(output.deepLinkUrl)
+                    stackNavigation.replaceAll(*resolveDeepLink(output.deepLinkUrl).toTypedArray())
                 }
             }
         }
@@ -315,7 +316,7 @@ abstract class MainComponent(
         private fun previewOutputConsumer() = OutputConsumer<PreviewOutput> { output ->
             when (output) {
                 is PreviewOutput.NavigateToApp -> {
-                    stackNavigation.replaceAll(TabNavigation())
+                    store.dispatchEvent(MainEvent.OpenApp)
                 }
                 is PreviewOutput.NavigateToWeekScheduleEditor -> {
                     stackNavigation.replaceAll(TabNavigation(), Editor(EditorConfig.WeekSchedule()))

@@ -39,12 +39,14 @@ enum class HomeworkStatus {
             return if (isComplete) {
                 if (isDone) COMPLETE else SKIPPED
             } else {
-                val duration = deadline - currentTime
-                if (duration.isPositive()) {
-                    val nearestTimeRange = TimeRange(currentDate, currentDate.shiftDay(2))
-                    if (nearestTimeRange.containsDate(deadline)) WAIT else IN_FUTURE
-                } else {
-                    NOT_COMPLETE
+                val deadlineDate = deadline.startThisDay()
+                when {
+                    deadlineDate > currentDate -> {
+                        val nearestTimeRange = TimeRange(currentDate, currentDate.shiftDay(2))
+                        if (nearestTimeRange.containsDate(deadlineDate)) WAIT else IN_FUTURE
+                    }
+                    deadlineDate == currentDate -> WAIT
+                    else -> NOT_COMPLETE
                 }
             }
         }

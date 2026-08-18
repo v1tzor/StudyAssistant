@@ -50,7 +50,10 @@ internal interface TodoDetailsWorkProcessor :
 
         private fun loadCompletedTodosWork() = flow<TodoWorkResult> {
             todoInteractor.fetchCompletedTodos().collectAndHandle(
-                onLeftAction = { emit(EffectResult(TodoEffect.ShowError(it))) },
+                onLeftAction = {
+                    emit(ActionResult(TodoAction.UpdateLoading(false)))
+                    emit(EffectResult(TodoEffect.ShowError(it)))
+                },
                 onRightAction = { todos ->
                     emit(ActionResult(TodoAction.UpdateTodos(todos.map { it.mapToUi() })))
                 }
