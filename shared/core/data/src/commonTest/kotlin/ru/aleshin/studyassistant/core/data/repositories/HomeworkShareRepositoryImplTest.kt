@@ -156,6 +156,7 @@ class HomeworkShareRepositoryImplTest {
         override fun calculateLeftTime(endTime: LocalTime): Long = error("Unused")
         override fun calculateProgress(startTime: Instant, endTime: Instant): Float = error("Unused")
         override fun secondTicker(): Flow<Unit> = emptyFlow()
+        override fun minuteTicker(): Flow<Instant> = emptyFlow()
     }
 
     private companion object {

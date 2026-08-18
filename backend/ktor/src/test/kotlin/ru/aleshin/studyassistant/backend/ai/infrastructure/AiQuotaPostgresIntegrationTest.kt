@@ -668,29 +668,25 @@ class AiQuotaPostgresIntegrationTest {
             now = now.plusSeconds(302),
         )
 
-        val stillCharged = repository.reserve(
-            installationHash = installationHash,
-            messageId = messageId,
-            now = now.plusSeconds(303),
-        ) as AiQuotaReservationResult.Reserved
-
         assertEquals(1, first.quota.used)
         assertEquals(false, retry.isNewMessage)
-        assertEquals(1, stillCharged.quota.used)
-        assertEquals(false, stillCharged.isNewMessage)
+        transaction(db = databaseFactory.database) {
+            assertEquals(1L, AiRequestsTable.selectAll().count())
+            assertEquals(1, AiUsageTable.selectAll().single()[AiUsageTable.used])
+        }
 
         repository.finalize(
             installationHash = installationHash,
             messageId = messageId,
             succeeded = false,
-            reservationGeneration = stillCharged.reservationGeneration,
-            now = now.plusSeconds(304),
+            reservationGeneration = retry.reservationGeneration,
+            now = now.plusSeconds(303),
         )
 
         val refunded = repository.reserve(
             installationHash = installationHash,
             messageId = messageId,
-            now = now.plusSeconds(305),
+            now = now.plusSeconds(304),
         ) as AiQuotaReservationResult.Reserved
 
         assertEquals(1, refunded.quota.used)

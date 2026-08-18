@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.core.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver.Companion.IN_MEMORY
 import kotlinx.coroutines.runBlocking
@@ -33,15 +34,14 @@ class CompletedHomeworksQueryTest {
     @Test
     fun queryUsesCompletionDateAndExcludesIncompleteRows() {
         val driver = JdbcSqliteDriver(IN_MEMORY)
-        Database.Schema.create(driver).value
+        runBlocking { Database.Schema.create(driver).await() }
         val queries = HomeworkQueries(driver)
-        runBlocking {
+        val result = runBlocking {
             queries.addOrUpdateHomework(homework("inside", isDone = true, completeDate = 200L))
             queries.addOrUpdateHomework(homework("outside", isDone = true, completeDate = 400L))
             queries.addOrUpdateHomework(homework("incomplete", isDone = false, completeDate = null))
+            queries.fetchCompletedHomeworksByTimeRange(100L, 300L).awaitAsList()
         }
-
-        val result = queries.fetchCompletedHomeworksByTimeRange(100L, 300L).executeAsList()
 
         assertEquals(listOf("inside"), result.map { it.uid })
         driver.close()

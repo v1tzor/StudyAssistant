@@ -16,8 +16,10 @@
 
 package ru.aleshin.studyassistant.core.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver.Companion.IN_MEMORY
+import kotlinx.coroutines.runBlocking
 import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.sqldelight.ai.AiSettingsQueries
 import kotlin.test.Test
@@ -34,9 +36,9 @@ class AiSettingsMigrationTest {
         driver.createVersionTwelveTable()
         driver.insertVersionTwelveSettings(quotaRemaining = 19, quotaResetAt = 123L)
 
-        Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).value
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).await() }
 
-        val settings = AiSettingsQueries(driver).fetchSettings().executeAsOne()
+        val settings = runBlocking { AiSettingsQueries(driver).fetchSettings().awaitAsOne() }
         assertEquals(12L, settings.quota_remaining)
         assertEquals(12L, settings.quota_limit)
         assertEquals(3L, settings.rewarded_resets_remaining)
@@ -50,9 +52,9 @@ class AiSettingsMigrationTest {
         driver.createVersionTwelveTable()
         driver.insertVersionTwelveSettings(quotaRemaining = 5, quotaResetAt = null)
 
-        Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).value
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).await() }
 
-        val settings = AiSettingsQueries(driver).fetchSettings().executeAsOne()
+        val settings = runBlocking { AiSettingsQueries(driver).fetchSettings().awaitAsOne() }
         assertEquals(5L, settings.quota_remaining)
         assertEquals(12L, settings.quota_limit)
         assertEquals(3L, settings.rewarded_resets_remaining)

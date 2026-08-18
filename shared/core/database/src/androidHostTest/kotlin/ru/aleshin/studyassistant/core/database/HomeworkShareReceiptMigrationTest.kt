@@ -16,8 +16,10 @@
 
 package ru.aleshin.studyassistant.core.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver.Companion.IN_MEMORY
+import kotlinx.coroutines.runBlocking
 import ru.aleshin.studyassistant.core.data.Database
 import ru.aleshin.studyassistant.sqldelight.shared.HomeworkShareReceiptQueries
 import kotlin.test.Test
@@ -43,11 +45,11 @@ class HomeworkShareReceiptMigrationTest {
         driver.createVersionSevenReceiptTable()
         driver.insertVersionSevenReceipt(RECEIPT_CODE, IMPORTED_AT)
 
-        Database.Schema.migrate(driver, oldVersion = 7, newVersion = 8).value
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 7, newVersion = 8).await() }
 
-        val receipt = HomeworkShareReceiptQueries(driver)
-            .fetchReceipt(RECEIPT_CODE)
-            .executeAsOne()
+        val receipt = runBlocking {
+            HomeworkShareReceiptQueries(driver).fetchReceipt(RECEIPT_CODE).awaitAsOne()
+        }
         assertEquals(RECEIPT_CODE, receipt)
         driver.close()
     }
@@ -58,11 +60,11 @@ class HomeworkShareReceiptMigrationTest {
         driver.createVersionSevenReceiptTable()
         driver.insertVersionSevenReceipt(RECEIPT_CODE, IMPORTED_AT)
 
-        Database.Schema.migrate(driver, oldVersion = 7, newVersion = 8).value
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 7, newVersion = 8).await() }
 
-        val receipt = HomeworkShareReceiptQueries(driver)
-            .fetchReceipt(RECEIPT_CODE)
-            .executeAsOne()
+        val receipt = runBlocking {
+            HomeworkShareReceiptQueries(driver).fetchReceipt(RECEIPT_CODE).awaitAsOne()
+        }
         assertEquals(RECEIPT_CODE, receipt)
         driver.close()
     }
