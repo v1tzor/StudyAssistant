@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
@@ -114,6 +115,7 @@ internal interface ShareSchedulesInteractor {
         private val startClassesReminderManager: StartClassesReminderManager,
         private val endClassesReminderManager: EndClassesReminderManager,
         private val dateManager: DateManager,
+        private val analyticsService: AnalyticsService,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ShareSchedulesInteractor {
 
@@ -164,7 +166,9 @@ internal interface ShareSchedulesInteractor {
                     schedules = schedules,
                     organizations = organizations,
                 )
-            )
+            ).apply {
+                analyticsService.trackEvent(CREATE_SHARE_EVENT, mapOf())
+            }
         }
 
         override suspend fun claimShare(code: String) = eitherWrapper.wrap {
@@ -174,14 +178,15 @@ internal interface ShareSchedulesInteractor {
             }
             ScheduleSharePreview(
                 claim = claim,
-                organizations = organizationRepository.fetchAllShortOrganization().first()
-                    .sortedByDescending { it.isMain },
+                organizations = organizationRepository.fetchAllShortOrganization().first().sortedByDescending { it.isMain },
                 links = links,
                 schedules = convertSchedules(claim.share.schedules, links),
                 maxNumberOfWeek = claim.share.schedules.maxOfOrNull { schedule ->
                     schedule.week.isoRepeatWeekNumber
                 } ?: 1,
-            )
+            ).apply {
+                analyticsService.trackEvent(CLAIM_SCHEDULE_EVENT, mapOf())
+            }
         }
 
         override suspend fun releaseShare(claim: ScheduleShareClaim) = eitherWrapper.wrapUnit {
@@ -282,6 +287,7 @@ internal interface ShareSchedulesInteractor {
                 imported = true
                 withContext(NonCancellable) {
                     shareRepository.confirmShare(claim)
+                    analyticsService.trackEvent(IMPORT_SCHEDULE_EVENT, mapOf())
                 }
             } catch (error: Throwable) {
                 if (!imported) {
@@ -547,6 +553,9 @@ internal interface ShareSchedulesInteractor {
 
         private companion object {
             const val MAX_SCHEDULES = 20
+            const val CREATE_SHARE_EVENT = "schedule_share_create"
+            const val CLAIM_SCHEDULE_EVENT = "schedule_share_claim"
+            const val IMPORT_SCHEDULE_EVENT = "schedule_share_import"
         }
     }
 }

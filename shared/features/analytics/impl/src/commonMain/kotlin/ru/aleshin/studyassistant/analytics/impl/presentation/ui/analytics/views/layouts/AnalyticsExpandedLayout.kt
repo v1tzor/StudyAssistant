@@ -40,6 +40,8 @@ import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.sections.AnalyticsSubjectsSection
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.sections.AnalyticsSummarySection
 import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.sections.AnalyticsTargetSection
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 
 /**
@@ -251,6 +253,12 @@ private fun LazyListScope.analyticsExpandedTrailingItems(
             regularity = data.regularity,
         )
     }
+    item(key = EXPANDED_BANNER_KEY) {
+        YandexInlineBanner(
+            modifier = Modifier.fillMaxWidth(),
+            placement = AdPlacement.ANALYTICS,
+        )
+    }
 }
 
 private fun Modifier.analyticsSinglePaneWidth(): Modifier {
@@ -258,6 +266,7 @@ private fun Modifier.analyticsSinglePaneWidth(): Modifier {
 }
 
 private val EXPANDED_PLACEHOLDER_HEIGHTS = listOf(220.dp, 280.dp, 340.dp, 260.dp)
+private const val EXPANDED_BANNER_KEY = "banner"
 private const val EXPANDED_TARGET_KEY = "target"
 private const val EXPANDED_SUMMARY_KEY = "summary"
 private const val EXPANDED_WORKLOAD_KEY = "workload"

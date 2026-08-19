@@ -535,7 +535,7 @@ private fun QuotaExpiredItem(
             ) {
                 AssistantSenderBadge()
                 Text(
-                    text = stringResource(Res.string.quota_expired_title, quotaLimit.toString()),
+                    text = stringResource(Res.string.quota_expired_title, quotaLimit),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -543,14 +543,14 @@ private fun QuotaExpiredItem(
                     text = if (rewardedResetsRemaining > 0) {
                         stringResource(
                             Res.string.quota_reset_suggestion_text,
-                            AiSettings.REWARDED_QUOTA.toString(),
-                            rewardedResetsRemaining.toString(),
-                            AiSettings.MAX_REWARDED_RESETS.toString(),
+                            AiSettings.REWARDED_QUOTA,
+                            rewardedResetsRemaining,
+                            AiSettings.MAX_REWARDED_RESETS,
                         )
                     } else {
                         stringResource(
                             Res.string.quota_rewards_exhausted_text,
-                            AiSettings.MAX_REWARDED_RESETS.toString(),
+                            AiSettings.MAX_REWARDED_RESETS,
                         )
                     },
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

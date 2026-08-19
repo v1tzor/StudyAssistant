@@ -140,14 +140,8 @@ This project utilizes the following technologies and libraries:
 - **[Ktor](https://ktor.io/)**: Asynchronous HTTP client and server framework for Kotlin.
 - **[PostgreSQL](https://www.postgresql.org/)**: Transactional quotas and encrypted temporary sharing storage.
 - **[DeepSeek API](https://api-docs.deepseek.com/)**: Server-side shared AI through the fixed Flash model.
-
-Release/archive builds require the public Ktor endpoint explicitly via
-`-Pstudyassistant.backend.url=https://api.studyassistant-app.ru` or
-`STUDYASSISTANT_BACKEND_URL`; provider keys and other privileged secrets never enter the mobile binary.
-For Android emulator development use
-`-Pstudyassistant.backend.url=http://10.0.2.2:8080`; cleartext traffic is enabled only in debug builds.
 - **[Tracer](https://apptracer.ru/)**: Android crash reporting.
-- **[MyTracker](https://tracker.my.com/ru/)**: Android analytics.
+- **[AppMetrica](https://appmetrica.yandex.ru/)**: Analytics and error reporting.
 
 ## 🎨 UI & Navigation
 - **[Compose Material 3](https://developer.android.com/jetpack/compose/material)**: Material Design components for Jetpack Compose.

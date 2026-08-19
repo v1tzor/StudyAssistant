@@ -48,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 import ru.aleshin.studyassistant.tasks.impl.presentation.models.share.HomeworkShareStatus
 import ru.aleshin.studyassistant.tasks.impl.presentation.ui.share.contract.ShareState
@@ -169,6 +171,10 @@ private fun ShareInputLayout(
             ) {
                 Text(text = stringResource(Res.string.scan_qr_button_title))
             }
+            YandexInlineBanner(
+                modifier = Modifier.fillMaxWidth(),
+                placement = AdPlacement.HOMEWORK_RECEIVE,
+            )
         }
     }
 

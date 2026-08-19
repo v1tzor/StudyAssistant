@@ -23,6 +23,26 @@ struct ComposeView: UIViewControllerRepresentable {
                     key: "YandexInfoBannerId",
                     demo: "demo-banner-yandex"
                 ),
+                shareImportBannerId: adUnitId(
+                    key: "YandexShareImportBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                sharePreviewBannerId: adUnitId(
+                    key: "YandexSharePreviewBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                aiImporterBannerId: adUnitId(
+                    key: "YandexAiImporterBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                homeworkReceiveBannerId: adUnitId(
+                    key: "YandexHomeworkReceiveBannerId",
+                    demo: "demo-banner-yandex"
+                ),
+                analyticsBannerId: adUnitId(
+                    key: "YandexAnalyticsBannerId",
+                    demo: "demo-banner-yandex"
+                ),
                 aiQuotaRewardedId: adUnitId(
                     key: "YandexAiRewardedId",
                     demo: "demo-rewarded-yandex"

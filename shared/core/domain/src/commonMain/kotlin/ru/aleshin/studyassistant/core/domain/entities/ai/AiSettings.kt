@@ -30,9 +30,9 @@ data class AiSettings(
     val quotaResetAt: Instant? = null,
 ) {
     companion object {
-        const val DAILY_QUOTA = 12
-        const val REWARDED_QUOTA = 12
-        const val MAX_REWARDED_RESETS = 3
+        const val DAILY_QUOTA = 10
+        const val REWARDED_QUOTA = 10
+        const val MAX_REWARDED_RESETS = 2
         const val MAX_DAILY_QUOTA = DAILY_QUOTA + REWARDED_QUOTA * MAX_REWARDED_RESETS
     }
 }

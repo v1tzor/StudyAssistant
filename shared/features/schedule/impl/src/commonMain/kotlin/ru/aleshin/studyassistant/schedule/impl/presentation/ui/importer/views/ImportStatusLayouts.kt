@@ -64,6 +64,8 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationShortUi
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.resources.ic_tooltip
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
@@ -295,6 +297,12 @@ internal fun ImportReviewSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+        item(key = BANNER_SECTION_KEY) {
+            YandexInlineBanner(
+                modifier = Modifier.padding(horizontal = horizontalPadding),
+                placement = AdPlacement.AI_IMPORTER,
+            )
         }
         item(key = WEEK_SECTION_KEY) {
             ImportWeekSection(
@@ -553,6 +561,7 @@ internal const val ORGANIZATION_SECTION_KEY = "import_organization_section"
 internal const val NOTE_SECTION_KEY = "import_note_section"
 internal const val EXTRACT_SECTION_KEY = "import_extract_section"
 internal const val REVIEW_HEADER_KEY = "import_review_header"
+internal const val BANNER_SECTION_KEY = "import_banner_section"
 internal const val WEEK_SECTION_KEY = "import_week_section"
 internal const val SUBJECTS_SECTION_KEY = "import_subjects_section"
 internal const val TEACHERS_SECTION_KEY = "import_teachers_section"

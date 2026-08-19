@@ -65,7 +65,7 @@ mytarget-ads = "5.45.3.4"
 
 # Crashlytics & Analytics
 tracer = "1.4.0"
-mytracker = "3.6.0"
+appmetrica = "8.5.1"
 
 # DI
 kodein = "7.33.0"
@@ -165,7 +165,7 @@ tracer-heapDumps = { module = "ru.ok.tracer:tracer-heap-dumps" }
 tracer-diskUsage = { module = "ru.ok.tracer:tracer-disk-usage" }
 tracer-samplingProfiler = { module = "ru.ok.tracer:tracer-profiler-sampling" }
 tracer-systraceProfiler = { module = "ru.ok.tracer:tracer-profiler-systrace" }
-mytracker-core = { module = "com.my.tracker:mytracker-sdk", version.ref = "mytracker" }
+appmetrica-sdk = { module = "io.appmetrica.analytics:analytics", version.ref = "appmetrica" }
 
 # DI
 kodein-core = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }

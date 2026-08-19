@@ -36,14 +36,12 @@ import ru.aleshin.studyassistant.tasks.impl.domain.interactors.TodoInteractor
 internal val domainModule = DI.Module("Domain") {
     bindSingleton<TasksErrorHandler> { TasksErrorHandler.Base() }
     bindSingleton<TasksEitherWrapper> { TasksEitherWrapper.Base(instance(), instance()) }
-    bindSingleton<TodoCompletionInteractor> {
-        TodoCompletionInteractor.Base(instance(), instance(), instance(), instance())
-    }
+    bindSingleton<TodoCompletionInteractor> { TodoCompletionInteractor.Base(instance(), instance(), instance(), instance()) }
 
     bindSingleton<HomeworksInteractor> {  HomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance())  }
     bindSingleton<OrganizationInteractor> { OrganizationInteractor.Base(instance(), instance()) }
     bindSingleton<ScheduleInteractor> {  ScheduleInteractor.Base(instance(), instance(), instance(), instance())  }
-    bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
+    bindSingleton<ShareHomeworksInteractor> { ShareHomeworksInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<GoalsInteractor> {  GoalsInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance())  }
     bindSingleton<SubjectsInteractor> { SubjectsInteractor.Base(instance(), instance()) }
     bindSingleton<TodoInteractor> { TodoInteractor.Base(instance(), instance(), instance(), instance(), instance()) }

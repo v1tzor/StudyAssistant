@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.DomainResult
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.schedules.Schedule
 import ru.aleshin.studyassistant.core.domain.entities.share.HomeworkShare
@@ -71,6 +72,7 @@ internal interface ShareHomeworksInteractor {
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
         private val dateManager: DateManager,
+        private val analyticsService: AnalyticsService,
         private val eitherWrapper: TasksEitherWrapper,
     ) : ShareHomeworksInteractor {
 
@@ -88,7 +90,12 @@ internal interface ShareHomeworksInteractor {
                     date = date,
                     homeworks = homeworks,
                 )
-            )
+            ).apply {
+                analyticsService.trackEvent(
+                    name = CREATE_SHARE_EVENT,
+                    eventParams = mapOf(Pair(HOMEWORKS_COUNT_KEY, homeworks.count().toString()))
+                )
+            }
         }
 
         override suspend fun fetchSharePreview(code: String) = eitherWrapper.wrap {
@@ -115,11 +122,12 @@ internal interface ShareHomeworksInteractor {
             }
             HomeworkSharePreview(
                 share = share,
-                organizations = organizationsRepository.fetchAllShortOrganization().first()
-                    .sortedByDescending { it.isMain },
+                organizations = organizationsRepository.fetchAllShortOrganization().first().sortedByDescending { it.isMain },
                 schedule = schedule,
                 links = links,
-            )
+            ).apply {
+                analyticsService.trackEvent(CLAIM_SHARE_EVENT, mapOf())
+            }
         }
 
         override suspend fun importShare(
@@ -148,7 +156,9 @@ internal interface ShareHomeworksInteractor {
                     updatedAt = currentTime.toEpochMilliseconds(),
                 )
             }
-            shareRepository.importShare(code, homeworks)
+            shareRepository.importShare(code, homeworks).apply {
+                analyticsService.trackEvent(IMPORT_SHARE_EVENT, mapOf())
+            }
         }
 
         private suspend fun fetchSchedule(date: Instant): Schedule {
@@ -156,18 +166,26 @@ internal interface ShareHomeworksInteractor {
             val numberOfWeek = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
             val customSchedule = customScheduleRepository.fetchScheduleByDate(date).first()
             if (customSchedule != null) {
-                return Schedule.Custom(customSchedule.copy(classes = customSchedule.classes.sortedBy {
-                    it.timeRange.from.dateTime().time
-                }))
+                return Schedule.Custom(
+                    data = customSchedule.copy(
+                        classes = customSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                    )
+                )
             }
             val baseSchedule = baseScheduleRepository.fetchScheduleByDate(date, numberOfWeek).first()
-            return Schedule.Base(baseSchedule?.copy(classes = baseSchedule.classes.sortedBy {
-                it.timeRange.from.dateTime().time
-            }))
+            return Schedule.Base(
+                data = baseSchedule?.copy(
+                    classes = baseSchedule.classes.sortedBy { it.timeRange.from.dateTime().time }
+                )
+            )
         }
 
         private companion object {
             const val MAX_HOMEWORKS = 20
+            const val CREATE_SHARE_EVENT = "homework_share_create"
+            const val CLAIM_SHARE_EVENT = "homework_share_claim"
+            const val IMPORT_SHARE_EVENT = "homework_share_import"
+            const val HOMEWORKS_COUNT_KEY = "homework_share_count_value"
         }
     }
 }

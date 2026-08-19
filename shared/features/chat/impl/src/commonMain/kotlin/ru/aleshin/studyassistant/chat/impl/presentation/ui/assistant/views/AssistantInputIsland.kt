@@ -75,7 +75,7 @@ internal fun AssistantInputIsland(
         mutableStateOf(TextFieldValue(userQuery))
     }
     val canSend = !isLoadingChat &&
-        responseStatus == ResponseStatus.SUCCESS &&
+        responseStatus != ResponseStatus.LOADING &&
         !isQuotaExpired &&
         isInputEnabled &&
         textFieldState.text.isNotBlank()

@@ -28,10 +28,22 @@ android {
 
     val localProperties = gradleLocalProperties(rootDir, providers)
 
+    val appMetricaApiKey = localProperties.getProperty("appMetricaApiKey")
+        ?: providers.gradleProperty("studyassistant.analytics.appmetrica.key").orNull.orEmpty()
     val yandexTasksBannerId = localProperties.getProperty("studyassistant.ads.tasks.banner.id")
         ?: providers.gradleProperty("studyassistant.ads.tasks.banner.id").orNull.orEmpty()
     val yandexInfoBannerId = localProperties.getProperty("studyassistant.ads.info.banner.id")
         ?: providers.gradleProperty("studyassistant.ads.info.banner.id").orNull.orEmpty()
+    val yandexShareImportBannerId = localProperties.getProperty("studyassistant.ads.share.import.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.share.import.banner.id").orNull.orEmpty()
+    val yandexSharePreviewBannerId = localProperties.getProperty("studyassistant.ads.share.preview.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.share.preview.banner.id").orNull.orEmpty()
+    val yandexAiImporterBannerId = localProperties.getProperty("studyassistant.ads.ai.importer.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.ai.importer.banner.id").orNull.orEmpty()
+    val yandexHomeworkReceiveBannerId = localProperties.getProperty("studyassistant.ads.homework.receive.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.homework.receive.banner.id").orNull.orEmpty()
+    val yandexAnalyticsBannerId = localProperties.getProperty("studyassistant.ads.analytics.banner.id")
+        ?: providers.gradleProperty("studyassistant.ads.analytics.banner.id").orNull.orEmpty()
     val yandexAiRewardedId = localProperties.getProperty("studyassistant.ads.ai.rewarded.id")
         ?: providers.gradleProperty("studyassistant.ads.ai.rewarded.id").orNull.orEmpty()
     val yandexScheduleRewardedId = localProperties.getProperty("studyassistant.ads.schedule.rewarded.id")
@@ -50,11 +62,15 @@ android {
 
         testInstrumentationRunner = libs.versions.testInstrumentationRunner.get()
         vectorDrawables.useSupportLibrary = true
-        val myTrackerKey = localProperties.getProperty("myTrackerKey")
 
-        buildConfigField("String", "MY_TRACKER_KEY", "\"$myTrackerKey\"")
+        buildConfigField("String", "APPMETRICA_API_KEY", "\"$appMetricaApiKey\"")
         buildConfigField("String", "YANDEX_TASKS_BANNER_ID", "\"$yandexTasksBannerId\"")
         buildConfigField("String", "YANDEX_INFO_BANNER_ID", "\"$yandexInfoBannerId\"")
+        buildConfigField("String", "YANDEX_SHARE_IMPORT_BANNER_ID", "\"$yandexShareImportBannerId\"")
+        buildConfigField("String", "YANDEX_SHARE_PREVIEW_BANNER_ID", "\"$yandexSharePreviewBannerId\"")
+        buildConfigField("String", "YANDEX_AI_IMPORTER_BANNER_ID", "\"$yandexAiImporterBannerId\"")
+        buildConfigField("String", "YANDEX_HOMEWORK_RECEIVE_BANNER_ID", "\"$yandexHomeworkReceiveBannerId\"")
+        buildConfigField("String", "YANDEX_ANALYTICS_BANNER_ID", "\"$yandexAnalyticsBannerId\"")
         buildConfigField("String", "YANDEX_AI_REWARDED_ID", "\"$yandexAiRewardedId\"")
         buildConfigField("String", "YANDEX_SCHEDULE_REWARDED_ID", "\"$yandexScheduleRewardedId\"")
         buildConfigField("String", "YANDEX_SCHEDULE_AI_REWARDED_ID", "\"$yandexScheduleAiRewardedId\"")
@@ -149,7 +165,7 @@ dependencies {
 
     implementation(platform(libs.tracer.bom))
     implementation(libs.bundles.tracer)
-    implementation(libs.mytracker.core)
+    implementation(libs.appmetrica.sdk)
 
     rustoreImplementation(libs.rustore.review)
     rustoreImplementation(libs.rustore.updates)

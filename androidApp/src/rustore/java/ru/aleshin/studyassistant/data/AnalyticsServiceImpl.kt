@@ -15,12 +15,12 @@
  */
 package ru.aleshin.studyassistant.data
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.provider.Settings.Secure
-import com.my.tracker.MyTracker
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 import ru.aleshin.studyassistant.android.BuildConfig
+import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 
 /**
@@ -31,19 +31,24 @@ class AnalyticsServiceImpl(
 ) : AnalyticsService {
 
     override fun trackEvent(name: String, eventParams: Map<String, String>) {
-        MyTracker.trackEvent(name, eventParams)
+        AppMetrica.reportEvent(name, eventParams)
     }
 
     override fun initializeService() {
-        MyTracker.getTrackerParams().apply {
-            setCustomParam("android_id", getAndroidId(context))
-            setCustomParam("store", "rustore")
+        val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+            .withLocationTracking(false)
+            .withCrashReporting(true)
+            .withAnrMonitoring(true)
+            .let { builder -> if (BuildConfig.DEBUG) builder.withLogs() else builder }
+            .build()
+        AppMetrica.activate(context.applicationContext, config)
+        AppMetrica.putAppEnvironmentValue("store", "rustore")
+        (context.applicationContext as? Application)?.let { application ->
+            AppMetrica.enableActivityAutoTracking(application)
         }
-        MyTracker.initTracker(BuildConfig.MY_TRACKER_KEY, (context.applicationContext as Application))
     }
 
-    @SuppressLint("HardwareIds")
-    private fun getAndroidId(context: Context): String? {
-        return Secure.getString(context.contentResolver, Secure.ANDROID_ID)
+    override fun setupUserId(id: UID) {
+        AppMetrica.setUserProfileID(id)
     }
 }

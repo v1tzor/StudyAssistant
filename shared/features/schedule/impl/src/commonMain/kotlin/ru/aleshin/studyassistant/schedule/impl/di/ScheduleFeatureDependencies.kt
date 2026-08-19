@@ -22,6 +22,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureDependencies
 import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
@@ -65,6 +66,6 @@ public interface ScheduleFeatureDependencies : BaseFeatureDependencies {
     public val dateManager: DateManager
     public val coroutineManager: CoroutineManager
     public val appDispatchers: AppDispatchers
+    public val analyticsService: AnalyticsService
     public val crashlyticsService: CrashlyticsService
-    public val context: Any?
 }

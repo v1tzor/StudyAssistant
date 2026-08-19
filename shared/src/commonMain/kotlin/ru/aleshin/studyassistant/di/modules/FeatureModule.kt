@@ -38,6 +38,7 @@ import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
@@ -64,7 +65,6 @@ import ru.aleshin.studyassistant.core.domain.repositories.ScheduleShareRepositor
 import ru.aleshin.studyassistant.core.domain.repositories.SubjectsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.TodoRepository
 import ru.aleshin.studyassistant.core.domain.repositories.UserDataResetRepository
-import ru.aleshin.studyassistant.di.PlatformConfiguration
 import ru.aleshin.studyassistant.editor.api.EditorDecomposeFeatureFactory
 import ru.aleshin.studyassistant.editor.impl.di.EditorFeatureDependencies
 import ru.aleshin.studyassistant.editor.impl.di.holder.EditorFeatureController
@@ -167,7 +167,7 @@ val featureModule = DI.Module("Feature") {
             override val coroutineManager = instance<CoroutineManager>()
             override val appDispatchers = instance<AppDispatchers>()
             override val crashlyticsService = instance<CrashlyticsService>()
-            override val context = instance<PlatformConfiguration>().context
+            override val analyticsService = instance<AnalyticsService>()
         }
     }
     bind<ScheduleFeatureController>() with scoped(FeatureControllerScope).singleton {
@@ -194,6 +194,7 @@ val featureModule = DI.Module("Feature") {
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
+            override val analyticsService = instance<AnalyticsService>()
         }
     }
     bind<TasksFeatureController>() with scoped(FeatureControllerScope).singleton {

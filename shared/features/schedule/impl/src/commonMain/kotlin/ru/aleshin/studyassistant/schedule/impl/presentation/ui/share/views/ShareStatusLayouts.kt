@@ -51,6 +51,8 @@ import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.subjects.SubjectUi
 import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.views.ShareQrCode
 import ru.aleshin.studyassistant.core.ui.views.shortDayMonthTimeFormat
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.contract.ShareState
@@ -142,6 +144,10 @@ internal fun ShareInputSection(
             ) {
                 Text(text = stringResource(Res.string.scan_qr_button_title))
             }
+            YandexInlineBanner(
+                modifier = Modifier.fillMaxWidth(),
+                placement = AdPlacement.SHARE_IMPORT,
+            )
         }
     }
 }
@@ -287,6 +293,10 @@ internal fun SharePreviewSection(
             onLinkOrganization = onLinkOrganization,
             onLinkSubjects = onLinkSubjects,
             onLinkTeachers = onLinkTeachers,
+        )
+        YandexInlineBanner(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
+            placement = AdPlacement.SHARE_PREVIEW,
         )
         Spacer(modifier = Modifier.height(72.dp))
     }

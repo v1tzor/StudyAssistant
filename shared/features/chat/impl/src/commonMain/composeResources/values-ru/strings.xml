@@ -28,7 +28,7 @@
     <string name="assistant_chat_text_field_placeholder">Отправьте любой запрос</string>
     <string name="assistant_empty_chat_title">Чем я могу вам помочь?</string>
     <string name="failure_response_text">К сожалению, не удалось выполнить запрос</string>
-    <string name="quota_expired_title">Лимит на сегодня — %d сообщений — исчерпан.</string>
+    <string name="quota_expired_title">Лимит на сегодня (%d сообщений) исчерпан.</string>
     <string name="quota_reset_suggestion_text">Посмотрите короткую рекламу, чтобы поддержать команду и получить ещё %1$d сообщений. Доступно сегодня: %2$d из %3$d.</string>
     <string name="quota_rewards_exhausted_text">Все %d награды за рекламу на сегодня использованы. Квота восстановится автоматически завтра.</string>
     <string name="watch_ad_reward_button">Посмотреть рекламу · +%d сообщений</string>

@@ -11,6 +11,7 @@ AGENTS.md
 design-qa.md
 .claude
 local.properties
+iosApp/iosApp/Config/Secrets.xcconfig
 xcuserdata
 backend/ktor/deploy/DEPLOYMENT.md
 backend/ktor/README.md

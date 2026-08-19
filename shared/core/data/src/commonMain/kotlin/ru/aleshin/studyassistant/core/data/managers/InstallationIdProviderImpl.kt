@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.core.data.managers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import ru.aleshin.studyassistant.core.common.exceptions.InternetConnectionException
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.database.datasource.secure.InstallationSecureDataSource
 import ru.aleshin.studyassistant.core.domain.managers.InstallationIdProvider
 import ru.aleshin.studyassistant.core.remote.datasources.installation.InstallationRemoteDataSource
@@ -29,6 +30,7 @@ import ru.aleshin.studyassistant.core.remote.datasources.installation.Installati
 class InstallationIdProviderImpl(
     private val secureDataSource: InstallationSecureDataSource,
     private val remoteDataSource: InstallationRemoteDataSource,
+    private val analyticsService: AnalyticsService
 ) : InstallationIdProvider {
 
     private val mutex = Mutex()
@@ -48,6 +50,7 @@ class InstallationIdProviderImpl(
         return remoteDataSource.register()
             .takeIf(INSTALLATION_CREDENTIAL_PATTERN::matches)
             ?.also { token -> secureDataSource.saveInstallationToken(token) }
+            ?.also { token -> analyticsService.setupUserId(token) }
             ?: throw InternetConnectionException()
     }
 

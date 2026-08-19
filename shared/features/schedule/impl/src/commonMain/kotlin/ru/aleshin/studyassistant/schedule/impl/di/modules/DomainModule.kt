@@ -19,7 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.di.modules
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.schedule.impl.di.ScheduleFeatureDependencies
+import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleEitherWrapper
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleErrorHandler
 import ru.aleshin.studyassistant.schedule.impl.domain.common.ScheduleImportHandler
@@ -41,46 +41,12 @@ internal val domainModule = DI.Module("Domain") {
     bindSingleton<ScheduleEitherWrapper> { ScheduleEitherWrapper.Base(instance(), instance()) }
     bindSingleton<ScheduleImportValidator> { ScheduleImportValidator.Base() }
     bindSingleton<ScheduleImportHandler> { ScheduleImportHandler.Base(instance()) }
-    bindSingleton<ImageCompressor> {
-        createImageCompressor(instance<ScheduleFeatureDependencies>().appDispatchers)
-    }
+    bindSingleton<ImageCompressor> { createImageCompressor(instance<AppDispatchers>()) }
 
     bindSingleton<ScheduleInteractor> { ScheduleInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<HomeworkInteractor> { HomeworkInteractor.Base(instance(), instance(), instance()) }
-    bindSingleton<ShareSchedulesInteractor> {
-        ShareSchedulesInteractor.Base(
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-        )
-    }
+    bindSingleton<ShareSchedulesInteractor> { ShareSchedulesInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<OrganizationsInteractor> { OrganizationsInteractor.Base(instance(), instance(), instance(), instance(), instance()) }
     bindSingleton<AnalysisInteractor> { AnalysisInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance()) }
-    bindSingleton<ScheduleImportInteractor> {
-        ScheduleImportInteractor.Base(
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-            instance(),
-        )
-    }
+    bindSingleton<ScheduleImportInteractor> { ScheduleImportInteractor.Base(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance()) }
 }

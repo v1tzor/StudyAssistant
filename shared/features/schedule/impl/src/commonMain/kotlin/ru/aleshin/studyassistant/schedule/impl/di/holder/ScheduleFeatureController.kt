@@ -25,6 +25,7 @@ import ru.aleshin.studyassistant.core.common.inject.BaseFeatureController
 import ru.aleshin.studyassistant.core.common.managers.AppDispatchers
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
@@ -82,8 +83,7 @@ public class ScheduleFeatureController(
         bindSingleton<DateManager> { dependencies.dateManager }
         bindSingleton<CoroutineManager> { dependencies.coroutineManager }
         bindSingleton<AppDispatchers> { dependencies.appDispatchers }
-        bindSingleton<ScheduleFeatureDependencies> { dependencies }
-
+        bindSingleton<AnalyticsService> { dependencies.analyticsService }
         bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
 
         bindSingleton<ScheduleFeatureApi> {

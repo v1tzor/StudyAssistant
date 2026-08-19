@@ -49,15 +49,26 @@ fun YandexInlineBanner(
     val adUnitId = when (placement) {
         AdPlacement.TASKS_OVERVIEW -> configuration.tasksOverviewBannerId
         AdPlacement.INFO_ORGANIZATIONS -> configuration.infoOrganizationsBannerId
+        AdPlacement.SHARE_IMPORT -> configuration.shareImportBannerId
+        AdPlacement.SHARE_PREVIEW -> configuration.sharePreviewBannerId
+        AdPlacement.AI_IMPORTER -> configuration.aiImporterBannerId
+        AdPlacement.HOMEWORK_RECEIVE -> configuration.homeworkReceiveBannerId
+        AdPlacement.ANALYTICS -> configuration.analyticsBannerId
     }
     if (adUnitId.isBlank()) return
+
+    val bannerMaxHeight = if (placement == AdPlacement.ANALYTICS || placement == AdPlacement.HOMEWORK_RECEIVE) {
+        BANNER_ANALYTICS_HEIGHT
+    } else {
+        BANNER_DEFAULT_HEIGHT
+    }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         var isLoaded by remember(adUnitId) { mutableStateOf(false) }
         val bannerState = rememberBannerAdState(
             adSize = BannerAdSize.Inline(
                 width = maxWidth,
-                maxHeight = BANNER_MAX_HEIGHT,
+                maxHeight = bannerMaxHeight,
             ),
             events = BannerEvents(
                 onAdLoaded = { isLoaded = true },
@@ -79,9 +90,10 @@ fun YandexInlineBanner(
                     )
                 )
                 .fillMaxWidth()
-                .height(BANNER_MAX_HEIGHT)
+                .height(bannerMaxHeight)
         )
     }
 }
 
-private val BANNER_MAX_HEIGHT = 50.dp
+private val BANNER_DEFAULT_HEIGHT = 50.dp
+private val BANNER_ANALYTICS_HEIGHT = 100.dp

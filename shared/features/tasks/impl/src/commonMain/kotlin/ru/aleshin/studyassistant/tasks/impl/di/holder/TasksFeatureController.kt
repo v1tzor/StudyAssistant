@@ -23,6 +23,7 @@ import org.kodein.di.instance
 import ru.aleshin.studyassistant.core.common.inject.BaseFeatureController
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
@@ -70,6 +71,7 @@ public class TasksFeatureController(
         bindSingleton<CoroutineManager> { dependencies.coroutineManager }
 
         bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
+        bindSingleton<AnalyticsService> { dependencies.analyticsService }
 
         bindSingleton<TasksFeatureApi> {
             object : TasksFeatureApi {

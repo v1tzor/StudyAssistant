@@ -275,12 +275,12 @@ private fun TimeControlContent(
                 label = {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = goalTime.type.mapToString(),
+                        text = goalTime.timeType.mapToString(),
                         textAlign = TextAlign.Center,
                     )
                 },
                 leadingIcon = {
-                    when (goalTime.type) {
+                    when (goalTime.timeType) {
                         GoalTime.Type.TIMER -> Icon(
                             painter = painterResource(Res.drawable.ic_timer),
                             contentDescription = null,
@@ -306,7 +306,7 @@ private fun TimeControlContent(
             )
             GoalTimeTypeChooserMenu(
                 expanded = isOpenTimeTypeChooserMenu,
-                selected = goalTime.type,
+                selected = goalTime.timeType,
                 onDismiss = { isOpenTimeTypeChooserMenu = false },
                 onChoose = {
                     onChangeTimeType(it)
@@ -414,7 +414,7 @@ private fun TimerStopwatchView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = when (goalTime.type) {
+                        text = when (goalTime.timeType) {
                             GoalTime.Type.TIMER -> stringResource(Res.string.goal_sheet_left_time_label)
                             GoalTime.Type.STOPWATCH -> stringResource(Res.string.goal_sheet_elapsed_time_label)
                             GoalTime.Type.NONE -> stringResource(Res.string.goal_sheet_left_time_label)

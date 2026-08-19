@@ -71,6 +71,11 @@ class MainActivity : FlavorMainActivity() {
                 adsConfiguration = AdsConfiguration(
                     tasksOverviewBannerId = BuildConfig.YANDEX_TASKS_BANNER_ID,
                     infoOrganizationsBannerId = BuildConfig.YANDEX_INFO_BANNER_ID,
+                    shareImportBannerId = BuildConfig.YANDEX_SHARE_IMPORT_BANNER_ID,
+                    sharePreviewBannerId = BuildConfig.YANDEX_SHARE_PREVIEW_BANNER_ID,
+                    aiImporterBannerId = BuildConfig.YANDEX_AI_IMPORTER_BANNER_ID,
+                    homeworkReceiveBannerId = BuildConfig.YANDEX_HOMEWORK_RECEIVE_BANNER_ID,
+                    analyticsBannerId = BuildConfig.YANDEX_ANALYTICS_BANNER_ID,
                     aiQuotaRewardedId = BuildConfig.YANDEX_AI_REWARDED_ID,
                     scheduleImportRewardedId = BuildConfig.YANDEX_SCHEDULE_REWARDED_ID,
                     aiScheduleAnalysisRewardedId = BuildConfig.YANDEX_SCHEDULE_AI_REWARDED_ID,

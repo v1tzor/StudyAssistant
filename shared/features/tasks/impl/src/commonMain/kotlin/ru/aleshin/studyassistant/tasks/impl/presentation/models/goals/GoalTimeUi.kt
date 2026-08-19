@@ -29,7 +29,7 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 @Serializable
 internal sealed class GoalTimeUi {
 
-    abstract val type: GoalTime.Type
+    abstract val timeType: GoalTime.Type
 
     @Serializable
     data class Timer(
@@ -38,7 +38,7 @@ internal sealed class GoalTimeUi {
         val startTimePoint: Instant,
         val isActive: Boolean = false,
     ) : GoalTimeUi() {
-        override val type = GoalTime.Type.TIMER
+        override val timeType = GoalTime.Type.TIMER
     }
 
     @Serializable
@@ -47,11 +47,11 @@ internal sealed class GoalTimeUi {
         val startTimePoint: Instant,
         val isActive: Boolean = false,
     ) : GoalTimeUi() {
-        override val type = GoalTime.Type.STOPWATCH
+        override val timeType = GoalTime.Type.STOPWATCH
     }
 
     @Serializable
     data object None : GoalTimeUi() {
-        override val type = GoalTime.Type.NONE
+        override val timeType = GoalTime.Type.NONE
     }
 }

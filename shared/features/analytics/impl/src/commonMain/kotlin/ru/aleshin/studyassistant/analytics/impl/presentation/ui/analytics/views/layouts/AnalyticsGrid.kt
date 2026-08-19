@@ -62,6 +62,8 @@ import ru.aleshin.studyassistant.analytics.impl.presentation.ui.analytics.views.
 import ru.aleshin.studyassistant.analytics.impl.resources.Res
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_empty_body
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_empty_title
+import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
+import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.views.PlaceholderBox
 
 /**
@@ -131,6 +133,12 @@ internal fun LazyGridScope.analyticsOverviewItems(
     item(key = REGULARITY_KEY) {
         AnalyticsRegularitySection(data.regularity)
     }
+    item(key = BANNER_KEY, span = fullSpan()) {
+        YandexInlineBanner(
+            modifier = Modifier.fillMaxWidth(),
+            placement = AdPlacement.ANALYTICS,
+        )
+    }
 }
 
 internal fun LazyGridScope.analyticsDetailsItems(
@@ -199,6 +207,12 @@ internal fun LazyGridScope.analyticsDetailsItems(
         item(key = INSIGHTS_KEY) {
             AnalyticsInsightsSection(data.insights)
         }
+    }
+    item(key = BANNER_KEY, span = fullSpan()) {
+        YandexInlineBanner(
+            modifier = Modifier.fillMaxWidth(),
+            placement = AdPlacement.ANALYTICS,
+        )
     }
 }
 
@@ -292,6 +306,7 @@ private fun fullSpan(): LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpa
 
 private val EMPTY_CONTENT_WIDTH = 360.dp
 private val PLACEHOLDER_HEIGHTS = listOf(220.dp, 280.dp, 340.dp, 260.dp)
+private const val BANNER_KEY = "banner"
 private const val TARGET_KEY = "target"
 private const val SUMMARY_KEY = "summary"
 private const val INSIGHTS_KEY = "insights"

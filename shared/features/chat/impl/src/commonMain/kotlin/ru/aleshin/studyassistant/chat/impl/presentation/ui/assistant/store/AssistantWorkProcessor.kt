@@ -59,7 +59,11 @@ internal interface AssistantWorkProcessor :
             is AssistantWorkCommand.SendMessage -> sendMessageWork(command.chatId, command.message)
             is AssistantWorkCommand.RetryAttempt -> retryAttemptWork(command.chatId)
             is AssistantWorkCommand.ClearUnsendMessage -> clearUnsendMessageWork(command.chatId)
-            is AssistantWorkCommand.ResolveToolCall -> resolveToolCallWork(command.chatId, command.toolCallId, command.approved)
+            is AssistantWorkCommand.ResolveToolCall -> resolveToolCallWork(
+                chatId = command.chatId,
+                toolCallId = command.toolCallId,
+                approved = command.approved,
+            )
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -152,10 +156,11 @@ internal interface AssistantWorkProcessor :
             emit(ActionResult(AssistantAction.UpdateRewardChallenge(null, false)))
         }
 
-        private fun clearChatHistoryWork(chatId: UID) = flow {
+        private fun clearChatHistoryWork(chatId: UID) = flow<AssistantWorkResult> {
             aiAssistantInteractor.clearHistory(chatId).handle(
                 onLeftAction = { emit(EffectResult(AssistantEffect.ShowError(it))) },
             )
+            emit(ActionResult(AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS)))
         }
 
         private fun sendMessageWork(chatId: UID, message: String) = flow<AssistantWorkResult> {

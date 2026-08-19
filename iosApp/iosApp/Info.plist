@@ -2,6 +2,8 @@
     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+        <key>AppMetricaApiKey</key>
+        <string>$(APPMETRICA_API_KEY)</string>
         <key>YandexAiRewardedId</key>
         <string></string>
         <key>YandexInfoBannerId</key>

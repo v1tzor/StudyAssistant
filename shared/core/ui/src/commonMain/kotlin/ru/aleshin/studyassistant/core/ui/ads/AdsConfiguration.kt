@@ -22,6 +22,11 @@ package ru.aleshin.studyassistant.core.ui.ads
 data class AdsConfiguration(
     val tasksOverviewBannerId: String,
     val infoOrganizationsBannerId: String,
+    val shareImportBannerId: String,
+    val sharePreviewBannerId: String,
+    val aiImporterBannerId: String,
+    val homeworkReceiveBannerId: String,
+    val analyticsBannerId: String,
     val aiQuotaRewardedId: String,
     val scheduleImportRewardedId: String,
     val aiScheduleAnalysisRewardedId: String,

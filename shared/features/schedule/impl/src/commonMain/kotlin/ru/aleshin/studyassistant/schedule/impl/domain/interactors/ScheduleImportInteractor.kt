@@ -30,6 +30,7 @@ import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
@@ -103,6 +104,7 @@ internal interface ScheduleImportInteractor {
         private val dateManager: DateManager,
         private val validator: ScheduleImportValidator,
         private val importHandler: ScheduleImportHandler,
+        private val analyticsService: AnalyticsService,
         private val eitherWrapper: ScheduleEitherWrapper,
     ) : ScheduleImportInteractor {
 
@@ -134,6 +136,7 @@ internal interface ScheduleImportInteractor {
                     todayDate = todayDate,
                 ),
             )
+            analyticsService.trackEvent(EXTRACT_DRAFT_EVENT, mapOf())
             importHandler.handleDraft(draft, organization)
         }
 
@@ -224,6 +227,7 @@ internal interface ScheduleImportInteractor {
                 }
             deprecateCurrentSchedules(currentTime)
             baseScheduleRepository.addOrUpdateSchedulesGroup(schedules)
+            analyticsService.trackEvent(APPLY_SESSION_EVENT, mapOf())
             restartClassReminders()
         }
 
@@ -247,6 +251,11 @@ internal interface ScheduleImportInteractor {
             if (notificationSettings.endOfClasses) {
                 endClassesReminderManager.startOrRetryReminderService()
             }
+        }
+
+        private companion object {
+            const val EXTRACT_DRAFT_EVENT = "schedule_ai_extract_draft"
+            const val APPLY_SESSION_EVENT = "schedule_ai_import_schedule"
         }
     }
 }

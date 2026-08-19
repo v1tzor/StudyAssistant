@@ -119,7 +119,7 @@ internal fun AssistantBottomBar(
             IconButton(
                 modifier = Modifier.size(32.dp),
                 enabled = !isLoadingChat &&
-                        responseStatus == ResponseStatus.SUCCESS &&
+                        responseStatus != ResponseStatus.LOADING &&
                         !isQuotaExpired &&
                         isInputEnabled &&
                         textFieldState.text.isNotBlank(),

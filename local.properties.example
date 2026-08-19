@@ -5,7 +5,7 @@ storePassword=password_1
 keyAlias=upload
 keyPassword=password_1
 
-myTrackerKey=tracker_key
+appMetricaApiKey=app_metrica_key
 tracerAppToken=tracer_app_token
 tracerPluginToken=tracer_plugin_token
 

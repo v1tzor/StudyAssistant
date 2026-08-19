@@ -22,4 +22,9 @@ package ru.aleshin.studyassistant.core.ui.ads
 enum class AdPlacement {
     TASKS_OVERVIEW,
     INFO_ORGANIZATIONS,
+    SHARE_IMPORT,
+    SHARE_PREVIEW,
+    AI_IMPORTER,
+    HOMEWORK_RECEIVE,
+    ANALYTICS,
 }

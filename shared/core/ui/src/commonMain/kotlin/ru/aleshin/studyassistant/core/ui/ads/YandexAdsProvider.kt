@@ -35,7 +35,7 @@ fun YandexAdsProvider(
     LaunchedEffect(Unit) {
         YandexAds.setUserConsent(false)
         YandexAds.setLocationTracking(false)
-        YandexAds.setAppAdAnalyticsReporting(false)
+        YandexAds.setAgeRestricted(false)
         YandexAds.initialize()
     }
     CompositionLocalProvider(

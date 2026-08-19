@@ -87,12 +87,7 @@ val coreDataModule = DI.Module("CoreData") {
     bindProvider<CalendarSettingsRepository> { CalendarSettingsRepositoryImpl(instance()) }
     bindSingleton<ProfileRepository> { ProfileRepositoryImpl(instance(), instance()) }
 
-    bindSingleton<InstallationIdProvider> {
-        InstallationIdProviderImpl(
-            secureDataSource = instance(),
-            remoteDataSource = instance(),
-        )
-    }
+    bindSingleton<InstallationIdProvider> { InstallationIdProviderImpl(instance(), instance(), instance()) }
     bindProvider<ScheduleShareRepository> { ScheduleShareRepositoryImpl(instance(), instance(), instance()) }
     bindProvider<HomeworkShareRepository> { HomeworkShareRepositoryImpl(instance(), instance(), instance(), instance()) }
     bindProvider<ScheduleImportRepository> { ScheduleImportRepositoryImpl(instance(), instance(), instance()) }
