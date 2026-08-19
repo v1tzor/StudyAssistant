@@ -45,15 +45,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
+import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.presentation.models.organizations.OrganizationUi
 import ru.aleshin.studyassistant.core.presentation.models.settings.CalendarSettingsUi
 import ru.aleshin.studyassistant.core.presentation.models.users.ProfileUi
@@ -75,6 +80,8 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.Schedu
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupPage
 import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupTopBar
 import ru.aleshin.studyassistant.preview.impl.resources.Res
+import ru.aleshin.studyassistant.preview.impl.resources.privacy_policy_disclaimer_link
+import ru.aleshin.studyassistant.preview.impl.resources.privacy_policy_disclaimer_start
 import ru.aleshin.studyassistant.preview.impl.resources.schedule_import_ai_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.schedule_start_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.step_title
@@ -399,7 +406,6 @@ private fun SetupPageNavigationSection(
                 onClick = onSaveCalendar,
                 navigationLabel = currentPage.buttonLabel,
             )
-
             SetupPage.SCHEDULE -> {
                 NavigationPageButton(
                     onClick = onImportSchedule,
@@ -415,6 +421,26 @@ private fun SetupPageNavigationSection(
                     onClick = onStartUsing,
                     navigationLabel = stringResource(Res.string.schedule_start_button_label),
                     isTonal = true,
+                )
+                val privacyPolicyDisclaimerStart = stringResource(Res.string.privacy_policy_disclaimer_start)
+                val privacyPolicyDisclaimerLink = stringResource(Res.string.privacy_policy_disclaimer_link)
+                val annotatedString = buildAnnotatedString {
+                    append(privacyPolicyDisclaimerStart)
+                    withLink(
+                        LinkAnnotation.Url(
+                            url = Constants.App.PRIVACY_POLICY,
+                            styles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary))
+                        )
+                    ) {
+                        append(privacyPolicyDisclaimerLink)
+                    }
+                }
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = annotatedString,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

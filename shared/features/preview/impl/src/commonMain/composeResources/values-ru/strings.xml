@@ -52,5 +52,7 @@
     <string name="organization_type_placeholder">Выберите подходящий вид</string>
     <string name="phone_number_label">Телефон</string>
     <string name="website_label">Сайт</string>
+    <string name="privacy_policy_disclaimer_start">Продолжая пользоваться, вы соглашаетесь с нашей </string>
+    <string name="privacy_policy_disclaimer_link">политикой конфиденциальности</string>
     <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
 </resources>
