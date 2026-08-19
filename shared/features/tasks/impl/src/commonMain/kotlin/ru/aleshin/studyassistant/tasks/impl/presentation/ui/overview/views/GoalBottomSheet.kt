@@ -121,7 +121,6 @@ internal fun GoalBottomSheet(
                     number = number,
                     onEditHomeworkClick = onEditHomeworkClick,
                 )
-
                 GoalType.TODO -> GoalBottomSheetTodoHeader(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     todo = contentTodo,

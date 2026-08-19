@@ -267,48 +267,38 @@ internal class OverviewComposeStore(
             homeworksScope = action.homeworkScope,
             isLoadingHomeworks = false,
         )
-
         is OverviewAction.UpdateTodos -> currentState.copy(
             groupedTodos = action.groupedTodos,
             isLoadingTasks = false,
         )
-
         is OverviewAction.UpdateGoals -> currentState.copy(
             selectedGoalsDate = action.selectedGoalsDate,
             dailyGoals = action.dailyGoals,
             goalsProgress = action.goalsProgress,
             isLoadingGoals = false,
         )
-
         is OverviewAction.UpdateHomeworksProgress -> currentState.copy(
             homeworksProgress = action.homeworkProgress,
             isLoadingHomeworksProgress = false,
         )
-
         is OverviewAction.UpdateHomeworkShareLink -> currentState.copy(
             homeworkShareLink = action.link,
         )
-
         is OverviewAction.UpdateActiveSchedule -> currentState.copy(
             activeSchedule = action.activeSchedule,
         )
-
         is OverviewAction.UpdateCurrentDate -> currentState.copy(
             currentDate = action.date,
         )
-
         is OverviewAction.UpdateHomeworksLoading -> currentState.copy(
             isLoadingHomeworks = action.isLoading,
         )
-
         is OverviewAction.UpdateHomeworksProgressLoading -> currentState.copy(
             isLoadingHomeworksProgress = action.isLoading,
         )
-
         is OverviewAction.UpdateTasksLoading -> currentState.copy(
             isLoadingTasks = action.isLoading,
         )
-
         is OverviewAction.UpdateGoalsLoading -> currentState.copy(
             isLoadingGoals = action.isLoading,
         )

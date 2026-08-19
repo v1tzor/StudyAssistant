@@ -563,10 +563,7 @@ internal fun DailyGoalsViewContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (goalItems.isNotEmpty()) {
-                        items(
-                            goalItems,
-                            key = { it.uid },
-                            contentType = { it.contentType }) { goal ->
+                        items(goalItems, key = { it.uid }, contentType = { it.contentType }) { goal ->
                             var goalBottomSheetViewerStatus by remember { mutableStateOf(false) }
                             var deleteWarningDialogState by remember { mutableStateOf(false) }
 

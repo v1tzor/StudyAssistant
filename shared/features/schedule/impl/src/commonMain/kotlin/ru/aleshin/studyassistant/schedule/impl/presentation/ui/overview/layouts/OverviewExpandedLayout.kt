@@ -81,7 +81,6 @@ internal fun OverviewExpandedLayout(
                     schedule = state.schedule,
                     activeClass = state.activeClass,
                     contentMaxWidth = classListMaxWidth,
-                    showBottomSpacer = false,
                     onAddHomeworkClick = onAddHomeworkClick,
                     onEditHomeworkClick = onEditHomeworkClick,
                     onAgainHomeworkClick = onAgainHomeworkClick,

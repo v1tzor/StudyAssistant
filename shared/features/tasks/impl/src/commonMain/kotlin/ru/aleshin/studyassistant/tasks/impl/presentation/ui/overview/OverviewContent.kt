@@ -130,75 +130,6 @@ internal fun OverviewContent(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        content = { paddingValues ->
-            BaseOverviewContent(
-                state = state,
-                modifier = Modifier.padding(paddingValues),
-                layoutMode = layoutMode,
-                overviewTasksTab = overviewTasksTab.value,
-                onChangeTab = { overviewTasksTab.value = it },
-                onEditHomeworkClick = {
-                    store.dispatchEvent(OverviewEvent.ClickEditHomework(it))
-                },
-                onShowAllSharedHomeworksClick = {
-                    store.dispatchEvent(OverviewEvent.ClickShowAllSharedHomeworks)
-                },
-                onHomeworkClick = {
-                    store.dispatchEvent(OverviewEvent.ClickHomework(it))
-                },
-                onDoHomework = {
-                    store.dispatchEvent(OverviewEvent.DoHomework(it))
-                },
-                onSkipHomework = {
-                    store.dispatchEvent(OverviewEvent.SkipHomework(it))
-                },
-                onRepeatHomework = {
-                    store.dispatchEvent(OverviewEvent.RepeatHomework(it))
-                },
-                onShareHomeworks = {
-                    store.dispatchEvent(OverviewEvent.ShareHomeworks(it))
-                },
-                onSelectGoalsDate = {
-                    store.dispatchEvent(OverviewEvent.SelectedGoalsDate(it))
-                },
-                onChangeGoalNumbers = {
-                    store.dispatchEvent(OverviewEvent.SetNewGoalNumbers(it))
-                },
-                onCompleteGoal = {
-                    store.dispatchEvent(OverviewEvent.CompleteGoal(it))
-                },
-                onDeleteGoal = {
-                    store.dispatchEvent(OverviewEvent.DeleteGoal(it))
-                },
-                onStartGoalTimeClick = {
-                    store.dispatchEvent(OverviewEvent.ClickStartGoalTime(it))
-                },
-                onPauseGoalTimeClick = {
-                    store.dispatchEvent(OverviewEvent.ClickPauseGoalTime(it))
-                },
-                onResetGoalTimeClick = {
-                    store.dispatchEvent(OverviewEvent.ClickResetGoalTime(it))
-                },
-                onChangeGoalTimeType = { type, goal ->
-                    store.dispatchEvent(OverviewEvent.ChangeGoalTimeType(goal, type))
-                },
-                onChangeGoalDesiredTime = { time, goal ->
-                    store.dispatchEvent(OverviewEvent.ChangeGoalDesiredTime(goal, time))
-                },
-                onScheduleGoal = {
-                    store.dispatchEvent(OverviewEvent.ScheduleGoal(it))
-                },
-                onShowAllTodoClick = {
-                    store.dispatchEvent(OverviewEvent.ClickShowAllTodo)
-                },
-                onEditTodoClick = {
-                    store.dispatchEvent(OverviewEvent.ClickEditTodo(it))
-                },
-                onChangeTodoDone = { task, done ->
-                    store.dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
-                },
-            )
-        },
         topBar = {
             if (layoutMode == OverviewLayoutMode.EXPANDED) {
                 OverviewExpandedTopBar(
@@ -221,7 +152,6 @@ internal fun OverviewContent(
                         OverviewTasksTab.HOMEWORKS -> {
                             store.dispatchEvent(OverviewEvent.AddHomeworkInEditor)
                         }
-
                         OverviewTasksTab.TODO -> {
                             store.dispatchEvent(OverviewEvent.ClickEditTodo(null))
                         }
@@ -244,7 +174,75 @@ internal fun OverviewContent(
             )
         },
         contentWindowInsets = WindowInsets.statusBars,
-    )
+    ) { paddingValues ->
+        BaseOverviewContent(
+            state = state,
+            modifier = Modifier.padding(paddingValues),
+            layoutMode = layoutMode,
+            overviewTasksTab = overviewTasksTab.value,
+            onChangeTab = { overviewTasksTab.value = it },
+            onEditHomeworkClick = {
+                store.dispatchEvent(OverviewEvent.ClickEditHomework(it))
+            },
+            onShowAllSharedHomeworksClick = {
+                store.dispatchEvent(OverviewEvent.ClickShowAllSharedHomeworks)
+            },
+            onHomeworkClick = {
+                store.dispatchEvent(OverviewEvent.ClickHomework(it))
+            },
+            onDoHomework = {
+                store.dispatchEvent(OverviewEvent.DoHomework(it))
+            },
+            onSkipHomework = {
+                store.dispatchEvent(OverviewEvent.SkipHomework(it))
+            },
+            onRepeatHomework = {
+                store.dispatchEvent(OverviewEvent.RepeatHomework(it))
+            },
+            onShareHomeworks = {
+                store.dispatchEvent(OverviewEvent.ShareHomeworks(it))
+            },
+            onSelectGoalsDate = {
+                store.dispatchEvent(OverviewEvent.SelectedGoalsDate(it))
+            },
+            onChangeGoalNumbers = {
+                store.dispatchEvent(OverviewEvent.SetNewGoalNumbers(it))
+            },
+            onCompleteGoal = {
+                store.dispatchEvent(OverviewEvent.CompleteGoal(it))
+            },
+            onDeleteGoal = {
+                store.dispatchEvent(OverviewEvent.DeleteGoal(it))
+            },
+            onStartGoalTimeClick = {
+                store.dispatchEvent(OverviewEvent.ClickStartGoalTime(it))
+            },
+            onPauseGoalTimeClick = {
+                store.dispatchEvent(OverviewEvent.ClickPauseGoalTime(it))
+            },
+            onResetGoalTimeClick = {
+                store.dispatchEvent(OverviewEvent.ClickResetGoalTime(it))
+            },
+            onChangeGoalTimeType = { type, goal ->
+                store.dispatchEvent(OverviewEvent.ChangeGoalTimeType(goal, type))
+            },
+            onChangeGoalDesiredTime = { time, goal ->
+                store.dispatchEvent(OverviewEvent.ChangeGoalDesiredTime(goal, time))
+            },
+            onScheduleGoal = {
+                store.dispatchEvent(OverviewEvent.ScheduleGoal(it))
+            },
+            onShowAllTodoClick = {
+                store.dispatchEvent(OverviewEvent.ClickShowAllTodo)
+            },
+            onEditTodoClick = {
+                store.dispatchEvent(OverviewEvent.ClickEditTodo(it))
+            },
+            onChangeTodoDone = { task, done ->
+                store.dispatchEvent(OverviewEvent.UpdateTodoDone(task, done))
+            },
+        )
+    }
 
     state.homeworkShareLink?.let { link ->
         val clipboard = LocalClipboardManager.current
@@ -323,7 +321,7 @@ private fun BaseOverviewContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         DailyGoalsSection(
-            isLoadingGoals = false,
+            isLoadingGoals = state.isLoadingGoals,
             layoutMode = layoutMode,
             currentDate = state.currentDate,
             selectedGoalsDate = state.selectedGoalsDate,

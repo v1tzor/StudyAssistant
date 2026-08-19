@@ -322,7 +322,7 @@ fun Long.toShortTimeString(): String {
     val seconds = this.toSeconds() - this.toMinutes() * Date.SECONDS_IN_MINUTE
 
     return buildString {
-        append(hours.toString().padStart(2, '0'))
+        append(hours.toString().padStart(1, '0'))
         append(':')
         append(minutes.toString().padStart(2, '0'))
         append(':')

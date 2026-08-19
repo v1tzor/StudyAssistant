@@ -63,15 +63,8 @@ internal interface GoalWorkProcessor :
             is GoalWorkCommand.StartGoalTime -> startGoalTimeWork(command.goal)
             is GoalWorkCommand.PauseGoalTime -> pauseGoalTimeWork(command.goal)
             is GoalWorkCommand.ResetGoalTime -> resetGoalTimeWork(command.goal)
-            is GoalWorkCommand.ChangeGoalTimeType -> changeGoalTimeTypeWork(
-                command.goal,
-                command.type
-            )
-
-            is GoalWorkCommand.ChangeGoalDesiredTime -> changeGoalDesiredTimeWork(
-                command.goal,
-                command.time
-            )
+            is GoalWorkCommand.ChangeGoalTimeType -> changeGoalTimeTypeWork(command.goal, command.type)
+            is GoalWorkCommand.ChangeGoalDesiredTime -> changeGoalDesiredTimeWork(command.goal, command.time)
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)

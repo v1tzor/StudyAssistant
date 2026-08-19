@@ -39,9 +39,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +78,6 @@ internal fun OverviewClassesSection(
     schedule: ScheduleDetailsUi?,
     activeClass: ActiveClassUi?,
     contentMaxWidth: Dp? = null,
-    showBottomSpacer: Boolean = true,
     onAddHomeworkClick: (ClassDetailsUi, Instant) -> Unit,
     onEditHomeworkClick: (HomeworkDetailsUi) -> Unit,
     onAgainHomeworkClick: (HomeworkDetailsUi) -> Unit,
@@ -89,6 +90,8 @@ internal fun OverviewClassesSection(
     ) { loading ->
         if (!loading && schedule != null) {
             val classes = remember(schedule) { schedule.classes }
+            var isShowedActiveClass by rememberSaveable { mutableStateOf(false) }
+
             if (classes.isNotEmpty()) {
                 val classListState = rememberLazyListState()
                 Box(
@@ -148,8 +151,16 @@ internal fun OverviewClassesSection(
                                 )
                             }
                         }
-                        if (showBottomSpacer) {
-                            item { Spacer(modifier = Modifier.height(60.dp)) }
+                        item { Spacer(modifier = Modifier.height(60.dp)) }
+                    }
+                }
+
+                LaunchedEffect(isShowedActiveClass) {
+                    if (!isShowedActiveClass) {
+                        val index = classes.indexOfFirst { it.uid == activeClass?.uid }
+                        if (index != -1) {
+                            classListState.animateScrollToItem(index)
+                            isShowedActiveClass = true
                         }
                     }
                 }

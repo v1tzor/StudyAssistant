@@ -57,6 +57,7 @@ import ru.aleshin.studyassistant.analytics.impl.resources.analytics_goals_durati
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_goals_title
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_overdue
 import ru.aleshin.studyassistant.analytics.impl.resources.analytics_planned
+import kotlin.math.abs
 
 /**
  * @author Stanislav Aleshin on 09.08.2026.
@@ -97,10 +98,7 @@ internal fun AnalyticsGoalsProgressCard(
             ) {
                 CircularProgressIndicator(
                     progress = {
-                        distribution.completionRate
-                            ?.takeIf { it.isFinite() }
-                            ?.coerceIn(0f, 1f)
-                            ?: 0f
+                        distribution.completionRate?.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 0f
                     },
                     modifier = Modifier.size(104.dp),
                     strokeWidth = 10.dp,
@@ -186,8 +184,7 @@ internal fun AnalyticsGoalsDurationCard(
                     icon = Icons.Default.Timer,
                     label = stringResource(Res.string.analytics_actual_time),
                     value = formatAnalyticsDuration(distribution.actualDuration),
-                    supportingText = stringResource(Res.string.analytics_active_timer)
-                        .takeIf { distribution.hasActiveTimer },
+                    supportingText = stringResource(Res.string.analytics_active_timer).takeIf { distribution.hasActiveTimer },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -197,8 +194,8 @@ internal fun AnalyticsGoalsDurationCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val progress = remember(distribution) {
-                    (distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L))
-                        .coerceIn(0f, 1f)
+                    val ratio = distribution.actualDuration.toFloat() / distribution.desiredDuration.coerceAtLeast(1L)
+                    (1f - abs(1f - ratio)).coerceIn(0f, 1f)
                 }
                 LinearProgressIndicator(
                     modifier = Modifier.weight(1f),
