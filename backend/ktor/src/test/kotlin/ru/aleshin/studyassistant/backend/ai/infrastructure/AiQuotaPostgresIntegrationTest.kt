@@ -369,7 +369,7 @@ class AiQuotaPostgresIntegrationTest {
 
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repeat(11) { index ->
+        repeat(9) { index ->
             repository.reserve(
                 installationHash = installationHash,
                 messageId = UUID.randomUUID(),
@@ -422,7 +422,7 @@ class AiQuotaPostgresIntegrationTest {
             .single()
 
         assertEquals(
-            expected = 12,
+            expected = 10,
             actual = reserved.quota.used,
         )
     }
@@ -465,8 +465,8 @@ class AiQuotaPostgresIntegrationTest {
                 ),
             )
 
-            assertEquals(12, completion.quota?.remaining)
-            assertEquals(2 - rewardIndex, completion.quota?.rewardedResetsRemaining)
+            assertEquals(10, completion.quota?.remaining)
+            assertEquals(1 - rewardIndex, completion.quota?.rewardedResetsRemaining)
 
             repeat(config.rewardedMessageAmount) { index ->
                 check(
@@ -546,7 +546,7 @@ class AiQuotaPostgresIntegrationTest {
         val installationHash = randomHash()
         val now = Instant.parse("2026-08-11T18:00:00Z")
 
-        repeat(12) { index ->
+        repeat(10) { index ->
             check(
                 repository.reserve(
                     installationHash = installationHash,
@@ -565,7 +565,7 @@ class AiQuotaPostgresIntegrationTest {
         )
 
         transaction(db = databaseFactory.database) {
-            assertEquals(12L, RateLimitEventsTable.selectAll().count())
+            assertEquals(10L, RateLimitEventsTable.selectAll().count())
         }
     }
 
@@ -829,9 +829,9 @@ class AiQuotaPostgresIntegrationTest {
         maxConcurrentExecutionsPerInstallation: Int = 100,
     ): AiConfig {
         return AiConfig(
-            dailyMessageLimit = 12,
-            rewardedMessageAmount = 12,
-            maxRewardedResetsPerDay = 3,
+            dailyMessageLimit = 10,
+            rewardedMessageAmount = 10,
+            maxRewardedResetsPerDay = 2,
             rewardChallengeLifetime = Duration.ofMinutes(15),
             globalDailyExecutionLimit = globalDailyExecutionLimit,
             executionLimit = 30,

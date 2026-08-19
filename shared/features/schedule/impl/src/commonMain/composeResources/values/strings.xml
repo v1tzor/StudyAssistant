@@ -112,7 +112,7 @@
     <string name="schedule_import_invalid_image_error">Choose a valid JPEG, PNG, WebP, HEIC, or AVIF image.</string>
     <string name="schedule_import_image_too_large_error">The image is too large. Choose a file up to 20 MB.</string>
     <string name="schedule_import_server_error">Schedule recognition is temporarily unavailable.</string>
-    <string name="schedule_import_title">Import schedule</string>
+    <string name="schedule_import_title">Import schedule (Beta)</string>
     <string name="schedule_import_source_title">Import from a photo</string>
     <string name="schedule_import_source_description">Take or choose a timetable photo, pick your organization, and add a short group hint if the photo contains several classes.</string>
     <string name="schedule_import_gallery_button">Choose a photo</string>

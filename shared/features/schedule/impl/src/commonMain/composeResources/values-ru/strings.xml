@@ -112,9 +112,9 @@
     <string name="schedule_import_invalid_image_error">Выберите корректное изображение JPEG, PNG, WebP, HEIC или AVIF.</string>
     <string name="schedule_import_image_too_large_error">Изображение слишком большое. Выберите файл размером до 20 МБ.</string>
     <string name="schedule_import_server_error">Распознавание расписания временно недоступно.</string>
-    <string name="schedule_import_title">Импорт расписания</string>
+    <string name="schedule_import_title">Импорт расписания (Beta)</string>
     <string name="schedule_import_source_title">Импорт по фото</string>
-    <string name="schedule_import_source_description">Сделайте или выберите фото расписания, укажите организацию и добавьте краткую пометку группы, если на фото несколько классов.</string>
+    <string name="schedule_import_source_description">Сделайте или выберите фото расписания, укажите организацию и добавьте краткую пометку группы, если на фото несколько классов (Возможны ошибки).</string>
     <string name="schedule_import_gallery_button">Выбрать фотографию</string>
     <string name="schedule_import_camera_button">Сделать фотографию</string>
     <string name="schedule_import_photo_selected">Фото готово к импорту</string>

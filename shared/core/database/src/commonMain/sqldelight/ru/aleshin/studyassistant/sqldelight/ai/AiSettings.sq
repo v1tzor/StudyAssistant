@@ -13,7 +13,7 @@ INSERT INTO aiSettingsEntity (
   rewarded_resets_remaining,
   quota_reset_at
 )
-VALUES (1, 12, 12, 3, NULL);
+VALUES (1, 10, 10, 2, NULL);
 
 fetchSettings:
 SELECT *

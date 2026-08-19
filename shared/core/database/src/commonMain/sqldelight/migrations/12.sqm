@@ -15,9 +15,9 @@ INSERT INTO aiSettingsEntity_new (
 )
 SELECT
   id,
-  MIN(quota_remaining, 12),
-  12,
-  3,
+  MIN(quota_remaining, 10),
+  10,
+  2,
   quota_reset_at
 FROM aiSettingsEntity;
 

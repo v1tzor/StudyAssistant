@@ -33,15 +33,15 @@ class AiSettingsMigrationTest {
     @Test
     fun migrationClampsLegacyQuotaAndAddsRewardLimits() {
         val driver = JdbcSqliteDriver(IN_MEMORY)
-        driver.createVersionTwelveTable()
-        driver.insertVersionTwelveSettings(quotaRemaining = 19, quotaResetAt = 123L)
+        driver.createVersionElevenTable()
+        driver.insertVersionElevenSettings(quotaRemaining = 19, quotaResetAt = 123L)
 
-        runBlocking { Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).await() }
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 11, newVersion = 12).await() }
 
         val settings = runBlocking { AiSettingsQueries(driver).fetchSettings().awaitAsOne() }
-        assertEquals(12L, settings.quota_remaining)
-        assertEquals(12L, settings.quota_limit)
-        assertEquals(3L, settings.rewarded_resets_remaining)
+        assertEquals(10L, settings.quota_remaining)
+        assertEquals(10L, settings.quota_limit)
+        assertEquals(2L, settings.rewarded_resets_remaining)
         assertEquals(123L, settings.quota_reset_at)
         driver.close()
     }
@@ -49,20 +49,20 @@ class AiSettingsMigrationTest {
     @Test
     fun migrationPreservesLegacyQuotaBelowNewLimit() {
         val driver = JdbcSqliteDriver(IN_MEMORY)
-        driver.createVersionTwelveTable()
-        driver.insertVersionTwelveSettings(quotaRemaining = 5, quotaResetAt = null)
+        driver.createVersionElevenTable()
+        driver.insertVersionElevenSettings(quotaRemaining = 5, quotaResetAt = null)
 
-        runBlocking { Database.Schema.migrate(driver, oldVersion = 12, newVersion = 13).await() }
+        runBlocking { Database.Schema.migrate(driver, oldVersion = 11, newVersion = 12).await() }
 
         val settings = runBlocking { AiSettingsQueries(driver).fetchSettings().awaitAsOne() }
         assertEquals(5L, settings.quota_remaining)
-        assertEquals(12L, settings.quota_limit)
-        assertEquals(3L, settings.rewarded_resets_remaining)
+        assertEquals(10L, settings.quota_limit)
+        assertEquals(2L, settings.rewarded_resets_remaining)
         assertEquals(null, settings.quota_reset_at)
         driver.close()
     }
 
-    private fun JdbcSqliteDriver.createVersionTwelveTable() {
+    private fun JdbcSqliteDriver.createVersionElevenTable() {
         execute(
             identifier = null,
             sql = """
@@ -76,7 +76,7 @@ class AiSettingsMigrationTest {
         ).value
     }
 
-    private fun JdbcSqliteDriver.insertVersionTwelveSettings(
+    private fun JdbcSqliteDriver.insertVersionElevenSettings(
         quotaRemaining: Long,
         quotaResetAt: Long?,
     ) {

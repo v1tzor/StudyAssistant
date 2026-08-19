@@ -209,9 +209,9 @@ class AiCompletionRoutesTest {
         val cachedResponse = AiCompletionResponseDto(
             message = AiCompletionMessageDto(content = "Recovered response"),
             finishReason = AiFinishReasonDto.STOP,
-            quotaRemaining = 11,
-            quotaLimit = 12,
-            rewardedResetsRemaining = 3,
+            quotaRemaining = 9,
+            quotaLimit = 10,
+            rewardedResetsRemaining = 2,
             quotaResetAt = Instant.parse("2026-08-13T00:00:00Z").toEpochMilli(),
         )
         val encrypted = cipher.encrypt(
@@ -328,7 +328,7 @@ class AiCompletionRoutesTest {
         ): AiQuotaReservationResult {
             reserveCalls++
             return reservationResult ?: AiQuotaReservationResult.Reserved(
-                quota = AiQuota(used = 1, limit = 12, rewardedResetsRemaining = 3),
+                quota = AiQuota(used = 1, limit = 10, rewardedResetsRemaining = 2),
                 resetAt = Instant.parse("2026-08-13T00:00:00Z"),
                 isNewMessage = true,
                 reservationGeneration = 1,
