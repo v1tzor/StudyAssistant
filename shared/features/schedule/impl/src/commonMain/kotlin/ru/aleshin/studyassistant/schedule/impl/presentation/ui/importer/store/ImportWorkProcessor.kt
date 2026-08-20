@@ -107,23 +107,9 @@ internal interface ImportWorkProcessor :
                 },
             )
         }.onStart {
-            emit(
-                ActionResult(
-                    ImportAction.UpdateAnalysisProgress(
-                        isLoading = true,
-                        startedAt = Clock.System.now().toEpochMilliseconds(),
-                    )
-                )
-            )
+            emit(ActionResult(ImportAction.UpdateAnalysisProgress(isLoading = true, startedAt = Clock.System.now().toEpochMilliseconds())))
         }.onCompletion {
-            emit(
-                ActionResult(
-                    ImportAction.UpdateAnalysisProgress(
-                        isLoading = false,
-                        startedAt = null,
-                    )
-                )
-            )
+            emit(ActionResult(ImportAction.UpdateAnalysisProgress(isLoading = false, startedAt = null)))
         }
 
         private fun prepareImportRewardWork(

@@ -39,7 +39,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -57,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -79,7 +79,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Numb
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
-import ru.aleshin.studyassistant.schedule.impl.resources.ic_swap_horiz
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_add_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_cancel_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
@@ -110,7 +109,6 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_subjects_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_title
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_swap_days
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teachers_title
 import ru.aleshin.studyassistant.schedule.impl.resources.shared_schedule_header
 import kotlin.time.Clock
@@ -247,6 +245,7 @@ internal fun ImportLoadingSection(
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                     )
                 }
@@ -282,7 +281,6 @@ internal fun ImportReviewSection(
     horizontalPadding: Dp = 16.dp,
     useSplitCatalogs: Boolean = false,
     onClassClick: (UID) -> Unit,
-    onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onSubjectClick: (UID) -> Unit,
     onTeacherClick: (UID) -> Unit,
     onAddSubject: () -> Unit,
@@ -330,11 +328,7 @@ internal fun ImportReviewSection(
     ) {
         item(key = REVIEW_HEADER_KEY) {
             Column(
-                modifier = Modifier.padding(
-                    start = horizontalPadding,
-                    top = 16.dp,
-                    end = horizontalPadding,
-                ),
+                modifier = Modifier.padding(start = horizontalPadding, top = 16.dp, end = horizontalPadding),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
@@ -356,13 +350,14 @@ internal fun ImportReviewSection(
         }
         item(key = WEEK_SECTION_KEY) {
             ImportWeekSection(
-                classes = session.classes.filter(ScheduleImportClassUi::included),
+                classes = remember(session.classes) {
+                    session.classes.filter(ScheduleImportClassUi::included)
+                },
                 subjects = session.subjects,
                 employees = session.employees,
                 maxNumberOfWeek = maxNumberOfWeek,
                 horizontalPadding = horizontalPadding,
                 onClassClick = onClassClick,
-                onReorderDayClasses = onReorderDayClasses,
                 onAddClass = onAddClass,
                 onUpdateStartOfDay = onUpdateStartOfDay,
                 onUpdateClassesDuration = onUpdateClassesDuration,
@@ -436,7 +431,6 @@ internal fun ImportWeekSection(
     maxNumberOfWeek: Int,
     horizontalPadding: Dp = 16.dp,
     onClassClick: (UID) -> Unit,
-    onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onAddClass: (Int, Int) -> Unit,
     onUpdateStartOfDay: (Int, Int, String) -> Unit,
     onUpdateClassesDuration: (Int, Int, Long, List<Pair<Int, Long>>) -> Unit,
@@ -469,13 +463,6 @@ internal fun ImportWeekSection(
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { swapDialogOpen = true }) {
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    painter = painterResource(Res.drawable.ic_swap_horiz),
-                    contentDescription = stringResource(Res.string.schedule_import_swap_days),
-                )
-            }
             ScheduleWeekChip(
                 selected = NumberOfWeekItem.valueOf(selectedWeek),
                 maxNumberOfWeek = maxNumberOfWeek,
@@ -486,9 +473,8 @@ internal fun ImportWeekSection(
             )
         }
         ImportFastEditBar(
-            selectedDay = selectedDay,
             dayClasses = selectedDayClasses,
-            onSelectDay = { day -> selectedDay = day },
+            onSwapDaysClick = { swapDialogOpen = true },
             onUpdateStartOfDay = { startTime ->
                 onUpdateStartOfDay(selectedWeek, selectedDay, startTime)
             },
@@ -518,10 +504,7 @@ internal fun ImportWeekSection(
                     subjects = subjects,
                     employees = employees,
                     onSelect = { selectedDay = dayOfWeek.isoDayNumber },
-                    onClassClick = onClassClick,
-                    onReorderClasses = { orderedIds ->
-                        onReorderDayClasses(dayOfWeek.isoDayNumber, selectedWeek, orderedIds)
-                    },
+                    onClassClick = onClassClick
                 )
             }
         }

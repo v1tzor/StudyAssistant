@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.isoDayNumber
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -129,6 +130,9 @@ internal fun ImportClassEditorSheet(
     val selectedSubject = subjects.firstOrNull { subject -> subject.uid == editable.subjectId }
     val selectedTeacher = employees.firstOrNull { employee -> employee.uid == editable.teacherId }
     val selectedDay = DayOfWeek.entries.firstOrNull { day -> day.isoDayNumber == editable.dayOfWeek }
+    val isTimeRangeValid = remember(editable.startTime, editable.endTime) {
+        isClassTimeRangeValid(editable.startTime, editable.endTime)
+    }
     val newSubjectName = stringResource(Res.string.schedule_import_new_subject_name)
     val newTeacherName = stringResource(Res.string.schedule_import_new_teacher_name)
     val sheetContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -269,6 +273,7 @@ internal fun ImportClassEditorSheet(
                 }
                 Button(
                     modifier = Modifier.weight(1f),
+                    enabled = isTimeRangeValid,
                     onClick = {
                         onConfirm(editable.copy(location = editable.location?.trim()?.takeIf(String::isNotEmpty)))
                     },
@@ -361,7 +366,15 @@ internal fun ImportClassEditorSheet(
             initTime = clockInstant(editable.startTime),
             onDismiss = { isStartPickerOpen = false },
             onConfirmTime = { instant ->
-                editable = editable.copy(startTime = formatClock(instant))
+                val startTime = formatClock(instant)
+                editable = editable.copy(
+                    startTime = startTime,
+                    endTime = endKeepingDuration(
+                        previousStart = editable.startTime,
+                        previousEnd = editable.endTime,
+                        newStart = startTime,
+                    ),
+                )
                 isStartPickerOpen = false
             },
         )
@@ -422,15 +435,53 @@ internal fun ImportEntitySelectorSheet(
 }
 
 private fun clockInstant(value: String): kotlin.time.Instant? {
-    val parts = value.split(':')
-    val hour = parts.getOrNull(0)?.toIntOrNull() ?: return null
-    val minute = parts.getOrNull(1)?.toIntOrNull() ?: return null
-    return Clock.System.now().setHoursAndMinutes(hour, minute)
+    val time = parseClock(value) ?: return null
+    return Clock.System.now().setHoursAndMinutes(time)
 }
 
 private fun formatClock(instant: kotlin.time.Instant): String {
-    val time = instant.dateTime().time
-    val hours = time.hour.toString().padStart(2, '0')
-    val minutes = time.minute.toString().padStart(2, '0')
+    return instant.dateTime().time.formatClock()
+}
+
+private fun endKeepingDuration(
+    previousStart: String,
+    previousEnd: String,
+    newStart: String,
+): String {
+    val from = parseClock(previousStart) ?: return previousEnd
+    val to = parseClock(previousEnd) ?: return previousEnd
+    val start = parseClock(newStart) ?: return previousEnd
+    val durationMinutes = to.toMinutes() - from.toMinutes()
+    if (durationMinutes <= 0) return previousEnd
+    val endMinutes = start.toMinutes() + durationMinutes
+    if (endMinutes !in 1 until MINUTES_IN_DAY) return previousEnd
+    return minutesToClock(endMinutes)
+}
+
+private fun isClassTimeRangeValid(startTime: String, endTime: String): Boolean {
+    val start = parseClock(startTime) ?: return false
+    val end = parseClock(endTime) ?: return false
+    return start < end
+}
+
+private fun parseClock(value: String): LocalTime? {
+    val raw = value.trim().replace('.', ':')
+    if (raw.isEmpty()) return null
+    val parts = raw.split(':')
+    if (parts.size !in 2..3) return null
+    val hour = parts[0].toIntOrNull() ?: return null
+    val minute = parts[1].toIntOrNull() ?: return null
+    return runCatching { LocalTime(hour, minute) }.getOrNull()
+}
+
+private fun LocalTime.toMinutes(): Int = hour * 60 + minute
+
+private fun LocalTime.formatClock(): String = minutesToClock(toMinutes())
+
+private fun minutesToClock(total: Int): String {
+    val hours = (total / 60).toString().padStart(2, '0')
+    val minutes = (total % 60).toString().padStart(2, '0')
     return "$hours:$minutes"
 }
+
+private const val MINUTES_IN_DAY = 24 * 60

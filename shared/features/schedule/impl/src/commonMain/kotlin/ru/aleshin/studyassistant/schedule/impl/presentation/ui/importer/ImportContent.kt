@@ -145,9 +145,6 @@ internal fun ImportContent(
             onExtract = { store.dispatchEvent(ImportEvent.ExtractDraft) },
             onCancelExtract = { store.dispatchEvent(ImportEvent.CancelExtract) },
             onClassClick = { classId -> editingClassId = classId },
-            onReorderDayClasses = { dayOfWeek, repeatWeek, orderedIds ->
-                store.dispatchEvent(ImportEvent.ReorderDayClasses(dayOfWeek, repeatWeek, orderedIds))
-            },
             onSubjectClick = { subjectId -> editingSubjectId = subjectId },
             onTeacherClick = { employeeId -> editingEmployeeId = employeeId },
             onAddSubject = {

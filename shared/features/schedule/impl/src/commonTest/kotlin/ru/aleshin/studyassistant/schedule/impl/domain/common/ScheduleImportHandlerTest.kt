@@ -255,6 +255,66 @@ internal class ScheduleImportHandlerTest {
     }
 
     @Test
+    fun updateClassSortsDayByStartTime() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", classNumber = 1),
+                    entry(subject = "PE", startTime = "08:50", endTime = "09:30", classNumber = 2),
+                    entry(subject = "History", startTime = "09:50", endTime = "10:30", classNumber = 3),
+                ),
+            ),
+            organization = organization(),
+        )
+        val history = session.classes.first { classModel ->
+            subjectName(session, classModel) == "History"
+        }
+
+        val updated = composer.updateClass(
+            session = session,
+            classModel = history.copy(startTime = "07:30", endTime = "08:10"),
+        )
+
+        val monday = updated.classes.filter { classModel -> classModel.dayOfWeek == 1 }
+        assertEquals(
+            listOf("History", "Math", "PE"),
+            monday.map { classModel -> subjectName(updated, classModel) },
+        )
+        assertEquals(listOf("07:30", "08:00", "08:50"), monday.map { classModel -> classModel.startTime })
+    }
+
+    @Test
+    fun updateClassMovesLessonToSelectedWeekdayInTimeOrder() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 1),
+                    entry(subject = "PE", startTime = "08:50", endTime = "09:30", classNumber = 2, dayOfWeek = 1),
+                    entry(subject = "History", startTime = "09:50", endTime = "10:30", classNumber = 1, dayOfWeek = 2),
+                ),
+            ),
+            organization = organization(),
+        )
+        val history = session.classes.first { classModel ->
+            subjectName(session, classModel) == "History"
+        }
+
+        val updated = composer.updateClass(
+            session = session,
+            classModel = history.copy(dayOfWeek = 1, startTime = "08:20", endTime = "09:00"),
+        )
+
+        val monday = updated.classes.filter { classModel -> classModel.dayOfWeek == 1 }
+        assertEquals(
+            listOf("Math", "History", "PE"),
+            monday.map { classModel -> subjectName(updated, classModel) },
+        )
+        assertTrue(updated.classes.none { classModel -> classModel.dayOfWeek == 2 })
+    }
+
+    @Test
     fun addClassAppendsLessonOnSelectedDay() {
         val session = composer.handleDraft(
             draft = ScheduleImportDraft(

@@ -42,8 +42,8 @@ internal class ScheduleImportTimeNormalizer(
             compareBy(
                 ScheduleImportClass::repeatWeek,
                 ScheduleImportClass::dayOfWeek,
+                { classModel -> classModel.startTime.ifBlank { LAST_CLOCK } },
                 { classModel -> classModel.number ?: Int.MAX_VALUE },
-                ScheduleImportClass::startTime,
             )
         )
     }
@@ -262,6 +262,7 @@ internal class ScheduleImportTimeNormalizer(
     }
 
     private companion object {
+        const val LAST_CLOCK = "99:99"
         const val MEGA_SPAN_MINUTES = 90
         const val DEFAULT_CLASS_MINUTES = 45
         const val DEFAULT_BREAK_MINUTES = 10

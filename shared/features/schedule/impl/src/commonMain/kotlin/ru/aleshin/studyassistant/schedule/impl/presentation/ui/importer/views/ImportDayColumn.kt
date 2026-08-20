@@ -60,16 +60,11 @@ internal fun ImportDayColumn(
     employees: List<EmployeeUi>,
     onSelect: () -> Unit,
     onClassClick: (UID) -> Unit,
-    onReorderClasses: (List<UID>) -> Unit,
 ) {
     Surface(
         modifier = modifier.size(176.dp, 320.dp),
         shape = MaterialTheme.shapes.large,
-        color = if (selected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerLow
-        },
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         border = if (selected) {
             BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         } else {
@@ -81,20 +76,12 @@ internal fun ImportDayColumn(
                 onClick = onSelect,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainer
-                },
+                color = MaterialTheme.colorScheme.surfaceContainer,
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                     text = dayOfWeek.mapToSting(),
-                    color = if (selected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmall,

@@ -72,6 +72,9 @@ internal fun ImportTopBar(
                 Spacer(modifier = Modifier.size(48.dp))
             }
         },
+        actions = {
+            Spacer(modifier = Modifier.size(48.dp))
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ),

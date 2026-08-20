@@ -18,7 +18,6 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -26,8 +25,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.isoDayNumber
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
@@ -47,10 +45,12 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.Imp
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.ic_break
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_swap_horiz
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_fast_edit_add_class
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_fast_edit_breaks
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_fast_edit_classes
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_fast_edit_start
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_swap_days
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 import ru.aleshin.studyassistant.core.ui.resources.friday_short_title as core_friday_short_title
 import ru.aleshin.studyassistant.core.ui.resources.ic_class as core_ic_class
@@ -68,90 +68,80 @@ import ru.aleshin.studyassistant.core.ui.resources.wednesday_short_title as core
 @Composable
 internal fun ImportFastEditBar(
     modifier: Modifier = Modifier,
-    selectedDay: Int,
     dayClasses: List<ScheduleImportClassUi>,
-    onSelectDay: (Int) -> Unit,
     onUpdateStartOfDay: (String) -> Unit,
     onUpdateClassesDuration: (Millis, List<Pair<Int, Long>>) -> Unit,
     onUpdateBreaksDuration: (Millis, List<Pair<Int, Long>>) -> Unit,
     onAddClass: () -> Unit,
+    onSwapDaysClick: () -> Unit,
 ) {
     var startDialogOpen by remember { mutableStateOf(false) }
     var classesDialogOpen by remember { mutableStateOf(false) }
     var breaksDialogOpen by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        IconButton(
+            modifier = Modifier.size(32.dp),
+            onClick = onSwapDaysClick
         ) {
-            DayOfWeek.entries.forEach { dayOfWeek ->
-                FilterChip(
-                    selected = dayOfWeek.isoDayNumber == selectedDay,
-                    onClick = { onSelectDay(dayOfWeek.isoDayNumber) },
-                    label = { Text(text = dayOfWeek.mapToShortTitle()) },
+            Icon(
+                modifier = Modifier.size(18.dp),
+                painter = painterResource(Res.drawable.ic_swap_horiz),
+                contentDescription = stringResource(Res.string.schedule_import_swap_days),
+            )
+        }
+        AssistChip(
+            onClick = { startDialogOpen = true },
+            enabled = dayClasses.isNotEmpty(),
+            label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_start)) },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
+                    contentDescription = null,
                 )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            AssistChip(
-                onClick = { startDialogOpen = true },
-                enabled = dayClasses.isNotEmpty(),
-                label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_start)) },
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(CoreRes.drawable.core_ic_clock_outline),
-                        contentDescription = null,
-                    )
-                },
-            )
-            AssistChip(
-                onClick = { classesDialogOpen = true },
-                enabled = dayClasses.isNotEmpty(),
-                label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_classes)) },
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(CoreRes.drawable.core_ic_class),
-                        contentDescription = null,
-                    )
-                },
-            )
-            AssistChip(
-                onClick = { breaksDialogOpen = true },
-                enabled = dayClasses.size > 1,
-                label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_breaks)) },
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(Res.drawable.ic_break),
-                        contentDescription = null,
-                    )
-                },
-            )
-            AssistChip(
-                onClick = onAddClass,
-                label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_add_class)) },
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                    )
-                },
-            )
-        }
+            },
+        )
+        AssistChip(
+            onClick = { classesDialogOpen = true },
+            enabled = dayClasses.isNotEmpty(),
+            label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_classes)) },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(CoreRes.drawable.core_ic_class),
+                    contentDescription = null,
+                )
+            },
+        )
+        AssistChip(
+            onClick = { breaksDialogOpen = true },
+            enabled = dayClasses.size > 1,
+            label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_breaks)) },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(Res.drawable.ic_break),
+                    contentDescription = null,
+                )
+            },
+        )
+        AssistChip(
+            onClick = onAddClass,
+            label = { Text(text = stringResource(Res.string.schedule_import_fast_edit_add_class)) },
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null,
+                )
+            },
+        )
     }
 
     if (startDialogOpen) {

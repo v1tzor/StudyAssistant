@@ -195,7 +195,7 @@ internal interface ScheduleImportHandler {
             session: ScheduleImportSession,
             classModel: ScheduleImportClass,
         ): ScheduleImportSession {
-            return session.copy(
+            return session.withNormalizedClasses(
                 classes = session.classes.map { item ->
                     if (item.uid == classModel.uid) classModel else item
                 },
@@ -254,7 +254,7 @@ internal interface ScheduleImportHandler {
             session: ScheduleImportSession,
             classId: UID,
         ): ScheduleImportSession {
-            return session.copy(
+            return session.withNormalizedClasses(
                 classes = session.classes.filter { classModel -> classModel.uid != classId },
             )
         }
@@ -341,7 +341,7 @@ internal interface ScheduleImportHandler {
                 eventType = last?.eventType ?: EventType.LESSON,
                 included = true,
             )
-            return session.copy(classes = session.classes + created)
+            return session.withNormalizedClasses(classes = session.classes + created)
         }
 
         override fun updateStartOfDay(
@@ -472,7 +472,7 @@ internal interface ScheduleImportHandler {
         ): ScheduleImportSession {
             if (firstDay == secondDay) return session
             if (firstDay !in 1..7 || secondDay !in 1..7) return session
-            return session.copy(
+            return session.withNormalizedClasses(
                 classes = session.classes.map { classModel ->
                     if (classModel.repeatWeek != repeatWeek) {
                         classModel
@@ -483,6 +483,12 @@ internal interface ScheduleImportHandler {
                     }
                 },
             )
+        }
+
+        private fun ScheduleImportSession.withNormalizedClasses(
+            classes: List<ScheduleImportClass>,
+        ): ScheduleImportSession {
+            return copy(classes = timeNormalizer.normalize(classes))
         }
 
         override fun mergeOrganizationPlaces(
