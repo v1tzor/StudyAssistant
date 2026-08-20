@@ -71,7 +71,7 @@ data class OpenRouterConfig(
         const val DEFAULT_SOCKS_HOST = "127.0.0.1"
         const val DEFAULT_SOCKS_PORT = 10_808
 
-        const val MODEL = "qwen/qwen3-vl-32b-instruct"
+        const val MODEL = "xiaomi/mimo-v2.5"
 
         fun from(
             applicationConfig: ApplicationConfig,
