@@ -32,6 +32,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -275,10 +279,17 @@ private fun OrganizationsExpandedEmployeesSection(
             onMoreClick = onShowAllEmployee,
         )
         if (isLoading) {
-            OrganizationsExpandedCardGrid(columns = 2) {
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxWidth().height(ORGANIZATIONS_EXPANDED_EMPLOYEE_GRID_HEIGHT),
+                horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+            ) {
                 items(Placeholder.SHORT_EMPLOYEES) {
                     PlaceholderBox(
-                        modifier = Modifier.width(ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_WIDTH).height(88.dp),
+                        modifier = Modifier
+                            .width(ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_WIDTH)
+                            .height(ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_HEIGHT),
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surfaceContainer,
                     )
@@ -287,8 +298,17 @@ private fun OrganizationsExpandedEmployeesSection(
         } else {
             val employees = organizationData?.employee.orEmpty()
             if (employees.isNotEmpty()) {
-                OrganizationsExpandedCardGrid(columns = 2) {
-                    items(employees) { employee ->
+                LazyHorizontalGrid(
+                    rows = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(ORGANIZATIONS_EXPANDED_EMPLOYEE_GRID_HEIGHT),
+                    state = rememberLazyGridState(),
+                    horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                    verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                ) {
+                    items(
+                        items = employees,
+                        key = { employee -> employee.uid },
+                    ) { employee ->
                         ShortEmployeeView(
                             onClick = { onShowEmployeeProfile(employee.uid) },
                             avatar = employee.avatar,
@@ -327,10 +347,17 @@ private fun OrganizationsExpandedSubjectsSection(
             onMoreClick = onShowAllSubjects,
         )
         if (isLoading) {
-            OrganizationsExpandedCardGrid(columns = 2) {
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxWidth().height(ORGANIZATIONS_EXPANDED_SUBJECT_GRID_HEIGHT),
+                horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+            ) {
                 items(Placeholder.SHORT_EMPLOYEES) {
                     PlaceholderBox(
-                        modifier = Modifier.width(ORGANIZATIONS_EXPANDED_SUBJECT_CARD_WIDTH).height(92.dp),
+                        modifier = Modifier
+                            .width(ORGANIZATIONS_EXPANDED_SUBJECT_CARD_WIDTH)
+                            .height(ORGANIZATIONS_EXPANDED_SUBJECT_CARD_HEIGHT),
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surfaceContainer,
                     )
@@ -339,8 +366,17 @@ private fun OrganizationsExpandedSubjectsSection(
         } else {
             val subjects = organizationData?.subjects.orEmpty()
             if (subjects.isNotEmpty()) {
-                OrganizationsExpandedCardGrid(columns = 2) {
-                    items(subjects) { subject ->
+                LazyHorizontalGrid(
+                    rows = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxWidth().height(ORGANIZATIONS_EXPANDED_SUBJECT_GRID_HEIGHT),
+                    state = rememberLazyGridState(),
+                    horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                    verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
+                ) {
+                    items(
+                        items = subjects,
+                        key = { subject -> subject.uid },
+                    ) { subject ->
                         ShortSubjectView(
                             onClick = { onShowSubjectEditor(subject.uid) },
                             eventType = subject.eventType,
@@ -393,41 +429,11 @@ private fun OrganizationsExpandedSectionHeader(
     }
 }
 
-@Composable
-private fun OrganizationsExpandedCardGrid(
-    columns: Int,
-    content: OrganizationsExpandedGridScope.() -> Unit,
-) {
-    val items = OrganizationsExpandedGridScope().apply(content).items
-    Column(verticalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing)) {
-        items.chunked(columns).forEach { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(AdaptiveLayoutDefaults.GridSpacing),
-            ) {
-                rowItems.forEach { item ->
-                    Box(content = { item() })
-                }
-            }
-        }
-    }
-}
-
 private val ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_WIDTH = 300.dp
+private val ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_HEIGHT = 88.dp
+private val ORGANIZATIONS_EXPANDED_EMPLOYEE_GRID_HEIGHT =
+    ORGANIZATIONS_EXPANDED_EMPLOYEE_CARD_HEIGHT * 2 + AdaptiveLayoutDefaults.GridSpacing
 private val ORGANIZATIONS_EXPANDED_SUBJECT_CARD_WIDTH = 230.dp
-
-private class OrganizationsExpandedGridScope {
-    val items = mutableListOf<@Composable () -> Unit>()
-
-    fun items(count: Int, itemContent: @Composable (Int) -> Unit) {
-        repeat(count) { index ->
-            items += { itemContent(index) }
-        }
-    }
-
-    fun <T> items(values: List<T>, itemContent: @Composable (T) -> Unit) {
-        values.forEach { value ->
-            items += { itemContent(value) }
-        }
-    }
-}
+private val ORGANIZATIONS_EXPANDED_SUBJECT_CARD_HEIGHT = 92.dp
+private val ORGANIZATIONS_EXPANDED_SUBJECT_GRID_HEIGHT =
+    ORGANIZATIONS_EXPANDED_SUBJECT_CARD_HEIGHT * 2 + AdaptiveLayoutDefaults.GridSpacing
