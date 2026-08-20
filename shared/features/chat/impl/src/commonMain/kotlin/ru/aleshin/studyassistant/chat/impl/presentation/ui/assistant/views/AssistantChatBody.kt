@@ -54,6 +54,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,7 +70,7 @@ import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnimations
-import com.mikepenz.markdown.model.rememberMarkdownState
+import com.mikepenz.markdown.model.parseMarkdown
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
@@ -352,34 +353,9 @@ private fun LazyItemScope.AssistantMessageItem(
             ) {
                 AssistantSenderBadge()
                 Column {
-                    val state = rememberMarkdownState(content = message.content ?: "")
-                    Markdown(
-                        markdownState = state,
+                    AssistantMarkdownMessage(
                         modifier = Modifier.padding(start = 8.dp).fillMaxWidth(),
-                        typography = markdownTypography(
-                            h1 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            h2 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            h3 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            h4 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            h5 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            h6 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            text = MaterialTheme.typography.bodyLarge,
-                            code = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
-                            quote = MaterialTheme.typography.bodyLarge.plus(SpanStyle(fontStyle = FontStyle.Italic)),
-                            paragraph = MaterialTheme.typography.bodyLarge,
-                            ordered = MaterialTheme.typography.bodyLarge,
-                            bullet = MaterialTheme.typography.bodyLarge,
-                            list = MaterialTheme.typography.bodyLarge,
-                        ),
-                        animations = markdownAnimations { this },
-                        loading = { internalModifier ->
-                            Text(
-                                modifier = internalModifier,
-                                text = message.content ?: "",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        },
+                        content = message.content.orEmpty(),
                     )
                     Box(modifier = Modifier.fillMaxWidth()) {
                         IconButton(
@@ -398,6 +374,45 @@ private fun LazyItemScope.AssistantMessageItem(
             }
         }
     }
+}
+
+@Composable
+private fun AssistantMarkdownMessage(
+    modifier: Modifier = Modifier,
+    content: String,
+) {
+    val parsedState = remember(content) { parseMarkdown(content) }
+    val headingStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+    val bodyStyle = MaterialTheme.typography.bodyLarge
+
+    Markdown(
+        state = parsedState,
+        modifier = modifier,
+        typography = markdownTypography(
+            h1 = headingStyle,
+            h2 = headingStyle,
+            h3 = headingStyle,
+            h4 = headingStyle,
+            h5 = headingStyle,
+            h6 = headingStyle,
+            text = bodyStyle,
+            code = bodyStyle.copy(fontFamily = FontFamily.Monospace),
+            quote = bodyStyle.plus(SpanStyle(fontStyle = FontStyle.Italic)),
+            paragraph = bodyStyle,
+            ordered = bodyStyle,
+            bullet = bodyStyle,
+            list = bodyStyle,
+        ),
+        animations = markdownAnimations { this },
+        error = { internalModifier ->
+            Text(
+                modifier = internalModifier,
+                text = content,
+                style = bodyStyle,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        },
+    )
 }
 
 @Composable
