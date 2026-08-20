@@ -53,10 +53,10 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ru.aleshin.studyassistant.core.common.extensions.epochTimeDuration
 import ru.aleshin.studyassistant.core.presentation.models.schedules.CustomScheduleUi
 import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.sheet.StickyBottomSheet
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurationMath
 import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurations
 import ru.aleshin.studyassistant.editor.impl.resources.Res
 import ru.aleshin.studyassistant.editor.impl.resources.custom_schedule_date_title
@@ -285,9 +285,7 @@ internal fun DailyScheduleBottomSheetContent(
 
     if (classesDurationEditorDialogState && customSchedule != null) {
         val classesDurations = remember(customSchedule.classes) {
-            customSchedule.classes.map {
-                Pair(customSchedule.classes.indexOf(it).inc(), epochTimeDuration(it.timeRange))
-            }
+            FastEditDurationMath.classDurations(customSchedule.classes.map { it.timeRange })
         }
 
         ClassesDurationEditorDialog(
@@ -303,22 +301,7 @@ internal fun DailyScheduleBottomSheetContent(
 
     if (breaksDurationEditorDialogState && customSchedule != null) {
         val breaksDurations = remember(customSchedule.classes) {
-            buildList {
-                customSchedule.classes.forEachIndexed { index, classModel ->
-                    if (index != customSchedule.classes.lastIndex) {
-                        val nextClassModel = customSchedule.classes[index + 1]
-                        add(
-                            Pair(
-                                index.inc(),
-                                epochTimeDuration(
-                                    classModel.timeRange.to,
-                                    nextClassModel.timeRange.from
-                                )
-                            )
-                        )
-                    }
-                }
-            }
+            FastEditDurationMath.breakDurations(customSchedule.classes.map { it.timeRange })
         }
 
         BreaksDurationEditorDialog(

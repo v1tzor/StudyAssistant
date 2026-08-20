@@ -170,6 +170,10 @@
     <string name="schedule_import_new_subject_name">New subject</string>
     <string name="schedule_import_new_teacher_name">New teacher</string>
     <string name="schedule_import_add_button">Add</string>
+    <string name="schedule_import_fast_edit_start">Start of the day</string>
+    <string name="schedule_import_fast_edit_classes">Class duration</string>
+    <string name="schedule_import_fast_edit_breaks">Break duration</string>
+    <string name="schedule_import_fast_edit_add_class">Add class</string>
     <string name="schedule_import_class_editor_title">Class</string>
     <string name="schedule_import_subject_editor_title">Subject</string>
     <string name="schedule_import_teacher_editor_title">Teacher</string>

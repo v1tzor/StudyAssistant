@@ -29,4 +29,5 @@ data class ScheduleDraftEntry(
     val eventType: ScheduleEventType?,
     val teacher: String?,
     val office: String?,
+    val location: String? = null,
 )

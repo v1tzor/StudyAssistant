@@ -71,13 +71,14 @@ class ScheduleExtractionJsonSchemaTest {
                 "eventType",
                 "teacher",
                 "office",
+                "location",
             ),
             entry.getValue("required").jsonArray.map { it.jsonPrimitive.content },
         )
         assertFalse(entry.getValue("properties").jsonObject.containsKey("unparsedLines"))
         assertFalse(entry.getValue("properties").jsonObject.containsKey("organization"))
         assertFalse(entry.getValue("properties").jsonObject.containsKey("notes"))
-        assertFalse(entry.getValue("properties").jsonObject.containsKey("location"))
+        assertTrue(entry.getValue("properties").jsonObject.containsKey("location"))
 
         val eventTypeValues = entry
             .getValue("properties")

@@ -24,7 +24,6 @@ import ru.aleshin.studyassistant.chat.impl.domain.tools.mappers.AiToolResultMapp
 import ru.aleshin.studyassistant.chat.impl.domain.tools.validation.AiToolArgumentsValidator
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
-import ru.aleshin.studyassistant.core.common.extensions.endThisDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.parseUsingOffset
 import ru.aleshin.studyassistant.core.common.extensions.randomUUID
@@ -118,8 +117,7 @@ internal interface AiToolCallProcessor {
 
             return when (AiToolName.fromWireName(call.function.name)) {
                 AiToolName.UPDATE_TODO,
-                AiToolName.COMPLETE_TODO,
-                AiToolName.DELETE_TODO -> {
+                AiToolName.COMPLETE_TODO -> {
                     val todo = args["todoId"]?.let { todoRepository.fetchTodoById(it).first() }
                     buildMap {
                         todo?.name?.let { put("target", it) }
@@ -127,8 +125,7 @@ internal interface AiToolCallProcessor {
                     }
                 }
                 AiToolName.UPDATE_HOMEWORK,
-                AiToolName.COMPLETE_HOMEWORK,
-                AiToolName.DELETE_HOMEWORK -> {
+                AiToolName.COMPLETE_HOMEWORK -> {
                     val homework = args["homeworkId"]?.let {
                         homeworksRepository.fetchHomeworkById(it).first()
                     }
@@ -137,8 +134,7 @@ internal interface AiToolCallProcessor {
                         putAll(visibleArgs)
                     }
                 }
-                AiToolName.UPDATE_CLASS,
-                AiToolName.DELETE_CLASS, -> {
+                AiToolName.UPDATE_CLASS -> {
                     val date = validator.date(args["date"])
                     val classModel = date?.let { targetDate ->
                         classesByDate(targetDate).find { it.uid == args["classId"] }
@@ -151,8 +147,7 @@ internal interface AiToolCallProcessor {
                     }
                 }
                 AiToolName.UPDATE_GOAL,
-                AiToolName.COMPLETE_GOAL,
-                AiToolName.DELETE_GOAL -> {
+                AiToolName.COMPLETE_GOAL -> {
                     val goal = args["goalId"]?.let { dailyGoalsRepository.fetchGoalById(it).first() }
                     buildMap {
                         val target = when (goal?.contentType) {
@@ -213,14 +208,11 @@ internal interface AiToolCallProcessor {
             AiToolName.CREATE_TODO -> createTodo(args)
             AiToolName.UPDATE_TODO -> updateTodo(args)
             AiToolName.COMPLETE_TODO -> completeTodo(args)
-            AiToolName.DELETE_TODO -> deleteTodo(args)
             AiToolName.CREATE_HOMEWORK -> createHomework(args)
             AiToolName.UPDATE_HOMEWORK -> updateHomework(args)
             AiToolName.COMPLETE_HOMEWORK -> completeHomework(args)
-            AiToolName.DELETE_HOMEWORK -> deleteHomework(args)
             AiToolName.CREATE_CLASS -> createClass(args)
             AiToolName.UPDATE_CLASS -> updateClass(args)
-            AiToolName.DELETE_CLASS -> deleteClass(args)
             AiToolName.GET_PROFILE -> getProfile()
             AiToolName.GET_HOMEWORKS -> getHomeworks(args)
             AiToolName.GET_OVERDUE_HOMEWORKS -> getOverdueHomeworks()
@@ -232,12 +224,10 @@ internal interface AiToolCallProcessor {
             AiToolName.GET_CLASSES_BY_DATE -> getClassesByDate(args)
             AiToolName.GET_CLASSES_BY_RANGE -> getClassesByRange(args)
             AiToolName.GET_NEAR_CLASS -> getNearClass(args)
-            AiToolName.GET_FREE_TIME -> getFreeTime(args)
             AiToolName.GET_GOALS -> getGoals(args)
             AiToolName.CREATE_GOAL -> createGoal(args)
             AiToolName.UPDATE_GOAL -> updateGoal(args)
             AiToolName.COMPLETE_GOAL -> completeGoal(args)
-            AiToolName.DELETE_GOAL -> deleteGoal(args)
             AiToolName.CREATE_SUBJECT -> createSubject(args)
             AiToolName.UPDATE_SUBJECT -> updateSubject(args)
             AiToolName.CREATE_EMPLOYEE -> createEmployee(args)
@@ -338,19 +328,6 @@ internal interface AiToolCallProcessor {
             }
 
             return AiToolResultMapper.success("todo_completion_updated")
-        }
-
-        private suspend fun deleteTodo(args: Map<String, String>): String {
-            val todoId = validator.required(args, "todoId") ?: return AiToolResultMapper.error("todo_required")
-            if (todoRepository.fetchTodoById(todoId).first() == null) {
-                return AiToolResultMapper.error("todo_not_found")
-            }
-            dailyGoalsRepository.fetchGoalByContentId(todoId).first()?.let { goal ->
-                dailyGoalsRepository.deleteGoal(goal.uid)
-            }
-            todoReminderManager.clearAllReminders(todoId)
-            todoRepository.deleteTodo(todoId)
-            return AiToolResultMapper.success("todo_deleted")
         }
 
         private suspend fun createHomework(args: Map<String, String>): String {
@@ -478,19 +455,6 @@ internal interface AiToolCallProcessor {
             }
 
             return AiToolResultMapper.success("homework_completion_updated")
-        }
-
-        private suspend fun deleteHomework(args: Map<String, String>): String {
-            val homeworkId = validator.required(args, "homeworkId")
-                ?: return AiToolResultMapper.error("homework_required")
-            if (homeworksRepository.fetchHomeworkById(homeworkId).first() == null) {
-                return AiToolResultMapper.error("homework_not_found")
-            }
-            dailyGoalsRepository.fetchGoalByContentId(homeworkId).first()?.let { goal ->
-                dailyGoalsRepository.deleteGoal(goal.uid)
-            }
-            homeworksRepository.deleteHomework(homeworkId)
-            return AiToolResultMapper.success("homework_deleted")
         }
 
         private suspend fun createClass(args: Map<String, String>): String {
@@ -647,19 +611,6 @@ internal interface AiToolCallProcessor {
                 },
             )
             return AiToolResultMapper.success("class_updated")
-        }
-
-        private suspend fun deleteClass(args: Map<String, String>): String {
-            val classId = validator.required(args, "classId")
-                ?: return AiToolResultMapper.error("class_required")
-            val date = validator.date(validator.required(args, "date"))
-                ?: return AiToolResultMapper.error("invalid_date")
-            val schedule = editableSchedule(date)
-            if (schedule.classes.none { it.uid == classId }) {
-                return AiToolResultMapper.error("class_not_found")
-            }
-            saveSchedule(schedule, schedule.classes.filterNot { it.uid == classId })
-            return AiToolResultMapper.success("class_deleted")
         }
 
         private suspend fun syncLinkedGoal(contentId: UID) {
@@ -842,36 +793,6 @@ internal interface AiToolCallProcessor {
             return AiToolResultMapper.classes(classes)
         }
 
-        private suspend fun getFreeTime(args: Map<String, String>): String {
-            val date = validator.date(args["date"])
-                ?: return AiToolResultMapper.error("invalid_date")
-            val minimumMinutes = validator.optional(args, "minimumMinutes")?.toIntOrNull() ?: 1
-            if (minimumMinutes !in 1..MINUTES_IN_DAY) {
-                return AiToolResultMapper.error("invalid_minimum_minutes")
-            }
-            val classes = classesByDate(date).sortedBy { it.timeRange.from }
-            val dayStart = date.startThisDay()
-            val dayEnd = date.endThisDay()
-
-            val boundaryPoints = buildList {
-                add(dayStart)
-                classes.forEach {
-                    add(it.timeRange.from)
-                    add(it.timeRange.to)
-                }
-                add(dayEnd)
-            }
-
-            val intervals = boundaryPoints.chunked(2).mapNotNull { pair ->
-                if (pair.size != 2) return@mapNotNull null
-                val from = pair[0]
-                val to = pair[1]
-                val durationMinutes = (to.toEpochMilliseconds() - from.toEpochMilliseconds()) / MILLIS_IN_MINUTE
-                if (durationMinutes >= minimumMinutes) TimeRange(from, to) else null
-            }
-            return AiToolResultMapper.freeIntervals(intervals)
-        }
-
         private suspend fun getGoals(args: Map<String, String>): String {
             val date = validator.date(args["date"])
                 ?: return AiToolResultMapper.error("invalid_date")
@@ -1000,24 +921,7 @@ internal interface AiToolCallProcessor {
             return AiToolResultMapper.success("goal_completion_updated")
         }
 
-        private suspend fun deleteGoal(args: Map<String, String>): String {
-            val goalId = validator.required(args, "goalId") ?: return AiToolResultMapper.error("goal_required")
-            val goal = dailyGoalsRepository.fetchGoalById(goalId).first() ?: return AiToolResultMapper.error("goal_not_found")
 
-            val dailyGoals = dailyGoalsRepository.fetchDailyGoalsByDate(goal.targetDate).first()
-            dailyGoalsRepository.deleteGoal(goalId)
-
-            if (dailyGoals.size > 1) {
-                val updatedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
-                val updatedGoals = dailyGoals.filter { it.uid != goal.uid }.map { targetGoal ->
-                    val newNumber = if (targetGoal.number < goal.number) targetGoal.number else targetGoal.number - 1
-                    targetGoal.copy(number = newNumber, updatedAt = updatedAt)
-                }
-                dailyGoalsRepository.addDailyDailyGoals(updatedGoals)
-            }
-
-            return AiToolResultMapper.success("goal_deleted")
-        }
 
         private suspend fun createSubject(args: Map<String, String>): String {
             val organizationId = validator.required(args, "organizationId") ?: return AiToolResultMapper.error("organization_required")
@@ -1173,8 +1077,19 @@ internal interface AiToolCallProcessor {
             val nearest = buildList {
                 var date = now.startThisDay()
                 while (date <= lastDate) {
-                    val elements = classesByDate(date).filter { classModel ->
-                        classModel.subject?.uid == subjectId && classModel.timeRange.to > now
+                    val elements = classesByDate(date).mapNotNull { classModel ->
+                        val classEnd = date.setHoursAndMinutes(classModel.timeRange.to)
+                        val matchesSubject = classModel.subject?.uid == subjectId
+                        if (matchesSubject && classEnd > now) {
+                            classModel.copy(
+                                timeRange = TimeRange(
+                                    from = date.setHoursAndMinutes(classModel.timeRange.from),
+                                    to = classEnd,
+                                ),
+                            )
+                        } else {
+                            null
+                        }
                     }
                     addAll(elements)
                     date = date.shiftDay(1)
@@ -1273,8 +1188,6 @@ internal interface AiToolCallProcessor {
         }
 
         private companion object {
-            const val MILLIS_IN_MINUTE = 60_000L
-            const val MINUTES_IN_DAY = 1_440
             val TODO_STATUSES = setOf("ALL", "ACTIVE", "COMPLETED")
         }
     }

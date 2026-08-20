@@ -28,7 +28,7 @@ import ru.aleshin.studyassistant.core.database.datasource.ai.AiLocalDataSource
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantMessage
 import ru.aleshin.studyassistant.core.domain.entities.ai.AiAssistantResponse
 import ru.aleshin.studyassistant.core.domain.entities.ai.dropUnconfirmedMessages
-import ru.aleshin.studyassistant.core.domain.entities.ai.optimisedMessagesForSend
+import ru.aleshin.studyassistant.core.domain.entities.ai.preparedMessagesForCompletion
 import ru.aleshin.studyassistant.core.remote.models.ai.backend.AiCompletionRequestPojo
 
 /**
@@ -99,7 +99,7 @@ internal interface AiConversationHandler {
         private suspend fun completeResponse(
             messages: List<AiAssistantMessage>,
         ): AiAssistantResponse {
-            val optimisedMessages = messages.optimisedMessagesForSend()
+            val optimisedMessages = messages.preparedMessagesForCompletion()
             val request = AiCompletionRequestPojo(
                 messageId = optimisedMessages.last { message -> message is AiAssistantMessage.UserMessage }.id,
                 locale = deviceInfoProvider.fetchDeviceLanguage(),
@@ -121,18 +121,14 @@ internal interface AiConversationHandler {
                 "create_todo",
                 "update_todo",
                 "complete_todo",
-                "delete_todo",
                 "create_homework",
                 "update_homework",
                 "complete_homework",
-                "delete_homework",
                 "create_class",
                 "update_class",
-                "delete_class",
                 "create_goal",
                 "update_goal",
                 "complete_goal",
-                "delete_goal",
                 "create_subject",
                 "update_subject",
                 "create_employee",
@@ -148,7 +144,6 @@ internal interface AiConversationHandler {
                 "get_classes_by_date",
                 "get_classes_by_range",
                 "get_near_class",
-                "get_free_time",
             )
         }
     }

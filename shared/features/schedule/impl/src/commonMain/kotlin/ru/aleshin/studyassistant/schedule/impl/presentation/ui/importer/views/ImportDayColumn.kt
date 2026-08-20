@@ -176,6 +176,19 @@ private fun ImportClassCard(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            val place = listOfNotNull(
+                classModel.office.trim().takeIf(String::isNotEmpty),
+                classModel.location?.trim()?.takeIf(String::isNotEmpty),
+            ).joinToString(" · ")
+            if (place.isNotEmpty()) {
+                Text(
+                    text = place,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

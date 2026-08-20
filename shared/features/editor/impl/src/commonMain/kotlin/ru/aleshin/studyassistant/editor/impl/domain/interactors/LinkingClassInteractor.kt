@@ -16,21 +16,23 @@
 
 package ru.aleshin.studyassistant.editor.impl.domain.interactors
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
 import ru.aleshin.studyassistant.core.common.extensions.dateTime
 import ru.aleshin.studyassistant.core.common.extensions.endOfWeek
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
 import ru.aleshin.studyassistant.core.common.extensions.shiftWeek
+import ru.aleshin.studyassistant.core.common.extensions.startThisDay
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.domain.entities.classes.Class
 import ru.aleshin.studyassistant.core.domain.entities.classes.ClassesForLinkedMap
-import ru.aleshin.studyassistant.core.domain.entities.schedules.base.associateWithDates
+import ru.aleshin.studyassistant.core.domain.entities.common.NumberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
+import ru.aleshin.studyassistant.core.domain.entities.schedules.base.BaseSchedule
+import ru.aleshin.studyassistant.core.domain.entities.schedules.custom.CustomSchedule
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
@@ -54,7 +56,6 @@ internal interface LinkingClassInteractor {
         private val eitherWrapper: EditorEitherWrapper,
     ) : LinkingClassInteractor {
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         override suspend fun fetchFreeClassesForHomework(
             subject: UID,
             date: Instant,
@@ -72,65 +73,69 @@ internal interface LinkingClassInteractor {
             val baseSchedulesFlow = baseScheduleRepository.fetchSchedulesByVersion(
                 version = searchedTimeRange,
                 numberOfWeek = null,
-            ).map { schedules ->
-                schedules.associateWithDates(searchedTimeRange, maxNumberOfWeek)
-            }
+            )
 
-            return@wrapFlow customSchedulesFlow.flatMapLatest { customSchedules ->
-                baseSchedulesFlow.map { baseSchedules ->
-                    buildMap<Instant, List<Class>> {
-                        customSchedules.forEach { customSchedule ->
-                            if (customSchedule.classes.isNotEmpty()) {
-                                val groupedClasses =
-                                    customSchedule.classes.groupBy { it.organization.uid }
-                                        .mapValues {
-                                            it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
-                                        }
-                                val classesWithTargetSubject =
-                                    customSchedule.classes.filter { classModel ->
-                                        val subjectFilter = classModel.subject?.uid == subject
-                                        return@filter subjectFilter
-                                    }
-                                val numberedClassesWithTargetSubject =
-                                    classesWithTargetSubject.map { classModel ->
-                                        val organizationClasses =
-                                            groupedClasses[classModel.organization.uid]
-                                        val number =
-                                            organizationClasses?.indexOf(classModel)?.inc() ?: 0
-                                        classModel.copy(number = number)
-                                    }
-                                put(customSchedule.date, numberedClassesWithTargetSubject)
-                            }
-                        }
-
-                        val availableBaseSchedules = baseSchedules.filter { !containsKey(it.key) }
-
-                        availableBaseSchedules.toList().forEach { baseScheduleEntry ->
-                            val baseSchedule = baseScheduleEntry.second
-                            if (baseSchedule.classes.isNotEmpty()) {
-                                val groupedClasses =
-                                    baseSchedule.classes.groupBy { it.organization.uid }.mapValues {
-                                        it.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
-                                    }
-                                val classesWithTargetSubject =
-                                    baseSchedule.classes.filter { classModel ->
-                                        val subjectFilter = classModel.subject?.uid == subject
-                                        return@filter subjectFilter
-                                    }
-                                val numberedClassesWithTargetSubject =
-                                    classesWithTargetSubject.map { classModel ->
-                                        val organizationClasses =
-                                            groupedClasses[classModel.organization.uid]
-                                        val number =
-                                            organizationClasses?.indexOf(classModel)?.inc() ?: 0
-                                        classModel.copy(number = number)
-                                    }
-                                put(baseScheduleEntry.first, numberedClassesWithTargetSubject)
-                            }
+            return@wrapFlow combine(customSchedulesFlow, baseSchedulesFlow) { customSchedules, baseSchedules ->
+                val customByDate = customSchedules.associateBy { schedule ->
+                    schedule.date.startThisDay()
+                }
+                buildMap<Instant, List<Class>> {
+                    searchedTimeRange.periodDates().forEach { rawDate ->
+                        val targetDate = rawDate.startThisDay()
+                        val customSchedule = customByDate[targetDate]
+                        val dayClasses = classesForDate(
+                            date = targetDate,
+                            maxNumberOfWeek = maxNumberOfWeek,
+                            customSchedule = customSchedule,
+                            baseSchedules = baseSchedules,
+                        )
+                        val numbered = numberedSubjectClasses(dayClasses, subject)
+                        if (numbered.isNotEmpty()) {
+                            put(targetDate, numbered)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+private fun classesForDate(
+    date: Instant,
+    maxNumberOfWeek: NumberOfRepeatWeek,
+    customSchedule: CustomSchedule?,
+    baseSchedules: List<BaseSchedule>,
+): List<Class> {
+    if (customSchedule != null) {
+        return customSchedule.classes
+    }
+    val week = date.dateTime().date.numberOfRepeatWeek(maxNumberOfWeek)
+    val dayOfWeek = date.dateTime().dayOfWeek
+    return baseSchedules
+        .filter { schedule ->
+            schedule.dayOfWeek == dayOfWeek &&
+                schedule.week == week &&
+                schedule.dateVersion.containsDate(date)
+        }
+        .maxByOrNull { schedule -> schedule.dateVersion.to }
+        ?.classes
+        .orEmpty()
+}
+
+private fun numberedSubjectClasses(
+    classes: List<Class>,
+    subject: UID,
+): List<Class> {
+    if (classes.isEmpty()) return emptyList()
+    val groupedClasses = classes.groupBy { classModel -> classModel.organization.uid }
+        .mapValues { entry ->
+            entry.value.sortedBy { classModel -> classModel.timeRange.from.dateTime().time }
+        }
+    return classes.filter { classModel ->
+        classModel.subject?.uid == subject
+    }.map { classModel ->
+        val organizationClasses = groupedClasses[classModel.organization.uid]
+        val number = organizationClasses?.indexOf(classModel)?.inc() ?: 0
+        classModel.copy(number = number)
     }
 }

@@ -69,11 +69,10 @@ internal sealed class ImportEvent : StoreEvent {
     data class DeleteClass(val classId: UID) : ImportEvent()
     data class DeleteSubject(val subjectId: UID) : ImportEvent()
     data class DeleteEmployee(val employeeId: UID) : ImportEvent()
-    data class ReorderDayClasses(
-        val dayOfWeek: Int,
-        val repeatWeek: Int,
-        val orderedIds: List<UID>,
-    ) : ImportEvent()
+    data class AddClass(val dayOfWeek: Int, val repeatWeek: Int) : ImportEvent()
+    data class UpdateStartOfDay(val repeatWeek: Int, val startTime: String) : ImportEvent()
+    data class UpdateClassesDuration(val repeatWeek: Int, val baseDuration: Long) : ImportEvent()
+    data class UpdateBreaksDuration(val repeatWeek: Int, val baseDuration: Long) : ImportEvent()
     data object ApplySession : ImportEvent()
     data class RewardedAdGranted(val challengeId: String) : ImportEvent()
     data object RewardedAdUnavailable : ImportEvent()
@@ -81,6 +80,11 @@ internal sealed class ImportEvent : StoreEvent {
     data object EditSource : ImportEvent()
     data object ClickBack : ImportEvent()
     data object ClickAddOrganization : ImportEvent()
+    data class ReorderDayClasses(
+        val dayOfWeek: Int,
+        val repeatWeek: Int,
+        val orderedIds: List<UID>,
+    ) : ImportEvent()
 }
 
 internal sealed class ImportEffect : StoreEffect {
@@ -89,23 +93,14 @@ internal sealed class ImportEffect : StoreEffect {
 
 internal sealed class ImportAction : StoreAction {
     data class UpdateLoadingPhoto(val isLoading: Boolean) : ImportAction()
-    data class UpdateAnalysisProgress(
-        val isLoading: Boolean,
-        val startedAt: Long?,
-    ) : ImportAction()
+    data class UpdateAnalysisProgress(val isLoading: Boolean, val startedAt: Long?) : ImportAction()
     data class UpdatePhoto(val preparedImage: CompressedScheduleImage?) : ImportAction()
     data class UpdateNote(val note: String) : ImportAction()
     data class UpdateSelectedOrganization(val organization: OrganizationShortUi?) : ImportAction()
     data class SetupOrganizations(val organizations: List<OrganizationShortUi>) : ImportAction()
-    data class SetupSession(
-        val session: ScheduleImportSessionUi?,
-        val requestId: UID?,
-    ) : ImportAction()
+    data class SetupSession(val session: ScheduleImportSessionUi?, val requestId: UID?) : ImportAction()
     data class UpdateApplied(val isApplied: Boolean) : ImportAction()
-    data class UpdateRewardChallenge(
-        val challengeId: String?,
-        val isInProgress: Boolean,
-    ) : ImportAction()
+    data class UpdateRewardChallenge(val challengeId: String?, val isInProgress: Boolean) : ImportAction()
 }
 
 internal sealed class ImportOutput : BaseOutput {

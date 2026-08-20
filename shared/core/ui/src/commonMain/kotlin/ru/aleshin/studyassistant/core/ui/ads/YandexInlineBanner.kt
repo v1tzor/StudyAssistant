@@ -16,10 +16,10 @@
 
 package ru.aleshin.studyassistant.core.ui.ads
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,10 +27,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.eygraber.compose.placeholder.PlaceholderHighlight
-import com.eygraber.compose.placeholder.placeholder
-import com.eygraber.compose.placeholder.shimmer
 import com.yandex.mobile.ads.kmp.banner.Banner
 import com.yandex.mobile.ads.kmp.banner.BannerAdSize
 import com.yandex.mobile.ads.kmp.banner.BannerEvents
@@ -63,37 +61,48 @@ fun YandexInlineBanner(
         BANNER_DEFAULT_HEIGHT
     }
 
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        var isLoaded by remember(adUnitId) { mutableStateOf(false) }
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(bannerMaxHeight),
+    ) {
+        var stableWidth by remember(adUnitId) { mutableStateOf<Dp?>(null) }
+        if (stableWidth == null && maxWidth > 0.dp) {
+            stableWidth = maxWidth
+        }
+        val bannerWidth = stableWidth ?: BANNER_FALLBACK_WIDTH
+        var loadFailed by remember(adUnitId) { mutableStateOf(false) }
         val bannerState = rememberBannerAdState(
             adSize = BannerAdSize.Inline(
-                width = maxWidth,
+                width = bannerWidth,
                 maxHeight = bannerMaxHeight,
             ),
             events = BannerEvents(
-                onAdLoaded = { isLoaded = true },
-                onAdFailedToLoad = { isLoaded = false },
+                onAdFailedToLoad = { loadFailed = true },
             ),
         )
-        LaunchedEffect(adUnitId, maxWidth) {
-            bannerState.loadAd(AdRequest(adUnitId = adUnitId))
+        LaunchedEffect(adUnitId) {
+            if (!loadFailed) {
+                bannerState.loadAd(AdRequest(adUnitId = adUnitId))
+            }
         }
-        Banner(
-            state = bannerState,
-            modifier = Modifier
-                .placeholder(
-                    visible = !isLoaded,
-                    color = MaterialTheme.colorScheme.surfaceContainer,
-                    shape = MaterialTheme.shapes.medium,
-                    highlight = PlaceholderHighlight.shimmer(
-                        highlightColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                    )
-                )
-                .fillMaxWidth()
-                .height(bannerMaxHeight)
-        )
+        if (!loadFailed) {
+            Banner(
+                state = bannerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(bannerMaxHeight),
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(bannerMaxHeight),
+            )
+        }
     }
 }
 
 private val BANNER_DEFAULT_HEIGHT = 50.dp
 private val BANNER_ANALYTICS_HEIGHT = 100.dp
+private val BANNER_FALLBACK_WIDTH = 320.dp

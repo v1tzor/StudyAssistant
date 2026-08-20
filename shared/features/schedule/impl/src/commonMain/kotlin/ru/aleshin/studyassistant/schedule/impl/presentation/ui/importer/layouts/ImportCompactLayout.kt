@@ -50,6 +50,10 @@ internal fun ImportCompactLayout(
     onTeacherClick: (UID) -> Unit,
     onAddSubject: () -> Unit,
     onAddTeacher: () -> Unit,
+    onAddClass: (Int, Int) -> Unit,
+    onUpdateStartOfDay: (Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Long) -> Unit,
+    onUpdateBreaksDuration: (Int, Long) -> Unit,
     onDone: () -> Unit,
 ) {
     Box(
@@ -74,6 +78,10 @@ internal fun ImportCompactLayout(
                 onTeacherClick = onTeacherClick,
                 onAddSubject = onAddSubject,
                 onAddTeacher = onAddTeacher,
+                onAddClass = onAddClass,
+                onUpdateStartOfDay = onUpdateStartOfDay,
+                onUpdateClassesDuration = onUpdateClassesDuration,
+                onUpdateBreaksDuration = onUpdateBreaksDuration,
             )
             else -> ImportSourceSection(
                 modifier = Modifier.widthIn(max = 600.dp),

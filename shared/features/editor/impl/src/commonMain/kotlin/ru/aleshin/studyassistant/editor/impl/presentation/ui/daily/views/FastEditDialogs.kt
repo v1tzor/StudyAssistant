@@ -39,6 +39,7 @@ import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
 import ru.aleshin.studyassistant.core.presentation.models.organizations.NumberedDurationUi
 import ru.aleshin.studyassistant.core.ui.views.DialogButtons
 import ru.aleshin.studyassistant.core.ui.views.DialogHeader
+import ru.aleshin.studyassistant.editor.impl.presentation.models.classes.FastEditDurationMath
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.common.NumberedDurationsList
 import ru.aleshin.studyassistant.editor.impl.presentation.ui.schedule.views.StartOfClassesField
 import ru.aleshin.studyassistant.editor.impl.resources.Res
@@ -106,17 +107,11 @@ internal fun ClassesDurationEditorDialog(
     onDismiss: () -> Unit,
     onConfirm: (Millis, List<NumberedDurationUi>) -> Unit,
 ) {
-    val classesDurationsMap = remember(classesDurations) {
-        classesDurations.groupBy { it.second }
+    val groupedDurations = remember(classesDurations) {
+        FastEditDurationMath.groupedDurations(classesDurations)
     }
-    val baseDuration = remember(classesDurationsMap) {
-        classesDurationsMap.maxByOrNull { it.value.size }?.key
-    }
-    val specificDurations = remember(classesDurations, baseDuration) {
-        classesDurations.filter { it.second != baseDuration }.map {
-            NumberedDurationUi(it.first, it.second)
-        }
-    }
+    val baseDuration = groupedDurations.first
+    val specificDurations = groupedDurations.second
 
     var editableBaseDuration by remember { mutableStateOf<Millis?>(baseDuration) }
     val editableSpecificDurations = remember { mutableStateOf(specificDurations) }
@@ -167,17 +162,11 @@ internal fun BreaksDurationEditorDialog(
     onDismiss: () -> Unit,
     onConfirm: (Millis, List<NumberedDurationUi>) -> Unit,
 ) {
-    val breaksDurationsMap = remember(breaksDurations) {
-        breaksDurations.groupBy { it.second }
+    val groupedDurations = remember(breaksDurations) {
+        FastEditDurationMath.groupedDurations(breaksDurations)
     }
-    val baseDuration = remember(breaksDurationsMap) {
-        breaksDurationsMap.maxByOrNull { it.value.size }?.key
-    }
-    val specificDurations = remember(breaksDurations, baseDuration) {
-        breaksDurations.filter { it.second != baseDuration }.map {
-            NumberedDurationUi(it.first, it.second)
-        }
-    }
+    val baseDuration = groupedDurations.first
+    val specificDurations = groupedDurations.second
 
     var editableBaseDuration by remember { mutableStateOf<Millis?>(baseDuration) }
     val editableSpecificDurations = remember { mutableStateOf(specificDurations) }

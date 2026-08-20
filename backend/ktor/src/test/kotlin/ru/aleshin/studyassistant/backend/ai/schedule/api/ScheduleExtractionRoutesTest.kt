@@ -153,6 +153,7 @@ class ScheduleExtractionRoutesTest {
                                     eventType = ScheduleEventType.LECTURE,
                                     teacher = null,
                                     office = "101",
+                                    location = "Корпус Б",
                                 ),
                             ),
                         ),

@@ -54,4 +54,5 @@ private fun ScheduleImportEntryPojo.mapToDomain() = ScheduleImportEntry(
     eventType = eventType?.name?.let(ScheduleImportEventType::valueOf),
     teacher = teacher,
     office = office,
+    location = location,
 )

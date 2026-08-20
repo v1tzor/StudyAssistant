@@ -92,6 +92,142 @@ class AiAssistantMessageTest {
     }
 
     @Test
+    fun preparedHistory_uniquifiesDuplicateToolCallIds() {
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "next chemistry homework",
+            time = instant(1),
+        )
+        val firstCall = AiAssistantMessage.AssistantMessage(
+            id = "assistant-1",
+            content = null,
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call-1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_subjects", arguments = mapOf("organizationId" to "org")),
+                ),
+            ),
+        )
+        val firstTool = AiAssistantMessage.ToolMessage(
+            id = "tool-1",
+            content = "[]",
+            time = instant(3),
+            toolCallId = "call-1",
+        )
+        val secondCall = AiAssistantMessage.AssistantMessage(
+            id = "assistant-2",
+            content = null,
+            time = instant(4),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call-1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_near_class", arguments = mapOf("subjectId" to "subj")),
+                ),
+            ),
+        )
+        val secondTool = AiAssistantMessage.ToolMessage(
+            id = "tool-2",
+            content = "{}",
+            time = instant(5),
+            toolCallId = "call-1",
+        )
+
+        val prepared = listOf(user, firstCall, firstTool, secondCall, secondTool)
+            .preparedMessagesForCompletion()
+
+        val toolIds = prepared.filterIsInstance<AiAssistantMessage.AssistantMessage>()
+            .flatMap { message -> message.toolCalls.orEmpty() }
+            .map(ToolCall::id)
+        assertEquals(toolIds.toSet().size, toolIds.size)
+
+        val firstAssistant = prepared.filterIsInstance<AiAssistantMessage.AssistantMessage>().first()
+        val secondAssistant = prepared.filterIsInstance<AiAssistantMessage.AssistantMessage>().last()
+        val remappedTools = prepared.filterIsInstance<AiAssistantMessage.ToolMessage>()
+        assertEquals(firstAssistant.toolCalls?.single()?.id, remappedTools[0].toolCallId)
+        assertEquals(secondAssistant.toolCalls?.single()?.id, remappedTools[1].toolCallId)
+    }
+
+    @Test
+    fun preparedHistory_uniquifiesDuplicateToolCallIdsInOneAssistantMessage() {
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "create homework for the next chemistry lesson",
+            time = instant(1),
+        )
+        val parallelCalls = AiAssistantMessage.AssistantMessage(
+            id = "assistant",
+            content = null,
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_organizations", arguments = emptyMap()),
+                ),
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_subjects", arguments = emptyMap()),
+                ),
+            ),
+        )
+        val organizationsResult = AiAssistantMessage.ToolMessage(
+            id = "tool-organizations",
+            content = "[]",
+            time = instant(3),
+            toolCallId = "call_1",
+        )
+        val subjectsResult = AiAssistantMessage.ToolMessage(
+            id = "tool-subjects",
+            content = "[]",
+            time = instant(4),
+            toolCallId = "call_1",
+        )
+
+        val prepared = listOf(user, parallelCalls, organizationsResult, subjectsResult)
+            .preparedMessagesForCompletion()
+
+        val assistant = prepared.filterIsInstance<AiAssistantMessage.AssistantMessage>().single()
+        val remappedCalls = assistant.toolCalls.orEmpty()
+        val remappedTools = prepared.filterIsInstance<AiAssistantMessage.ToolMessage>()
+        val remappedIds = remappedCalls.map(ToolCall::id)
+
+        assertEquals(listOf("get_organizations", "get_subjects"), remappedCalls.map { it.function.name })
+        assertEquals(remappedIds.toSet().size, remappedIds.size)
+        assertEquals(2, remappedIds.size)
+        assertEquals(remappedCalls[0].id, remappedTools[0].toolCallId)
+        assertEquals(remappedCalls[1].id, remappedTools[1].toolCallId)
+        assertEquals("call_1", remappedCalls[0].id)
+        assertEquals("call_1-1", remappedCalls[1].id)
+    }
+
+    @Test
+    fun preparedHistory_dropsEmptyAssistantMessages() {
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "hello",
+            time = instant(1),
+        )
+        val emptyAssistant = AiAssistantMessage.AssistantMessage(
+            id = "empty",
+            content = null,
+            time = instant(2),
+        )
+        val finalAssistant = AiAssistantMessage.AssistantMessage(
+            id = "final",
+            content = "hi",
+            time = instant(3),
+        )
+
+        val prepared = listOf(user, emptyAssistant, finalAssistant).preparedMessagesForCompletion()
+
+        assertEquals(listOf("user", "final"), prepared.map(AiAssistantMessage::id))
+    }
+
+    @Test
     fun dropUnconfirmedMessages_dropsContentAssistantWithUnresolvedTools() = runBlocking {
         val system = AiAssistantMessage.SystemMessage(
             id = "system",
@@ -154,6 +290,97 @@ class AiAssistantMessageTest {
         val kept = listOf(user, assistant, tool).dropUnconfirmedMessages { }
 
         assertEquals(listOf("user", "assistant", "tool"), kept.map(AiAssistantMessage::id))
+    }
+
+    @Test
+    fun dropUnconfirmedMessages_dropsDuplicateIdCallsWhenOneToolResultIsMissing() = runBlocking {
+        val system = AiAssistantMessage.SystemMessage(
+            id = "system",
+            content = "system",
+            time = instant(0),
+        )
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "next chemistry homework",
+            time = instant(1),
+        )
+        val assistant = AiAssistantMessage.AssistantMessage(
+            id = "assistant",
+            content = null,
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_organizations", arguments = emptyMap()),
+                ),
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_subjects", arguments = emptyMap()),
+                ),
+            ),
+        )
+        val onlyOneResult = AiAssistantMessage.ToolMessage(
+            id = "tool",
+            content = "[]",
+            time = instant(3),
+            toolCallId = "call_1",
+        )
+        val dropped = mutableListOf<String>()
+
+        val kept = listOf(system, user, assistant, onlyOneResult).dropUnconfirmedMessages { message ->
+            dropped += message.id
+        }
+
+        assertEquals(listOf("system"), kept.map(AiAssistantMessage::id))
+        assertEquals(listOf("user", "assistant", "tool"), dropped)
+    }
+
+    @Test
+    fun dropUnconfirmedMessages_keepsDuplicateIdCallsWhenEachHasAToolResult() = runBlocking {
+        val user = AiAssistantMessage.UserMessage(
+            id = "user",
+            content = "next chemistry homework",
+            time = instant(1),
+        )
+        val assistant = AiAssistantMessage.AssistantMessage(
+            id = "assistant",
+            content = null,
+            time = instant(2),
+            toolCalls = listOf(
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_organizations", arguments = emptyMap()),
+                ),
+                ToolCall(
+                    id = "call_1",
+                    type = ToolCallType.FUNCTION,
+                    function = FunctionResponse(name = "get_subjects", arguments = emptyMap()),
+                ),
+            ),
+        )
+        val organizationsResult = AiAssistantMessage.ToolMessage(
+            id = "tool-organizations",
+            content = "[]",
+            time = instant(3),
+            toolCallId = "call_1",
+        )
+        val subjectsResult = AiAssistantMessage.ToolMessage(
+            id = "tool-subjects",
+            content = "[]",
+            time = instant(4),
+            toolCallId = "call_1",
+        )
+
+        val kept = listOf(user, assistant, organizationsResult, subjectsResult)
+            .dropUnconfirmedMessages { }
+
+        assertEquals(
+            listOf("user", "assistant", "tool-organizations", "tool-subjects"),
+            kept.map(AiAssistantMessage::id),
+        )
     }
 
     private fun instant(epochSeconds: Long) = Instant.fromEpochSeconds(epochSeconds)

@@ -83,15 +83,7 @@ fun List<AiAssistantMessage>.optimisedMessagesForSend(
 ): List<AiAssistantMessage> {
     val messages = this.sortedBy { it.time }
     val systemMessages = messages.filterIsInstance<AiAssistantMessage.SystemMessage>()
-    val conversationTurns = messages.filterNot { it is AiAssistantMessage.SystemMessage }
-        .fold(mutableListOf<MutableList<AiAssistantMessage>>()) { turns, message ->
-            if (message is AiAssistantMessage.UserMessage || turns.isEmpty()) {
-                turns += mutableListOf(message)
-            } else {
-                turns.last() += message
-            }
-            turns
-        }
+    val conversationTurns = messages.conversationTurns()
 
     var remainingTokens = tokenBudget - systemMessages.sumOf(AiAssistantMessage::estimatedTokens)
     val selectedTurns = mutableListOf<List<AiAssistantMessage>>()
@@ -105,11 +97,98 @@ fun List<AiAssistantMessage>.optimisedMessagesForSend(
     return systemMessages + selectedTurns.asReversed().flatten()
 }
 
+fun List<AiAssistantMessage>.preparedMessagesForCompletion(
+    tokenBudget: Int = 6_000,
+    maxMessages: Int = 80,
+    maxTotalCharacters: Int = 60_000,
+): List<AiAssistantMessage> {
+    val uniquified = uniquifyToolCallIds()
+    val withoutEmptyAssistants = uniquified.filterNot { message ->
+        message is AiAssistantMessage.AssistantMessage &&
+            message.content.isNullOrBlank() &&
+            message.toolCalls.isNullOrEmpty()
+    }
+    val optimized = withoutEmptyAssistants.optimisedMessagesForSend(tokenBudget = tokenBudget)
+    val systemMessages = optimized.filterIsInstance<AiAssistantMessage.SystemMessage>()
+    val conversationTurns = optimized.filterNot { message ->
+        message is AiAssistantMessage.SystemMessage
+    }.conversationTurns()
+
+    val selectedTurns = mutableListOf<List<AiAssistantMessage>>()
+    var remainingCharacters = maxTotalCharacters - systemMessages.sumOf { message -> message.content.length }
+    var remainingMessages = maxMessages - systemMessages.size
+    for (turn in conversationTurns.asReversed()) {
+        val turnCharacters = turn.sumOf(AiAssistantMessage::estimatedCharacters)
+        if (
+            selectedTurns.isNotEmpty() &&
+            (turn.size > remainingMessages || turnCharacters > remainingCharacters)
+        ) {
+            break
+        }
+        selectedTurns += turn
+        remainingCharacters -= turnCharacters
+        remainingMessages -= turn.size
+        if (remainingCharacters <= 0 || remainingMessages <= 0) break
+    }
+    return systemMessages + selectedTurns.asReversed().flatten()
+}
+
+internal fun List<AiAssistantMessage>.uniquifyToolCallIds(): List<AiAssistantMessage> {
+    val messages = sortedBy(AiAssistantMessage::time)
+    val seenIds = mutableSetOf<String>()
+    val pendingByOriginalId = mutableMapOf<String, ArrayDeque<String>>()
+    var generatedIndex = 0
+    return messages.map { message ->
+        when (message) {
+            is AiAssistantMessage.AssistantMessage -> {
+                pendingByOriginalId.clear()
+                val uniqueCalls = message.toolCalls.orEmpty().map { call ->
+                    val uniqueId = if (seenIds.add(call.id)) {
+                        call.id
+                    } else {
+                        generatedIndex += 1
+                        val nextId = "${call.id}-$generatedIndex"
+                        seenIds.add(nextId)
+                        nextId
+                    }
+                    pendingByOriginalId.getOrPut(call.id) { ArrayDeque() }.addLast(uniqueId)
+                    call.copy(id = uniqueId)
+                }
+                message.copy(toolCalls = uniqueCalls.takeIf(List<ToolCall>::isNotEmpty))
+            }
+            is AiAssistantMessage.ToolMessage -> {
+                val remappedId = pendingByOriginalId[message.toolCallId]
+                    ?.removeFirstOrNull()
+                    ?: message.toolCallId
+                message.copy(toolCallId = remappedId)
+            }
+            else -> message
+        }
+    }
+}
+
+private fun List<AiAssistantMessage>.conversationTurns(): List<List<AiAssistantMessage>> {
+    return fold(mutableListOf<MutableList<AiAssistantMessage>>()) { turns, message ->
+        if (message is AiAssistantMessage.UserMessage || turns.isEmpty()) {
+            turns += mutableListOf(message)
+        } else {
+            turns.last() += message
+        }
+        turns
+    }
+}
+
 private fun AiAssistantMessage.estimatedTokens(): Int {
+    return (estimatedCharacters() + 3) / 4 + 8
+}
+
+private fun AiAssistantMessage.estimatedCharacters(): Int {
     val toolPayloadSize = (this as? AiAssistantMessage.AssistantMessage)?.toolCalls
-        ?.sumOf { call -> call.function.arguments?.toString()?.length ?: 0 }
+        ?.sumOf { call ->
+            call.id.length + call.function.name.length + (call.function.arguments?.toString()?.length ?: 0)
+        }
         ?: 0
-    return ((content?.length ?: 0) + toolPayloadSize + 3) / 4 + 8
+    return (content?.length ?: 0) + toolPayloadSize
 }
 
 suspend fun List<AiAssistantMessage>.dropUnconfirmedMessages(
@@ -135,16 +214,26 @@ private fun List<AiAssistantMessage>.lastConfirmedTurnEndIndex(): Int? {
         val calls = assistant.toolCalls.orEmpty()
         if (calls.isEmpty()) return index
 
-        val callIds = calls.map(ToolCall::id).toSet()
-        val laterToolIds = drop(index + 1)
-            .filterIsInstance<AiAssistantMessage.ToolMessage>()
-            .mapTo(mutableSetOf(), AiAssistantMessage.ToolMessage::toolCallId)
-        if (callIds.any { callId -> callId !in laterToolIds }) continue
+        val remainingCallIds = calls.map(ToolCall::id).toMutableList()
+        var lastConsumedIndex: Int? = null
+        for (laterIndex in (index + 1)..lastIndex) {
+            when (val later = this[laterIndex]) {
+                is AiAssistantMessage.UserMessage,
+                is AiAssistantMessage.AssistantMessage -> break
+                is AiAssistantMessage.ToolMessage -> {
+                    val matchIndex = remainingCallIds.indexOf(later.toolCallId)
+                    if (matchIndex >= 0) {
+                        remainingCallIds.removeAt(matchIndex)
+                        lastConsumedIndex = laterIndex
+                    }
+                }
+                is AiAssistantMessage.SystemMessage -> Unit
+            }
+            if (remainingCallIds.isEmpty()) break
+        }
+        if (remainingCallIds.isNotEmpty()) continue
 
-        return indices.drop(index + 1).lastOrNull { laterIndex ->
-            val tool = this[laterIndex] as? AiAssistantMessage.ToolMessage
-            tool != null && tool.toolCallId in callIds
-        } ?: index
+        return lastConsumedIndex ?: index
     }
     return null
 }

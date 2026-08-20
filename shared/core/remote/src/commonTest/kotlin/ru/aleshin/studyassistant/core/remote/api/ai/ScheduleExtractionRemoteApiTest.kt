@@ -68,6 +68,8 @@ class ScheduleExtractionRemoteApiTest {
         assertEquals("request-1", requestJson.getValue("requestId").jsonPrimitive.content)
         assertEquals(2, requestJson.getValue("numberOfWeeks").jsonPrimitive.content.toInt())
         assertEquals("Математика", response.draft.entries.single().subject)
+        assertEquals("101", response.draft.entries.single().office)
+        assertEquals(null, response.draft.entries.single().location)
         assertEquals(11, response.quotaRemaining)
         assertEquals(12, response.quotaLimit)
         assertEquals(3, response.rewardedResetsRemaining)

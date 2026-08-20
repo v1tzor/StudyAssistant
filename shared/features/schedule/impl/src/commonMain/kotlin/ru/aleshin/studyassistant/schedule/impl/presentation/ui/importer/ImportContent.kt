@@ -155,6 +155,18 @@ internal fun ImportContent(
                 store.dispatchEvent(ImportEvent.AddEmployee(firstName = newTeacherName, uid = uid))
                 editingEmployeeId = uid
             },
+            onAddClass = { dayOfWeek, repeatWeek ->
+                store.dispatchEvent(ImportEvent.AddClass(dayOfWeek, repeatWeek))
+            },
+            onUpdateStartOfDay = { repeatWeek, startTime ->
+                store.dispatchEvent(ImportEvent.UpdateStartOfDay(repeatWeek, startTime))
+            },
+            onUpdateClassesDuration = { repeatWeek, duration ->
+                store.dispatchEvent(ImportEvent.UpdateClassesDuration(repeatWeek, duration))
+            },
+            onUpdateBreaksDuration = { repeatWeek, duration ->
+                store.dispatchEvent(ImportEvent.UpdateBreaksDuration(repeatWeek, duration))
+            },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
         )
     }

@@ -27,6 +27,7 @@ import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardPurpose
@@ -169,6 +170,7 @@ class ShareSchedulesInteractorTest {
             startClassesReminderManager = UnusedStartClassesReminderManager,
             endClassesReminderManager = UnusedEndClassesReminderManager,
             dateManager = FakeDateManager,
+            analyticsService = AnalyticsService.Empty(),
             eitherWrapper = ScheduleEitherWrapper.Base(
                 errorHandler = ScheduleErrorHandler.Base(),
                 crashlyticsService = UnusedCrashlyticsService,

@@ -36,11 +36,13 @@ internal interface AiToolCallStateResolver {
                 val calls = assistant.toolCalls.orEmpty()
                 if (calls.isEmpty()) continue
 
-                val resolvedIds = ordered.drop(index + 1)
-                    .filterIsInstance<AiAssistantMessage.ToolMessage>()
-                    .mapTo(mutableSetOf(), AiAssistantMessage.ToolMessage::toolCallId)
-                val unresolved = calls.filterNot { it.id in resolvedIds }
-                if (unresolved.isNotEmpty()) return unresolved
+                val remaining = calls.toMutableList()
+                for (later in ordered.drop(index + 1)) {
+                    val tool = later as? AiAssistantMessage.ToolMessage ?: continue
+                    val matchIndex = remaining.indexOfFirst { call -> call.id == tool.toolCallId }
+                    if (matchIndex >= 0) remaining.removeAt(matchIndex)
+                }
+                if (remaining.isNotEmpty()) return remaining
             }
             return emptyList()
         }

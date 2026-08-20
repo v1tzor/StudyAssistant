@@ -135,44 +135,27 @@ internal interface CustomScheduleInteractor {
         ) = eitherWrapper.wrapUnit {
             val updatedClasses = buildList<Class> {
                 schedule.classes.forEachIndexed { index, classModel ->
-                    val targetClass = lastOrNull() ?: classModel
-                    val targetDuration =
-                        specificDurations.find { it.number == index.inc() }?.duration
-                            ?: baseDuration
-
-                    // Update target class duration
-                    val updatedTargetClass = targetClass.copy(
-                        timeRange = TimeRange(
-                            from = targetClass.timeRange.from,
-                            to = targetClass.timeRange.from.shiftMillis(targetDuration),
+                    val targetDuration = specificDurations.find { it.number == index.inc() }?.duration ?: baseDuration
+                    val from = if (isEmpty()) {
+                        classModel.timeRange.from
+                    } else {
+                        val previousOriginal = schedule.classes[index - 1]
+                        val originalGap = epochTimeDuration(
+                            start = previousOriginal.timeRange.to,
+                            end = classModel.timeRange.from,
                         )
-                    )
-                    if (getOrNull(index) == null) add(updatedTargetClass) else set(
-                        index,
-                        updatedTargetClass
-                    )
-
-                    if (index != schedule.classes.lastIndex) {
-                        val nextClass = schedule.classes[index + 1]
-                        val endTimeDifference = epochTimeDuration(
-                            start = classModel.timeRange.to,
-                            end = updatedTargetClass.timeRange.to,
-                        )
-
-                        // Restoring the initial break between classes
-                        val updatedNextClass = nextClass.copy(
-                            timeRange = TimeRange(
-                                from = nextClass.timeRange.from.shiftMillis(endTimeDifference),
-                                to = nextClass.timeRange.to.shiftMillis(endTimeDifference),
-                            )
-                        )
-
-                        if (!updatedNextClass.timeRange.to.equalsDay(nextClass.timeRange.to)) {
-                            throw ShiftTimeError()
-                        } else {
-                            add(updatedNextClass)
-                        }
+                        last().timeRange.to.shiftMillis(originalGap.coerceAtLeast(0L))
                     }
+                    val updatedTargetClass = classModel.copy(
+                        timeRange = TimeRange(
+                            from = from,
+                            to = from.shiftMillis(targetDuration),
+                        )
+                    )
+                    if (!updatedTargetClass.timeRange.to.equalsDay(from)) {
+                        throw ShiftTimeError()
+                    }
+                    add(updatedTargetClass)
                 }
             }
 

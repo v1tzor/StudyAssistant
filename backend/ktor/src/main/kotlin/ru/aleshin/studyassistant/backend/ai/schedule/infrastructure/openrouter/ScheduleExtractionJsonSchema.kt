@@ -109,7 +109,18 @@ internal object ScheduleExtractionJsonSchema {
                     put("subject", nullableString("Subject or event name from the same visual block"))
                     put("eventType", eventTypeSchema())
                     put("teacher", nullableString("Teacher name if clearly shown for this event. Formats: LastName FirstName Patronymic OR FirstName Patronymic OR FirstName"))
-                    put("office", nullableString("Room, office or classroom if clearly shown for this event"))
+                    put(
+                        "office",
+                        nullableString(
+                            "Classroom, room, cabinet or auditorium number from the same block or a каб/ауд/room column (101, каб. 215). Null if not visible",
+                        ),
+                    )
+                    put(
+                        "location",
+                        nullableString(
+                            "Building, campus, address or named site if shown. Null when only a room number exists",
+                        ),
+                    )
                 },
             )
             put(
@@ -124,6 +135,7 @@ internal object ScheduleExtractionJsonSchema {
                     "eventType",
                     "teacher",
                     "office",
+                    "location",
                 ),
             )
             put("additionalProperties", JsonPrimitive(false))

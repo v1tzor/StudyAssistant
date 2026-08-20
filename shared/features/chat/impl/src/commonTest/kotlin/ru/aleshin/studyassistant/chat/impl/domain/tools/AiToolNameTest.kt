@@ -28,8 +28,22 @@ class AiToolNameTest {
         assertTrue(AiToolName.CREATE_HOMEWORK.mutatesData)
         assertTrue(AiToolName.CREATE_CLASS.mutatesData)
         assertTrue(AiToolName.UPDATE_CLASS.mutatesData)
-        assertTrue(AiToolName.DELETE_CLASS.mutatesData)
         assertFalse(AiToolName.GET_HOMEWORKS.mutatesData)
         assertFalse(AiToolName.GET_CLASSES_BY_DATE.mutatesData)
+    }
+
+    @Test
+    fun removedToolsAreNotInClientCatalog() {
+        val removed = setOf(
+            "get_free_time",
+            "delete_todo",
+            "delete_homework",
+            "delete_class",
+            "delete_goal",
+        )
+        assertTrue(AiToolName.supportedWireNames.none { name -> name in removed })
+        assertTrue("create_homework" in AiToolName.supportedWireNames)
+        assertTrue("get_near_class" in AiToolName.supportedWireNames)
+        assertTrue("get_subjects" in AiToolName.supportedWireNames)
     }
 }

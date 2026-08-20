@@ -26,18 +26,14 @@ internal enum class AiToolName(
     CREATE_TODO("create_todo", true),
     UPDATE_TODO("update_todo", true),
     COMPLETE_TODO("complete_todo", true),
-    DELETE_TODO("delete_todo", true),
     CREATE_HOMEWORK("create_homework", true),
     UPDATE_HOMEWORK("update_homework", true),
     COMPLETE_HOMEWORK("complete_homework", true),
-    DELETE_HOMEWORK("delete_homework", true),
     CREATE_CLASS("create_class", true),
     UPDATE_CLASS("update_class", true),
-    DELETE_CLASS("delete_class", true),
     CREATE_GOAL("create_goal", true),
     UPDATE_GOAL("update_goal", true),
     COMPLETE_GOAL("complete_goal", true),
-    DELETE_GOAL("delete_goal", true),
     CREATE_SUBJECT("create_subject", true),
     UPDATE_SUBJECT("update_subject", true),
     CREATE_EMPLOYEE("create_employee", true),
@@ -53,7 +49,6 @@ internal enum class AiToolName(
     GET_CLASSES_BY_DATE("get_classes_by_date", false),
     GET_CLASSES_BY_RANGE("get_classes_by_range", false),
     GET_NEAR_CLASS("get_near_class", false),
-    GET_FREE_TIME("get_free_time", false),
     GET_GOALS("get_goals", false);
 
     companion object {

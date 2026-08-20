@@ -180,6 +180,44 @@ internal class ImportComposeStore(
                 )
                 sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
             }
+            is ImportEvent.AddClass -> with(state) {
+                val current = session ?: return
+                val updated = importHandler.addClass(
+                    session = current.mapToDomain(),
+                    dayOfWeek = event.dayOfWeek,
+                    repeatWeek = event.repeatWeek,
+                )
+                sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
+            }
+            is ImportEvent.UpdateStartOfDay -> with(state) {
+                val current = session ?: return
+                val updated = importHandler.updateStartOfDay(
+                    session = current.mapToDomain(),
+                    repeatWeek = event.repeatWeek,
+                    startTime = event.startTime,
+                )
+                sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
+            }
+            is ImportEvent.UpdateClassesDuration -> with(state) {
+                val current = session ?: return
+                val updated = importHandler.updateClassesDuration(
+                    session = current.mapToDomain(),
+                    repeatWeek = event.repeatWeek,
+                    baseDuration = event.baseDuration,
+                    specificDurations = emptyList(),
+                )
+                sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
+            }
+            is ImportEvent.UpdateBreaksDuration -> with(state) {
+                val current = session ?: return
+                val updated = importHandler.updateBreaksDuration(
+                    session = current.mapToDomain(),
+                    repeatWeek = event.repeatWeek,
+                    baseDuration = event.baseDuration,
+                    specificDurations = emptyList(),
+                )
+                sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
+            }
             is ImportEvent.ApplySession -> with(state) {
                 if (session != null && selectedOrganization != null && requestId != null) {
                     launchBackgroundWork(BackgroundKey.REWARD) {

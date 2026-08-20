@@ -94,6 +94,9 @@ internal class AssistantComposeStore(
                 val chatId = state().chatHistory?.uid
                 if (chatId != null) {
                     sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS))
+                    launchBackgroundWork(BackgroundKey.SEND_MESSAGE) {
+                        sendAction(AssistantAction.UpdateResponseStatus(ResponseStatus.SUCCESS))
+                    }
                     launchBackgroundWork(BackgroundKey.MESSAGE_ACTION) {
                         val command = AssistantWorkCommand.ClearChatHistory(chatId)
                         workProcessor.work(command).collectAndHandleWork()

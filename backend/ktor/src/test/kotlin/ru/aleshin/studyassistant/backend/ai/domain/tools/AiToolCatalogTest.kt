@@ -34,13 +34,24 @@ class AiToolCatalogTest {
     @Test
     fun classMutationsRequireDateAndCreateRequiresOrganization() {
         val tools = requireNotNull(
-            catalog.resolve(listOf("create_class", "update_class", "delete_class")),
+            catalog.resolve(listOf("create_class", "update_class")),
         ).associateBy { it.name }
 
         assertTrue("date" in tools.getValue("create_class").requiredFields())
         assertTrue("organizationId" in tools.getValue("create_class").requiredFields())
         assertTrue("date" in tools.getValue("update_class").requiredFields())
-        assertTrue("date" in tools.getValue("delete_class").requiredFields())
+    }
+
+    @Test
+    fun removedToolsAreRejected() {
+        assertEquals(
+            null,
+            catalog.resolve(listOf("get_free_time")),
+        )
+        assertEquals(
+            null,
+            catalog.resolve(listOf("delete_todo", "delete_homework", "delete_class", "delete_goal")),
+        )
     }
 
     private fun ru.aleshin.studyassistant.backend.ai.domain.model.AiToolDefinition.requiredFields(): Set<String> {
@@ -64,22 +75,17 @@ class AiToolCatalogTest {
             "get_classes_by_range",
             "get_near_class",
             "get_goals",
-            "get_free_time",
             "create_todo",
             "update_todo",
             "complete_todo",
-            "delete_todo",
             "create_homework",
             "update_homework",
             "complete_homework",
-            "delete_homework",
             "create_class",
             "update_class",
-            "delete_class",
             "create_goal",
             "update_goal",
             "complete_goal",
-            "delete_goal",
             "create_subject",
             "update_subject",
             "create_employee",

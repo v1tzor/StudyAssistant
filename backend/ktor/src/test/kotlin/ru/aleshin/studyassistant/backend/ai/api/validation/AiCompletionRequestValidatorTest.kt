@@ -80,6 +80,23 @@ class AiCompletionRequestValidatorTest {
     }
 
     @Test
+    fun removedToolsShouldFailClientServerMismatch() {
+        listOf(
+            "get_free_time",
+            "delete_todo",
+            "delete_homework",
+            "delete_class",
+            "delete_goal",
+        ).forEach { name ->
+            assertFailsWith<InvalidRequestException> {
+                validator.validate(
+                    request = request(toolNames = listOf(name)),
+                )
+            }
+        }
+    }
+
+    @Test
     fun unresolvedToolCallShouldFail() {
         assertFailsWith<InvalidRequestException> {
             validator.validate(

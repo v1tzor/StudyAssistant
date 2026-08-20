@@ -170,6 +170,10 @@
     <string name="schedule_import_new_subject_name">Новый предмет</string>
     <string name="schedule_import_new_teacher_name">Новый преподаватель</string>
     <string name="schedule_import_add_button">Добавить</string>
+    <string name="schedule_import_fast_edit_start">Начало дня</string>
+    <string name="schedule_import_fast_edit_classes">Длительность занятий</string>
+    <string name="schedule_import_fast_edit_breaks">Длительность перерывов</string>
+    <string name="schedule_import_fast_edit_add_class">Добавить урок</string>
     <string name="schedule_import_class_editor_title">Занятие</string>
     <string name="schedule_import_subject_editor_title">Предмет</string>
     <string name="schedule_import_teacher_editor_title">Преподаватель</string>

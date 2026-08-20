@@ -242,6 +242,10 @@ internal fun ImportReviewSection(
     onTeacherClick: (UID) -> Unit,
     onAddSubject: () -> Unit,
     onAddTeacher: () -> Unit,
+    onAddClass: (Int, Int) -> Unit,
+    onUpdateStartOfDay: (Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Long) -> Unit,
+    onUpdateBreaksDuration: (Int, Long) -> Unit,
 ) {
     val session = state.session ?: return
     val coroutineScope = rememberCoroutineScope()
@@ -313,6 +317,10 @@ internal fun ImportReviewSection(
                 horizontalPadding = horizontalPadding,
                 onClassClick = onClassClick,
                 onReorderDayClasses = onReorderDayClasses,
+                onAddClass = onAddClass,
+                onUpdateStartOfDay = onUpdateStartOfDay,
+                onUpdateClassesDuration = onUpdateClassesDuration,
+                onUpdateBreaksDuration = onUpdateBreaksDuration,
                 onWeekSelected = {
                     coroutineScope.launch { schedulesScrollState.animateScrollTo(0) }
                 },
@@ -382,6 +390,10 @@ internal fun ImportWeekSection(
     horizontalPadding: Dp = 16.dp,
     onClassClick: (UID) -> Unit,
     onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
+    onAddClass: (Int, Int) -> Unit,
+    onUpdateStartOfDay: (Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Long) -> Unit,
+    onUpdateBreaksDuration: (Int, Long) -> Unit,
     onWeekSelected: () -> Unit,
     schedulesScrollState: ScrollState,
 ) {
@@ -409,6 +421,16 @@ internal fun ImportWeekSection(
                 },
             )
         }
+        val weekClasses = remember(classes, selectedWeek) {
+            classes.filter { classModel -> classModel.repeatWeek == selectedWeek }
+        }
+        ImportFastEditBar(
+            weekClasses = weekClasses,
+            onUpdateStartOfDay = { startTime -> onUpdateStartOfDay(selectedWeek, startTime) },
+            onUpdateClassesDuration = { duration -> onUpdateClassesDuration(selectedWeek, duration) },
+            onUpdateBreaksDuration = { duration -> onUpdateBreaksDuration(selectedWeek, duration) },
+            onAddClass = { onAddClass(DayOfWeek.MONDAY.isoDayNumber, selectedWeek) },
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

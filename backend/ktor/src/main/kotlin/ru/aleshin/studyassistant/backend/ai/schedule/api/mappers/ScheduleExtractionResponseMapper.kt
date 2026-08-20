@@ -59,6 +59,7 @@ class ScheduleExtractionResponseMapper {
                         },
                         teacher = entry.teacher,
                         office = entry.office,
+                        location = entry.location,
                     )
                 },
             ),

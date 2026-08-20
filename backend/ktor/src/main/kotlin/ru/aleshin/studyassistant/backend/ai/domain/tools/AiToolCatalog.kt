@@ -51,7 +51,7 @@ class AiToolCatalog {
             ),
             tool(
                 name = "get_subjects",
-                description = "List local subjects for one organization.",
+                description = "List subjects for one organization. Match names from this list; never invent subjectId.",
                 parameters = objectSchema(
                     required = listOf("organizationId"),
                     properties = listOf(
@@ -128,7 +128,7 @@ class AiToolCatalog {
             ),
             tool(
                 name = "get_near_class",
-                description = "Read the next scheduled class for one subject.",
+                description = "Next class for a subjectId from get_subjects. Returns classId and date for create_homework.",
                 parameters = objectSchema(
                     required = listOf("subjectId"),
                     properties = listOf(
@@ -142,21 +142,6 @@ class AiToolCatalog {
                 parameters = objectSchema(
                     required = listOf("date"),
                     properties = listOf("date" to dateProperty("Local calendar date (YYYY-MM-DD).")),
-                ),
-            ),
-            tool(
-                name = "get_free_time",
-                description = "Find intervals without scheduled classes on one date.",
-                parameters = objectSchema(
-                    required = listOf("date"),
-                    properties = listOf(
-                        "date" to dateProperty("Local calendar date (YYYY-MM-DD)."),
-                        "minimumMinutes" to integerProperty(
-                            description = "Minimum interval duration in minutes.",
-                            minimum = 1,
-                            maximum = 1_440,
-                        ),
-                    ),
                 ),
             ),
             tool(
@@ -204,16 +189,8 @@ class AiToolCatalog {
                 ),
             ),
             tool(
-                name = "delete_todo",
-                description = "Propose deleting one TODO. Explicit confirmation required.",
-                parameters = objectSchema(
-                    required = listOf("todoId"),
-                    properties = listOf("todoId" to idProperty("Target TODO UUID.")),
-                ),
-            ),
-            tool(
                 name = "create_homework",
-                description = "Propose new homework. Requires confirmation.",
+                description = "Propose homework. Requires confirmation. Use existing organizationId, subjectId, deadline (class date) and optional classId from tools. Never invent IDs.",
                 parameters = objectSchema(
                     required = listOf("organizationId", "subjectId", "deadline"),
                     properties = listOf(
@@ -262,14 +239,6 @@ class AiToolCatalog {
                 ),
             ),
             tool(
-                name = "delete_homework",
-                description = "Propose deleting one homework item. Explicit confirmation required.",
-                parameters = objectSchema(
-                    required = listOf("homeworkId"),
-                    properties = listOf("homeworkId" to idProperty("Target homework UUID.")),
-                ),
-            ),
-            tool(
                 name = "create_class",
                 description = "Propose adding a class to the schedule. Requires confirmation.",
                 parameters = classMutationSchema(idField = null),
@@ -278,17 +247,6 @@ class AiToolCatalog {
                 name = "update_class",
                 description = "Propose changing a scheduled class. Requires confirmation.",
                 parameters = classMutationSchema(idField = "classId"),
-            ),
-            tool(
-                name = "delete_class",
-                description = "Propose deleting a scheduled class. Explicit confirmation required.",
-                parameters = objectSchema(
-                    required = listOf("classId", "date"),
-                    properties = listOf(
-                        "classId" to idProperty("Target class UUID."),
-                        "date" to dateProperty("Local date containing the class (YYYY-MM-DD)."),
-                    ),
-                ),
             ),
             tool(
                 name = "create_goal",
@@ -335,14 +293,6 @@ class AiToolCatalog {
                         "goalId" to idProperty("Target goal UUID."),
                         "completed" to booleanProperty("The requested completion state."),
                     ),
-                ),
-            ),
-            tool(
-                name = "delete_goal",
-                description = "Propose deleting a daily goal. Explicit confirmation required.",
-                parameters = objectSchema(
-                    required = listOf("goalId"),
-                    properties = listOf("goalId" to idProperty("Target goal UUID.")),
                 ),
             ),
             tool(

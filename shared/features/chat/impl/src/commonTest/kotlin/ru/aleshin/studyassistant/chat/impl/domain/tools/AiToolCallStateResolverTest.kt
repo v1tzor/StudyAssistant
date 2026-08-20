@@ -55,6 +55,18 @@ class AiToolCallStateResolverTest {
     }
 
     @Test
+    fun `requires one tool result per duplicate id call instance`() {
+        val organizationsCall = toolCall("call_1", "get_organizations")
+        val subjectsCall = toolCall("call_1", "get_subjects")
+        val messages = listOf(
+            assistantMessage(organizationsCall, subjectsCall),
+            toolMessage(callId = "call_1", timestamp = 2L),
+        )
+
+        assertEquals(listOf(subjectsCall), resolver.activeCalls(messages))
+    }
+
+    @Test
     fun `does not revive an older resolved batch`() {
         val oldCall = toolCall("old", "create_todo")
         val currentCall = toolCall("current", "create_homework")

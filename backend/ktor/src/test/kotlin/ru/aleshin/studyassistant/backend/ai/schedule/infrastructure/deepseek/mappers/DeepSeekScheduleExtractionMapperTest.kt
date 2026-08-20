@@ -41,6 +41,32 @@ class DeepSeekScheduleExtractionMapperTest {
         assertEquals(1, draft.entries.single().dayOfWeek)
         assertEquals("09:00", draft.entries.single().startTime)
         assertEquals(ScheduleEventType.LECTURE, draft.entries.single().eventType)
+        assertEquals("101", draft.entries.single().office)
+        assertEquals("Корпус Б", draft.entries.single().location)
+    }
+
+    @Test
+    fun numericOfficeShouldMapToString() {
+        val response = VALID_RESPONSE
+            .replace("\"office\":\"101\"", "\"office\":215")
+            .replace("\"location\":\"Корпус Б\"", "\"location\":null")
+
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals("215", draft.entries.single().office)
+        assertEquals(null, draft.entries.single().location)
+    }
+
+    @Test
+    fun singleDigitHourShouldMapToClock() {
+        val response = VALID_RESPONSE.replace("09:00", "9:00").replace("10:30", "10.30")
+
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals("09:00", draft.entries.single().startTime)
+        assertEquals("10:30", draft.entries.single().endTime)
     }
 
     @Test
@@ -64,6 +90,6 @@ class DeepSeekScheduleExtractionMapperTest {
                 "\"repeatWeek\":1,\"dayOfWeek\":1,\"classNumber\":1," +
                 "\"startTime\":\"09:00\",\"endTime\":\"10:30\"," +
                 "\"subject\":\"Mathematics\",\"eventType\":\"LECTURE\"," +
-                "\"teacher\":null,\"office\":\"101\"}]}"
+                "\"teacher\":null,\"office\":\"101\",\"location\":\"Корпус Б\"}]}"
     }
 }

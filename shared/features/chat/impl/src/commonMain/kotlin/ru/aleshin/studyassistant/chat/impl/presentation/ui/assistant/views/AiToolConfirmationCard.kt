@@ -46,16 +46,13 @@ import ru.aleshin.studyassistant.chat.impl.resources.completed_field_label
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_change_button
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_change_description
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_class_creation_title
-import ru.aleshin.studyassistant.chat.impl.resources.confirm_class_deletion_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_class_update_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_generic_change_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_homework_completion_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_homework_creation_title
-import ru.aleshin.studyassistant.chat.impl.resources.confirm_homework_deletion_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_homework_update_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_todo_completion_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_todo_creation_title
-import ru.aleshin.studyassistant.chat.impl.resources.confirm_todo_deletion_title
 import ru.aleshin.studyassistant.chat.impl.resources.confirm_todo_update_title
 import ru.aleshin.studyassistant.chat.impl.resources.custom_data_field_label
 import ru.aleshin.studyassistant.chat.impl.resources.date_field_label
@@ -190,14 +187,11 @@ private fun confirmationTitle(name: String): String = stringResource(
         "create_todo" -> Res.string.confirm_todo_creation_title
         "update_todo" -> Res.string.confirm_todo_update_title
         "complete_todo" -> Res.string.confirm_todo_completion_title
-        "delete_todo" -> Res.string.confirm_todo_deletion_title
         "create_homework" -> Res.string.confirm_homework_creation_title
         "update_homework" -> Res.string.confirm_homework_update_title
         "complete_homework" -> Res.string.confirm_homework_completion_title
-        "delete_homework" -> Res.string.confirm_homework_deletion_title
         "create_class" -> Res.string.confirm_class_creation_title
         "update_class" -> Res.string.confirm_class_update_title
-        "delete_class" -> Res.string.confirm_class_deletion_title
         else -> Res.string.confirm_generic_change_title
     },
 )

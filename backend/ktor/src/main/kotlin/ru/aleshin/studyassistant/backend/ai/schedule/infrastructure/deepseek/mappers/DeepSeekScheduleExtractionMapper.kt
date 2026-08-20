@@ -55,16 +55,17 @@ class DeepSeekScheduleExtractionMapper(
                 entry.eventType,
                 entry.teacher,
                 entry.office,
+                entry.location,
             )
             if (fields.any { field -> field.isOversized() }) {
                 return null
             }
 
             val startTime = entry.startTime.normalizedField()?.let { value ->
-                runCatching { LocalTime.parse(value).toString() }.getOrNull() ?: return null
+                parseClock(value) ?: return null
             }
             val endTime = entry.endTime.normalizedField()?.let { value ->
-                runCatching { LocalTime.parse(value).toString() }.getOrNull() ?: return null
+                parseClock(value) ?: return null
             }
             if (
                 entry.repeatWeek !in 1..numberOfWeeks ||
@@ -90,6 +91,7 @@ class DeepSeekScheduleExtractionMapper(
                     ?.let { value -> ScheduleEventType.entries.find { it.name == value } },
                 teacher = entry.teacher.normalizedField(),
                 office = entry.office.normalizedField(),
+                location = entry.location.normalizedField(),
             )
         }
 
@@ -97,6 +99,24 @@ class DeepSeekScheduleExtractionMapper(
             title = title,
             entries = entries,
         )
+    }
+
+    private fun parseClock(value: String): String? {
+        val parsed = parseLocalTime(value) ?: return null
+        return String.format("%02d:%02d", parsed.hour, parsed.minute)
+    }
+
+    private fun parseLocalTime(value: String): LocalTime? {
+        val normalized = value.trim().replace('.', ':')
+        runCatching { LocalTime.parse(normalized) }.getOrNull()?.let { parsed ->
+            return parsed
+        }
+        val parts = normalized.split(':')
+        if (parts.size !in 2..3) return null
+        val hour = parts[0].toIntOrNull() ?: return null
+        val minute = parts[1].toIntOrNull() ?: return null
+        val second = parts.getOrNull(2)?.toIntOrNull() ?: 0
+        return runCatching { LocalTime.of(hour, minute, second) }.getOrNull()
     }
 
     private fun String?.normalizedField(): String? {

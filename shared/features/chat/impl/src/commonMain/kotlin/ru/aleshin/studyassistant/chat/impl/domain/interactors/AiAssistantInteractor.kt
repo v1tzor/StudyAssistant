@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.chat.impl.domain.interactors
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -129,18 +130,20 @@ internal interface AiAssistantInteractor {
         }
 
         override suspend fun sendMessage(chatId: UID, message: String?) = eitherWrapper.wrapUnit {
-            val userMessage = message?.let { content ->
-                AiAssistantMessage.UserMessage(
-                    content = content,
-                    time = dateManager.fetchCurrentInstant(),
+            recoverUnconfirmedOnFailure(chatId) {
+                val userMessage = message?.let { content ->
+                    AiAssistantMessage.UserMessage(
+                        content = content,
+                        time = dateManager.fetchCurrentInstant(),
+                    )
+                }
+                val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
+                handleMessage(
+                    chatId = chatId,
+                    assistantMessage = response.choices.firstOrNull()?.message,
+                    toolRound = 0,
                 )
             }
-            val response = aiAssistantRepository.sendUserMessage(chatId, userMessage)
-            handleMessage(
-                chatId = chatId,
-                assistantMessage = response.choices.firstOrNull()?.message,
-                toolRound = 0,
-            )
         }
 
         override suspend fun resolveToolCall(
@@ -148,41 +151,45 @@ internal interface AiAssistantInteractor {
             toolCallId: UID,
             approved: Boolean,
         ) = eitherWrapper.wrapUnit {
-            toolDecisionMutex.withLock {
-                val history = checkNotNull(aiAssistantRepository.fetchChatHistoryById(chatId).first())
-                val activeCalls = toolCallProcessor.activeCalls(history.messages)
-                val targetCall = activeCalls.find { it.id == toolCallId } ?: throw IllegalArgumentException("Tool call is not pending")
-                require(toolCallProcessor.isMutation(targetCall)) {
-                    "Read-only tool cannot be confirmed"
+            recoverUnconfirmedOnFailure(chatId) {
+                toolDecisionMutex.withLock {
+                    val history = checkNotNull(aiAssistantRepository.fetchChatHistoryById(chatId).first())
+                    val activeCalls = toolCallProcessor.activeCalls(history.messages)
+                    val targetCall = activeCalls.find { it.id == toolCallId } ?: throw IllegalArgumentException("Tool call is not pending")
+                    require(toolCallProcessor.isMutation(targetCall)) {
+                        "Read-only tool cannot be confirmed"
+                    }
+
+                    aiAssistantRepository.saveToolResponses(
+                        chatId = chatId,
+                        messages = listOf(toolCallProcessor.execute(targetCall, approved)),
+                    )
+
+                    val updatedHistory = checkNotNull(
+                        aiAssistantRepository.fetchChatHistoryById(chatId).first(),
+                    )
+                    val unresolvedCalls = toolCallProcessor.activeCalls(updatedHistory.messages)
+                    if (unresolvedCalls.any(toolCallProcessor::isMutation)) return@withLock
+
+                    val readResults = unresolvedCalls.map { call -> toolCallProcessor.execute(call) }
+                    if (readResults.isNotEmpty()) {
+                        aiAssistantRepository.saveToolResponses(chatId, readResults)
+                    }
+                    val response = aiAssistantRepository.completeToolRound(chatId)
+                    handleMessage(
+                        chatId = chatId,
+                        assistantMessage = response.choices.firstOrNull()?.message,
+                        toolRound = countToolRounds(updatedHistory.messages),
+                    )
                 }
-
-                aiAssistantRepository.saveToolResponses(
-                    chatId = chatId,
-                    messages = listOf(toolCallProcessor.execute(targetCall, approved)),
-                )
-
-                val updatedHistory = checkNotNull(
-                    aiAssistantRepository.fetchChatHistoryById(chatId).first(),
-                )
-                val unresolvedCalls = toolCallProcessor.activeCalls(updatedHistory.messages)
-                if (unresolvedCalls.any(toolCallProcessor::isMutation)) return@withLock
-
-                val readResults = unresolvedCalls.map { call -> toolCallProcessor.execute(call) }
-                if (readResults.isNotEmpty()) {
-                    aiAssistantRepository.saveToolResponses(chatId, readResults)
-                }
-                val response = aiAssistantRepository.completeToolRound(chatId)
-                handleMessage(
-                    chatId = chatId,
-                    assistantMessage = response.choices.firstOrNull()?.message,
-                    toolRound = countToolRounds(updatedHistory.messages),
-                )
             }
         }
 
         override suspend fun retryAttempt(chatId: UID) = eitherWrapper.wrapUnit {
-            val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId) ?: return@wrapUnit
-            handleMessage(chatId, assistantMessage, toolRound = 0)
+            recoverUnconfirmedOnFailure(chatId) {
+                val assistantMessage = aiAssistantRepository.retrySendLastMessage(chatId) ?: return@recoverUnconfirmedOnFailure
+                handleMessage(chatId, assistantMessage, toolRound = 0)
+            }
         }
 
         override suspend fun clearUnsendMessage(chatId: UID) = eitherWrapper.wrapUnit {
@@ -199,17 +206,32 @@ internal interface AiAssistantInteractor {
             aiAssistantRepository.saveAssistantMessage(chatId, message)
 
             if (toolCalls.isEmpty()) return
-            check(toolRound < MAX_TOOL_ROUNDS) { "Maximum AI tool-call rounds exceeded" }
             if (toolCalls.any(toolCallProcessor::isMutation)) return
 
             val results = toolCalls.map { call -> toolCallProcessor.execute(call) }
             aiAssistantRepository.saveToolResponses(chatId, results)
+            if (toolRound + 1 >= MAX_TOOL_ROUNDS) return
+
             val response = aiAssistantRepository.completeToolRound(chatId)
             handleMessage(
                 chatId = chatId,
                 assistantMessage = response.choices.firstOrNull()?.message,
                 toolRound = toolRound + 1,
             )
+        }
+
+        private suspend fun recoverUnconfirmedOnFailure(
+            chatId: UID,
+            block: suspend () -> Unit,
+        ) {
+            try {
+                block()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                aiAssistantRepository.deleteUnconfirmedMessages(chatId)
+                throw error
+            }
         }
 
         private fun countToolRounds(messages: List<AiAssistantMessage>): Int {
@@ -221,7 +243,7 @@ internal interface AiAssistantInteractor {
         }
 
         private companion object {
-            const val MAX_TOOL_ROUNDS = 6
+            const val MAX_TOOL_ROUNDS = 8
         }
     }
 }

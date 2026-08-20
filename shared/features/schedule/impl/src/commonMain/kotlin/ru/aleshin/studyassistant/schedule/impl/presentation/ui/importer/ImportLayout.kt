@@ -44,6 +44,10 @@ internal fun ImportLayout(
     onTeacherClick: (UID) -> Unit,
     onAddSubject: () -> Unit,
     onAddTeacher: () -> Unit,
+    onAddClass: (Int, Int) -> Unit,
+    onUpdateStartOfDay: (Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Long) -> Unit,
+    onUpdateBreaksDuration: (Int, Long) -> Unit,
     onDone: () -> Unit,
 ) {
     when (layoutMode) {
@@ -62,6 +66,10 @@ internal fun ImportLayout(
             onTeacherClick = onTeacherClick,
             onAddSubject = onAddSubject,
             onAddTeacher = onAddTeacher,
+            onAddClass = onAddClass,
+            onUpdateStartOfDay = onUpdateStartOfDay,
+            onUpdateClassesDuration = onUpdateClassesDuration,
+            onUpdateBreaksDuration = onUpdateBreaksDuration,
             onDone = onDone,
         )
         ImportLayoutMode.EXPANDED -> ImportExpandedLayout(
@@ -79,6 +87,10 @@ internal fun ImportLayout(
             onTeacherClick = onTeacherClick,
             onAddSubject = onAddSubject,
             onAddTeacher = onAddTeacher,
+            onAddClass = onAddClass,
+            onUpdateStartOfDay = onUpdateStartOfDay,
+            onUpdateClassesDuration = onUpdateClassesDuration,
+            onUpdateBreaksDuration = onUpdateBreaksDuration,
             onDone = onDone,
         )
     }

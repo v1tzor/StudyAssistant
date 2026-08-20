@@ -31,5 +31,8 @@ data class DeepSeekScheduleDraftEntryDto(
     val subject: String? = null,
     val eventType: String? = null,
     val teacher: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val office: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
+    val location: String? = null,
 )

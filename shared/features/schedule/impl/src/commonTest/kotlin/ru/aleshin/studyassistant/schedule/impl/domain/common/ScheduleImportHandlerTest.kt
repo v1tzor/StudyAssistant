@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.domain.common
 
+import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
@@ -68,10 +69,77 @@ internal class ScheduleImportHandlerTest {
         assertEquals("08:45", mathClass.endTime)
 
         val physics = session.subjects.first { subject -> subject.name == "Physics" }
-        val anna = session.employees.first { employee -> employee.firstName == "Anna" }
+        val anna = session.employees.first { employee ->
+            listOfNotNull(employee.secondName, employee.firstName, employee.patronymic)
+                .any { part -> part.contains("Anna", ignoreCase = true) }
+        }
         assertFalse(physics.uid in session.originalSubjectIds)
         assertFalse(anna.uid in session.originalEmployeeIds)
         assertEquals(anna.uid, session.classes.first { classModel -> classModel.subjectId == physics.uid }.teacherId)
+        assertEquals("101", mathClass.office)
+        assertEquals("101", session.classes.first { classModel -> classModel.subjectId == physics.uid }.office)
+    }
+
+    @Test
+    fun handleDraftKeepsOfficeAndLocationOnCreatedSubjectAndClass() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(
+                        subject = "Chemistry",
+                        startTime = "08:00",
+                        endTime = "08:45",
+                        office = "215",
+                        location = "Корпус Б",
+                    ),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val classModel = session.classes.single()
+        val subject = session.subjects.single()
+        assertEquals("215", classModel.office)
+        assertEquals("Корпус Б", classModel.location)
+        assertEquals("215", subject.office)
+        assertEquals("Корпус Б", subject.location?.value)
+    }
+
+    @Test
+    fun mergeOrganizationPlacesAddsImportedOfficesAndLocationsToOrganization() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(
+                        subject = "Chemistry",
+                        startTime = "08:00",
+                        endTime = "08:45",
+                        office = "215",
+                        location = "Корпус Б",
+                    ),
+                    entry(
+                        subject = "Physics",
+                        startTime = "09:00",
+                        endTime = "09:45",
+                        office = "101",
+                        location = "Корпус Б",
+                    ),
+                ),
+            ),
+            organization = organization(offices = listOf("12"), locations = listOf(ContactInfo(value = "Старый корпус"))),
+        )
+
+        val merged = composer.mergeOrganizationPlaces(
+            organization = organization(offices = listOf("12"), locations = listOf(ContactInfo(value = "Старый корпус"))),
+            session = session,
+            updatedAt = 10L,
+        )
+
+        assertEquals(listOf("12", "215", "101"), merged.offices)
+        assertEquals(listOf("Старый корпус", "Корпус Б"), merged.locations.map(ContactInfo::value))
+        assertEquals(10L, merged.updatedAt)
     }
 
     @Test
@@ -109,6 +177,95 @@ internal class ScheduleImportHandlerTest {
         )
 
         assertEquals(listOf(1, 2, 3), session.classes.map { classModel -> classModel.number })
+    }
+
+    @Test
+    fun handleDraftKeepsPrintedPeriodNumbersWithGaps() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Physics", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 5),
+                    entry(subject = "Geography", startTime = "09:50", endTime = "10:30", classNumber = 3, dayOfWeek = 5),
+                    entry(subject = "Chemistry", startTime = "11:40", endTime = "12:20", classNumber = 5, dayOfWeek = 5),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        assertEquals(listOf(1, 3, 5), session.classes.map { classModel -> classModel.number })
+        assertEquals("11:40", session.classes.first { classModel -> classModel.number == 5 }.startTime)
+        assertEquals("12:20", session.classes.first { classModel -> classModel.number == 5 }.endTime)
+    }
+
+    @Test
+    fun handleDraftSplitsClonedMegaTimesUsingWeekGridAndKeepsPrintedNumbers() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 1),
+                    entry(subject = "PE", startTime = "08:50", endTime = "09:30", classNumber = 2, dayOfWeek = 1),
+                    entry(subject = "English", startTime = "09:50", endTime = "10:30", classNumber = 3, dayOfWeek = 1),
+                    entry(subject = "Physics", startTime = "10:40", endTime = "11:20", classNumber = 4, dayOfWeek = 1),
+                    entry(subject = "Algebra", startTime = "11:40", endTime = "12:20", classNumber = 5, dayOfWeek = 1),
+                    entry(subject = "Physics", startTime = "08:00", endTime = "15:40", classNumber = 1, dayOfWeek = 5),
+                    entry(subject = "Geography", startTime = "08:00", endTime = "15:40", classNumber = 3, dayOfWeek = 5),
+                    entry(subject = "Chemistry", startTime = "08:00", endTime = "15:40", classNumber = 5, dayOfWeek = 5),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val friday = session.classes.filter { classModel -> classModel.dayOfWeek == 5 }
+            .sortedBy { classModel -> classModel.number }
+        assertEquals(listOf(1, 3, 5), friday.map { classModel -> classModel.number })
+        assertEquals("08:00", friday[0].startTime)
+        assertEquals("08:40", friday[0].endTime)
+        assertEquals("09:50", friday[1].startTime)
+        assertEquals("10:30", friday[1].endTime)
+        assertEquals("11:40", friday[2].startTime)
+        assertEquals("12:20", friday[2].endTime)
+    }
+
+    @Test
+    fun handleDraftRestoresPrintedNumbersFromTimeGridWhenModelCompactedThem() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 1),
+                    entry(subject = "PE", startTime = "08:50", endTime = "09:30", classNumber = 2, dayOfWeek = 1),
+                    entry(subject = "English", startTime = "09:50", endTime = "10:30", classNumber = 3, dayOfWeek = 1),
+                    entry(subject = "Algebra", startTime = "11:40", endTime = "12:20", classNumber = 5, dayOfWeek = 1),
+                    entry(subject = "Physics", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 5),
+                    entry(subject = "Geography", startTime = "09:50", endTime = "10:30", classNumber = 2, dayOfWeek = 5),
+                    entry(subject = "Chemistry", startTime = "11:40", endTime = "12:20", classNumber = 3, dayOfWeek = 5),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val friday = session.classes.filter { classModel -> classModel.dayOfWeek == 5 }
+            .sortedBy { classModel -> classModel.startTime }
+        assertEquals(listOf(1, 3, 5), friday.map { classModel -> classModel.number })
+    }
+
+    @Test
+    fun addClassAppendsLessonOnSelectedDay() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(entry(subject = "Math", startTime = "08:00", endTime = "08:40")),
+            ),
+            organization = organization(),
+        )
+
+        val updated = composer.addClass(session, dayOfWeek = 1, repeatWeek = 1)
+
+        assertEquals(2, updated.classes.size)
+        assertEquals("08:50", updated.classes.last().startTime)
+        assertEquals("09:35", updated.classes.last().endTime)
     }
 
     @Test
@@ -326,6 +483,8 @@ internal class ScheduleImportHandlerTest {
     private fun organization(
         subjects: List<Subject> = emptyList(),
         employees: List<Employee> = emptyList(),
+        offices: List<String> = emptyList(),
+        locations: List<ContactInfo> = emptyList(),
     ) = Organization(
         uid = "org-1",
         isMain = true,
@@ -333,6 +492,8 @@ internal class ScheduleImportHandlerTest {
         type = OrganizationType.SCHOOL,
         subjects = subjects,
         employee = employees,
+        locations = locations,
+        offices = offices,
         updatedAt = 1L,
     )
 
@@ -368,17 +529,20 @@ internal class ScheduleImportHandlerTest {
         startTime: String,
         endTime: String,
         classNumber: Int? = 1,
+        dayOfWeek: Int = 1,
+        office: String? = "101",
+        location: String? = null,
     ) = ScheduleImportEntry(
         repeatWeek = 1,
-        dayOfWeek = 1,
+        dayOfWeek = dayOfWeek,
         classNumber = classNumber,
         startTime = startTime,
         endTime = endTime,
         subject = subject,
         eventType = ScheduleImportEventType.LESSON,
         teacher = teacher,
-        office = "101",
-        location = null,
+        office = office,
+        location = location,
         organization = null,
         notes = null,
         included = true,
