@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 import shared
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {

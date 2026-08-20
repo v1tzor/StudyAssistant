@@ -38,48 +38,44 @@ StudyAssistant
 
 ## 🎓 Your Ultimate Academic Organizer
 
-### 🤖 AI-Powered Study Assistant
-Talk directly to your personal neural network assistant — a smart AI that not only chats but also creates tasks, schedules homework, analyzes your calendar, and even helps you solve academic problems. Whether you're planning your day or tackling tough assignments, the assistant is always by your side.
+StudyAssistant is a **completely free** planner for school, college, and university. There is no subscription, no account, and no cloud copy of your diary. Your schedule, homework, TODOs, organizations, and profile stay on the device.
 
-### 🎯 Daily Goals with Timer & Stopwatch
-Set clear daily goals and stay on track with built-in timers and a stopwatch. Organize your homework, track your focus sessions, and never miss a task again — ideal for maintaining momentum and beating procrastination.
+> **Free forever.** Every feature is included. We do not collect personal identity — no email, no sign-in, no friends graph.
 
-### 🌐 Offline by Design
-Schedules, homework, TODOs, organizations, employees, subjects, settings, and your profile are stored locally and work without an account. Network access is used only when you explicitly share or import a schedule/homework item and when you use the AI assistant.
+### 🌐 Offline by design
+Classes, homework, TODOs, organizations, employees, subjects, settings, and your local profile work without the internet. The network is used only when you choose to share or import something, talk to the assistant, or import a timetable from a photo.
 
-### 📚 Convenient Organization of Classes
-Divide all classes, subjects and assignments by educational organizations – colleges, schools, courses, universities, etc. Work comfortably with each of them and get the most out of your learning processes.
+### 📚 Organizations & classes
+Keep school, college, courses, and university in separate organizations. Subjects, teachers, classrooms, and assignments stay grouped where they belong.
 
-### 🔗 Temporary Sharing
-Share schedules and homework with a short-lived code or QR link. The recipient sees a preview before importing the data into their local database; friends, contacts, and cloud profiles are not required.
+### 📷 Import a timetable from a photo
+Photograph a timetable (table, diary, or weekly grid). Review the draft, fix times if needed, then apply it locally — including rooms and locations when they are on the image.
 
-### ⏰ Flexible Scheduling
-Design your recurring schedules with ease and make one-time adjustments for specific days. Change class durations, swap subjects, and keep a history of all schedule changes so you’re always on top of your time management.
+### ⏰ Flexible scheduling
+Build a repeating week and override a single day when the plan changes. Adjust start times, lesson length, and breaks without rebuilding the whole timetable.
 
-### 📝 Smart Homework Management
-Simplify your homework routine! Quickly add tasks and link them directly to your upcoming classes. During lessons, the app automatically determines the next subject, saving you time and effort. 
+### 📝 Homework linked to classes
+Add homework and attach it to the next lesson of a subject. During the day the app already knows what is coming up, so you are not hunting through the week by hand.
 
-### 📊 Workload Statistics
-Stay ahead of your tasks with real-time workload tracking! Monitor your weekly workload right on the home screen, and get detailed statistics on the number of tasks for each day, helping you plan your time more effectively.
+### 🤖 AI assistant
+Chat in the app about *your* local data. The assistant can look up organizations, subjects, and classes, then **propose** homework or TODOs — nothing is written until you confirm. History stays on the device. A shared daily quota keeps the service free for everyone.
 
-### 🔔 Smart Notifications
-Never miss a beat! Receive timely notifications about high workloads, incomplete assignments, and alerts for the beginning or end of lessons. Keeping up-to-date with your schedule has never been easier!
+### 🔗 Temporary sharing
+Hand someone a short code or QR link for a schedule or homework item. They preview it, then import into their own local database. No friend list, no cloud profile, no permanent link.
 
-### ✅ Create Your Todo List
-Organize your tasks effortlessly! Create and manage your personal TODO list, ensuring that you never miss an important deadline and stay one step ahead in your studies.
+### 🎯 Daily goals & timers
+Set the day’s goals and track them with a timer or stopwatch so focus sessions stay honest.
+
+### ✅ TODO list
+Keep personal tasks next to homework — with reminders, not with another login.
+
+### 📊 Workload
+See the week’s load on the home screen and how many tasks sit on each day before it piles up.
+
+### 🔔 Notifications
+Get alerts for the start and end of classes, unfinished homework, and a heavy day. Full reminder coverage is on Android; iOS is still catching up.
 
 ---
-
-Start today with the Study Assistant app—a powerful tool to make your learning more efficient and organized! 🚀
-
----
-
-> <picture>
->   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/light-theme/info.svg">
->   <img alt="Info" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/info.svg">
-> </picture><br>
->
-> Study data is stored locally on the device. Only data explicitly sent through temporary sharing and AI requests leaves the device. The application has no account, subscription, or background cloud synchronization.
 
 # Screenshots
 
@@ -103,8 +99,20 @@ Start today with the Study Assistant app—a powerful tool to make your learning
       </tbody>
   </table>
 </div>
- 
-###  
+
+## Privacy & staying free
+
+Your timetable, homework, messages, and profile **do not leave the phone** as a backup or an account. There is no sign-in and we do not collect personal data such as email, phone number, or a public user profile.
+
+The only things that go over the network are what you explicitly send:
+
+- a temporary share you create (encrypted in transit, short-lived on the server)
+- an AI chat turn or a photo used to extract a timetable
+- optional ads / a rewarded ad if you want extra AI messages
+
+**[AppMetrica](https://appmetrica.yandex.ru/)** records crashes and coarse product usage so we can keep AI and sharing online without charging you. It is not a dump of your classes or homework, we do not sell study data, and we do not turn it into a marketing profile of you.
+
+Short Yandex ads (and an optional rewarded ad for extra AI messages) exist for the same reason: they pay for the shared backend, not for unlocking the app.
 
 ## Markets
 | Service        | Availability |
@@ -141,7 +149,7 @@ This project utilizes the following technologies and libraries:
 - **[PostgreSQL](https://www.postgresql.org/)**: Transactional quotas and encrypted temporary sharing storage.
 - **[DeepSeek API](https://api-docs.deepseek.com/)**: Server-side shared AI through the fixed Flash model.
 - **[Tracer](https://apptracer.ru/)**: Android crash reporting.
-- **[AppMetrica](https://appmetrica.yandex.ru/)**: Analytics and error reporting.
+- **[AppMetrica](https://appmetrica.yandex.ru/)**: Crash and usage analytics for the shared AI and sharing backend.
 
 ## 🎨 UI & Navigation
 - **[Compose Material 3](https://developer.android.com/jetpack/compose/material)**: Material Design components for Jetpack Compose.
@@ -188,6 +196,7 @@ graph LR;
     features --> preview-impl --> preview-api
     features --> schedule-impl --> schedule-api
     features --> tasks-impl --> tasks-api
+    features --> analytics-impl --> analytics-api
     features --> info-impl --> info-api
     features --> profile-impl --> profile-api
     features --> settings-impl --> settings-api

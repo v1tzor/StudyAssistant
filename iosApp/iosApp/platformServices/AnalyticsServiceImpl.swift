@@ -11,11 +11,11 @@ import shared
 import AppMetricaCore
 
 public class AnalyticsServiceImpl : CommonAnalyticsService {
-   
+
     public func setupUserId(id: String) {
-        AppMetrica.setUserProfileID(id)
+        AppMetrica.userProfileID = id
     }
-    
+
     public func initializeService() {
         guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "AppMetricaApiKey") as? String, !apiKey.isEmpty else {
             return
@@ -24,8 +24,8 @@ public class AnalyticsServiceImpl : CommonAnalyticsService {
             AppMetrica.activate(with: configuration)
         }
     }
-    
+
     public func trackEvent(name: String, eventParams: [String : String]) {
-        AppMetrica.reportEvent(name: name, parameters: eventParams)
+        AppMetrica.reportEvent(name: name, parameters: eventParams, onFailure: nil)
     }
 }

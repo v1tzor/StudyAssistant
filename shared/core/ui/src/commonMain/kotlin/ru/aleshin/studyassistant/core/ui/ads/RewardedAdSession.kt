@@ -16,33 +16,36 @@
 
 package ru.aleshin.studyassistant.core.ui.ads
 
+import kotlinx.atomicfu.locks.reentrantLock
+import kotlinx.atomicfu.locks.withLock
+
 /**
  * @author Stanislav Aleshin on 17.08.2026.
  */
 object RewardedAdSession {
 
-    private val lock = Any()
+    private val lock = reentrantLock()
     private var presentedKey: String? = null
     private var rewardedKey: String? = null
 
-    fun markPresented(key: String) = synchronized(lock) {
+    fun markPresented(key: String) = lock.withLock {
         presentedKey = key
     }
 
-    fun markRewarded(key: String) = synchronized(lock) {
+    fun markRewarded(key: String) = lock.withLock {
         presentedKey = key
         rewardedKey = key
     }
 
-    fun hasRewarded(key: String) = synchronized(lock) {
+    fun hasRewarded(key: String) = lock.withLock {
         rewardedKey == key
     }
 
-    fun isPresented(key: String) = synchronized(lock) {
+    fun isPresented(key: String) = lock.withLock {
         presentedKey == key
     }
 
-    fun clear(key: String) = synchronized(lock) {
+    fun clear(key: String) = lock.withLock {
         if (presentedKey == key) presentedKey = null
         if (rewardedKey == key) rewardedKey = null
     }
