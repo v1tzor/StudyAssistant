@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.core.ui.ads
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.yandex.mobile.ads.kmp.banner.Banner
 import com.yandex.mobile.ads.kmp.banner.BannerAdSize
@@ -53,6 +51,7 @@ fun YandexInlineBanner(
         AdPlacement.HOMEWORK_RECEIVE -> configuration.homeworkReceiveBannerId
         AdPlacement.ANALYTICS -> configuration.analyticsBannerId
     }
+
     if (adUnitId.isBlank()) return
 
     val bannerMaxHeight = if (placement == AdPlacement.ANALYTICS || placement == AdPlacement.HOMEWORK_RECEIVE) {
@@ -61,46 +60,42 @@ fun YandexInlineBanner(
         BANNER_DEFAULT_HEIGHT
     }
 
-    BoxWithConstraints(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(bannerMaxHeight),
-    ) {
-        var stableWidth by remember(adUnitId) { mutableStateOf<Dp?>(null) }
-        if (stableWidth == null && maxWidth > 0.dp) {
-            stableWidth = maxWidth
-        }
-        val bannerWidth = stableWidth ?: BANNER_FALLBACK_WIDTH
-        var loadFailed by remember(adUnitId) { mutableStateOf(false) }
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val bannerWidth = if (maxWidth > 0.dp) maxWidth else BANNER_FALLBACK_WIDTH
+
+        var loadState by remember(adUnitId) { mutableStateOf(AdLoadState.Loading) }
+
         val bannerState = rememberBannerAdState(
             adSize = BannerAdSize.Inline(
                 width = bannerWidth,
                 maxHeight = bannerMaxHeight,
             ),
             events = BannerEvents(
-                onAdFailedToLoad = { loadFailed = true },
+                onAdFailedToLoad = { loadState = AdLoadState.Failed },
+                onAdLoaded = { loadState = AdLoadState.Loaded }
             ),
         )
-        LaunchedEffect(adUnitId) {
-            if (!loadFailed) {
-                bannerState.loadAd(AdRequest(adUnitId = adUnitId))
-            }
+
+        LaunchedEffect(adUnitId, bannerWidth) {
+            loadState = AdLoadState.Loading
+            bannerState.loadAd(AdRequest(adUnitId = adUnitId))
         }
-        if (!loadFailed) {
+
+        if (loadState != AdLoadState.Failed) {
             Banner(
                 state = bannerState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(bannerMaxHeight),
             )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(bannerMaxHeight),
-            )
         }
     }
+}
+
+private enum class AdLoadState {
+    Loading,
+    Loaded,
+    Failed
 }
 
 private val BANNER_DEFAULT_HEIGHT = 50.dp
