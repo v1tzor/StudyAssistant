@@ -20,7 +20,6 @@ import ru.aleshin.studyassistant.backend.ai.schedule.domain.model.ScheduleEventT
 import ru.aleshin.studyassistant.backend.ai.testAiConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 /**
  * @author Stanislav Aleshin on 12.08.2026.
@@ -70,17 +69,68 @@ class DeepSeekScheduleExtractionMapperTest {
     }
 
     @Test
-    fun invalidTimeShouldFailMapping() {
+    fun invalidTimeShouldSkipEntry() {
         val response = VALID_RESPONSE.replace("09:00", "25:00")
 
-        assertNull(mapper.mapResponse(content = response, numberOfWeeks = 2))
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals(emptyList(), draft.entries)
     }
 
     @Test
-    fun repeatWeekOutsideRequestShouldFailMapping() {
+    fun invalidEntryShouldNotDropTheRestOfTheDraft() {
+        val response =
+            "{\"title\":null,\"entries\":[" +
+                "{\"repeatWeek\":1,\"dayOfWeek\":1,\"classNumber\":1," +
+                "\"startTime\":\"25:00\",\"endTime\":\"10:30\"," +
+                "\"subject\":\"Broken\",\"eventType\":null,\"teacher\":null,\"office\":null,\"location\":null}," +
+                "{\"repeatWeek\":1,\"dayOfWeek\":1,\"classNumber\":2," +
+                "\"startTime\":\"11:00\",\"endTime\":\"11:45\"," +
+                "\"subject\":\"History\",\"eventType\":null,\"teacher\":null,\"office\":null,\"location\":null}" +
+                "]}"
+
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals(listOf("History"), draft.entries.map { entry -> entry.subject })
+        assertEquals("11:00", draft.entries.single().startTime)
+    }
+
+    @Test
+    fun timeRangeAndStringClassNumberShouldMap() {
+        val response = VALID_RESPONSE
+            .replace("\"classNumber\":1", "\"classNumber\":\"3\"")
+            .replace("\"startTime\":\"09:00\"", "\"startTime\":\"9:00-10:30\"")
+            .replace("\"endTime\":\"10:30\"", "\"endTime\":null")
+
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals(3, draft.entries.single().classNumber)
+        assertEquals("09:00", draft.entries.single().startTime)
+        assertEquals("10:30", draft.entries.single().endTime)
+    }
+
+    @Test
+    fun markdownJsonShouldMap() {
+        val response = "```json\n$VALID_RESPONSE\n```"
+
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals("Semester schedule", draft.title)
+        assertEquals(1, draft.entries.size)
+    }
+
+    @Test
+    fun repeatWeekOutsideRequestShouldSkipEntry() {
         val response = VALID_RESPONSE.replace("\"repeatWeek\":1", "\"repeatWeek\":3")
 
-        assertNull(mapper.mapResponse(content = response, numberOfWeeks = 2))
+        val draft = mapper.mapResponse(content = response, numberOfWeeks = 2)
+
+        requireNotNull(draft)
+        assertEquals(emptyList(), draft.entries)
     }
 
     private companion object {

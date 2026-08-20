@@ -33,4 +33,5 @@ data class OpenRouterChatRequestDto(
     val maxTokens: Int,
     val stream: Boolean = false,
     val provider: OpenRouterProviderPreferencesDto? = null,
+    val reasoning: OpenRouterReasoningDto? = null,
 )

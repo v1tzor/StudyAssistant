@@ -23,13 +23,21 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class DeepSeekScheduleDraftEntryDto(
+    @Serializable(with = FlexibleIntSerializer::class)
     val repeatWeek: Int,
+    @Serializable(with = FlexibleIntSerializer::class)
     val dayOfWeek: Int,
+    @Serializable(with = FlexibleNullableIntSerializer::class)
     val classNumber: Int? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val startTime: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val endTime: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val subject: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val eventType: String? = null,
+    @Serializable(with = FlexibleNullableStringSerializer::class)
     val teacher: String? = null,
     @Serializable(with = FlexibleNullableStringSerializer::class)
     val office: String? = null,

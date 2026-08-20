@@ -23,5 +23,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class OpenRouterResponseMessageDto(
+    @Serializable(with = OpenRouterMessageContentSerializer::class)
     val content: String? = null,
 )

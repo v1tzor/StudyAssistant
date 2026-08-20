@@ -47,6 +47,7 @@ import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.d
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterImageUrlDto
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterMessageDto
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterProviderPreferencesDto
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterReasoningDto
 import java.io.IOException
 import java.time.Clock
 import java.time.Duration
@@ -128,7 +129,6 @@ class OpenRouterScheduleExtractionGateway(
                     return ScheduleProviderResult.Success(draft = draft)
                 }
                 if (attempt == config.maxRetries) {
-                    logger.warn("OpenRouter returned an invalid or incomplete schedule draft")
                     return ScheduleProviderResult.Unavailable
                 }
                 delayBeforeRetry(attempt = attempt, retryAfter = null)
@@ -213,6 +213,7 @@ class OpenRouterScheduleExtractionGateway(
             temperature = EXTRACTION_TEMPERATURE,
             maxTokens = config.maxTokens,
             provider = OpenRouterProviderPreferencesDto(requireParameters = true),
+            reasoning = OpenRouterReasoningDto(enabled = false),
         )
     }
 
@@ -232,10 +233,14 @@ class OpenRouterScheduleExtractionGateway(
         numberOfWeeks: Int,
     ): ScheduleDraft? {
         val content = readProviderContent(response = response) ?: return null
-        return mapper.mapResponse(
+        val draft = mapper.mapResponse(
             content = content,
             numberOfWeeks = numberOfWeeks,
         )
+        if (draft == null) {
+            logger.warn("OpenRouter schedule JSON could not be mapped, contentChars={}", content.length)
+        }
+        return draft
     }
 
     private suspend fun readProviderContent(response: HttpResponse): String? {
@@ -247,6 +252,7 @@ class OpenRouterScheduleExtractionGateway(
         } catch (cause: CancellationException) {
             throw cause
         } catch (_: IOException) {
+            logger.warn("OpenRouter schedule response body could not be read")
             return null
         }
 
@@ -259,16 +265,39 @@ class OpenRouterScheduleExtractionGateway(
         val providerResponse = try {
             OpenRouterJson.decodeFromString<OpenRouterChatResponseDto>(bytes.decodeToString())
         } catch (_: SerializationException) {
+            logger.warn("OpenRouter schedule envelope was not valid JSON")
             return null
         } catch (_: IllegalArgumentException) {
+            logger.warn("OpenRouter schedule envelope could not be decoded")
             return null
         }
 
-        val choice = providerResponse.choices.singleOrNull() ?: return null
-        if (choice.finishReason != null && choice.finishReason != STOP_FINISH_REASON) {
+        val choice = providerResponse.choices.singleOrNull()
+        if (choice == null) {
+            logger.warn("OpenRouter schedule response did not contain a single choice")
             return null
         }
-        return choice.message?.content?.trim()?.takeIf(String::isNotEmpty)
+        val finishReason = choice.finishReason
+        if (finishReason == ERROR_FINISH_REASON || finishReason == CONTENT_FILTER_FINISH_REASON) {
+            logger.warn("OpenRouter schedule finish_reason={}", finishReason)
+            return null
+        }
+        val content = choice.message?.content?.trim()?.takeIf(String::isNotEmpty)
+        if (content == null) {
+            logger.warn(
+                "OpenRouter schedule content was empty, finishReason={}, contentChars=0",
+                finishReason,
+            )
+            return null
+        }
+        if (finishReason != null && finishReason != STOP_FINISH_REASON) {
+            logger.warn(
+                "OpenRouter schedule finish_reason={} contentChars={}",
+                finishReason,
+                content.length,
+            )
+        }
+        return content
     }
 
     private suspend fun delayBeforeRetry(attempt: Int, retryAfter: String?) {
@@ -321,6 +350,8 @@ class OpenRouterScheduleExtractionGateway(
         const val APP_TITLE = "StudyAssistant"
         const val EXTRACTION_TEMPERATURE = 0.1
         const val STOP_FINISH_REASON = "stop"
+        const val ERROR_FINISH_REASON = "error"
+        const val CONTENT_FILTER_FINISH_REASON = "content_filter"
         const val MILLIS_PER_SECOND = 1_000L
         const val MAX_SHIFT = 30
 

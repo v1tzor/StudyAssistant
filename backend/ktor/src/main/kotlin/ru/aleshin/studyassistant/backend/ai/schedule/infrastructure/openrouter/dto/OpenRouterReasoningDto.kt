@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.deepseek.dto
+package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto
 
 import kotlinx.serialization.Serializable
 
 /**
- * @author Stanislav Aleshin on 12.08.2026.
+ * @author Stanislav Aleshin on 20.08.2026.
  */
 @Serializable
-data class DeepSeekScheduleDraftDto(
-    val title: String? = null,
-    @Serializable(with = LenientDraftEntriesSerializer::class)
-    val entries: List<DeepSeekScheduleDraftEntryDto> = emptyList(),
+data class OpenRouterReasoningDto(
+    val enabled: Boolean? = null,
+    val effort: String? = null,
+    val exclude: Boolean? = null,
 )
