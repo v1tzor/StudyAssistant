@@ -68,18 +68,7 @@ class MainActivity : FlavorMainActivity() {
         setContent {
             AppScreen(
                 component = mainComponent,
-                adsConfiguration = AdsConfiguration(
-                    tasksOverviewBannerId = BuildConfig.YANDEX_TASKS_BANNER_ID,
-                    infoOrganizationsBannerId = BuildConfig.YANDEX_INFO_BANNER_ID,
-                    shareImportBannerId = BuildConfig.YANDEX_SHARE_IMPORT_BANNER_ID,
-                    sharePreviewBannerId = BuildConfig.YANDEX_SHARE_PREVIEW_BANNER_ID,
-                    aiImporterBannerId = BuildConfig.YANDEX_AI_IMPORTER_BANNER_ID,
-                    homeworkReceiveBannerId = BuildConfig.YANDEX_HOMEWORK_RECEIVE_BANNER_ID,
-                    analyticsBannerId = BuildConfig.YANDEX_ANALYTICS_BANNER_ID,
-                    aiQuotaRewardedId = BuildConfig.YANDEX_AI_REWARDED_ID,
-                    scheduleImportRewardedId = BuildConfig.YANDEX_SCHEDULE_REWARDED_ID,
-                    aiScheduleAnalysisRewardedId = BuildConfig.YANDEX_SCHEDULE_AI_REWARDED_ID,
-                )
+                adsConfiguration = createAdsConfiguration()
             )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -120,3 +109,23 @@ class MainActivity : FlavorMainActivity() {
         super.onPause()
     }
 }
+
+private fun createAdsConfiguration(): AdsConfiguration {
+    val isDebug = BuildConfig.DEBUG
+
+    return AdsConfiguration(
+        tasksOverviewBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_TASKS_BANNER_ID,
+        infoOrganizationsBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_INFO_BANNER_ID,
+        shareImportBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_SHARE_IMPORT_BANNER_ID,
+        sharePreviewBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_SHARE_PREVIEW_BANNER_ID,
+        aiImporterBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_AI_IMPORTER_BANNER_ID,
+        homeworkReceiveBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_HOMEWORK_RECEIVE_BANNER_ID,
+        analyticsBannerId = if (isDebug) DEBUG_BANNER_ID else BuildConfig.YANDEX_ANALYTICS_BANNER_ID,
+        aiQuotaRewardedId = if (isDebug) DEBUG_REWARD_ID else BuildConfig.YANDEX_AI_REWARDED_ID,
+        scheduleImportRewardedId = if (isDebug) DEBUG_REWARD_ID else BuildConfig.YANDEX_SCHEDULE_REWARDED_ID,
+        aiScheduleAnalysisRewardedId = if (isDebug) DEBUG_REWARD_ID else BuildConfig.YANDEX_SCHEDULE_AI_REWARDED_ID,
+    )
+}
+
+private const val DEBUG_BANNER_ID = "demo-banner-yandex"
+private const val DEBUG_REWARD_ID = "demo-rewarded-yandex"
