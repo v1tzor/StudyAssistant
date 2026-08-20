@@ -218,10 +218,6 @@ class OpenRouterScheduleExtractionGateway(
             ),
             temperature = EXTRACTION_TEMPERATURE,
             maxTokens = config.maxTokens,
-            provider = OpenRouterProviderPreferencesDto(
-                order = PROVIDER_ORDER,
-                allowFallbacks = false,
-            ),
             reasoning = OpenRouterReasoningDto(
                 maxTokens = REASONING_MAX_TOKENS,
                 exclude = true,
@@ -369,7 +365,6 @@ class OpenRouterScheduleExtractionGateway(
 
         const val REASONING_MAX_TOKENS = 6096
         const val BUSY_RETRY_AFTER_SECONDS = 10L
-        val PROVIDER_ORDER = listOf("xiaomi", "novita", "gmicloud", "parasail")
 
         val SYSTEM_PROMPT = """
             You are an expert timetable and academic schedule extraction engine.

@@ -253,7 +253,7 @@ internal fun ImportLoadingSection(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = 2,
+                        maxLines = 3,
                     )
                 }
                 Text(
