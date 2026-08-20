@@ -27,7 +27,7 @@ data class OpenRouterChatRequestDto(
     val model: String,
     val messages: List<OpenRouterMessageDto>,
     @SerialName("response_format")
-    val responseFormat: OpenRouterResponseFormatDto,
+    val responseFormat: OpenRouterResponseFormatDto? = null,
     val temperature: Double,
     @SerialName("max_tokens")
     val maxTokens: Int,
