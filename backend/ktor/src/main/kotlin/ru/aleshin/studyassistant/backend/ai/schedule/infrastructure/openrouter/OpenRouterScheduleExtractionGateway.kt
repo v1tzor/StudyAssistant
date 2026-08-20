@@ -46,6 +46,7 @@ import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.d
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterContentPartDto
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterImageUrlDto
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterMessageDto
+import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterProviderPreferencesDto
 import ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto.OpenRouterReasoningDto
 import java.io.IOException
 import java.time.Clock
@@ -77,7 +78,11 @@ class OpenRouterScheduleExtractionGateway(
                 concurrencyLimiter.acquire()
                 true
             } ?: false
-            if (!acquired) return@withTimeoutOrNull ScheduleProviderResult.Unavailable
+            if (!acquired) {
+                return@withTimeoutOrNull ScheduleProviderResult.RateLimited(
+                    retryAfterSeconds = BUSY_RETRY_AFTER_SECONDS,
+                )
+            }
 
             try {
                 extractWithinDeadline(request = request)
@@ -213,6 +218,10 @@ class OpenRouterScheduleExtractionGateway(
             ),
             temperature = EXTRACTION_TEMPERATURE,
             maxTokens = config.maxTokens,
+            provider = OpenRouterProviderPreferencesDto(
+                order = PROVIDER_ORDER,
+                allowFallbacks = false,
+            ),
             reasoning = OpenRouterReasoningDto(
                 maxTokens = REASONING_MAX_TOKENS,
                 exclude = true,
@@ -358,7 +367,9 @@ class OpenRouterScheduleExtractionGateway(
         const val MILLIS_PER_SECOND = 1_000L
         const val MAX_SHIFT = 30
 
-        const val REASONING_MAX_TOKENS = 4096
+        const val REASONING_MAX_TOKENS = 6096
+        const val BUSY_RETRY_AFTER_SECONDS = 10L
+        val PROVIDER_ORDER = listOf("xiaomi", "novita", "gmicloud", "parasail")
 
         val SYSTEM_PROMPT = """
             You are an expert timetable and academic schedule extraction engine.

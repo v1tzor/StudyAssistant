@@ -35,12 +35,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -73,6 +75,7 @@ import ru.aleshin.studyassistant.core.presentation.models.users.EmployeeUi
 import ru.aleshin.studyassistant.core.ui.ads.AdPlacement
 import ru.aleshin.studyassistant.core.ui.ads.YandexInlineBanner
 import ru.aleshin.studyassistant.core.ui.resources.ic_tooltip
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 import ru.aleshin.studyassistant.core.ui.views.InfoTextField
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.ScheduleImportClassUi
 import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.NumberOfWeekItem
@@ -84,6 +87,7 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_cancel_
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_extract_button
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_large_photo_hint
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_placeholder
@@ -150,6 +154,9 @@ internal fun ImportSourceSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+        item(key = PHOTO_HINT_SECTION_KEY) {
+            ImportLargePhotoHint()
         }
         item(key = PHOTO_SECTION_KEY) {
             ImportSourceActions(
@@ -648,6 +655,37 @@ internal fun ImportSuccessSection(
     }
 }
 
+@Composable
+private fun ImportLargePhotoHint(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = StudyAssistantRes.colors.accents.yellowContainer,
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                modifier = Modifier.size(32.dp),
+                imageVector = Icons.Default.WarningAmber,
+                contentDescription = null,
+                tint = StudyAssistantRes.colors.accents.onYellowContainer,
+            )
+            Text(
+                text = stringResource(Res.string.schedule_import_large_photo_hint),
+                style = MaterialTheme.typography.bodyMedium,
+                color = StudyAssistantRes.colors.accents.onYellowContainer,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
 private data class ImportProcessingStatus(
     val startSeconds: Int,
     val text: StringResource,
@@ -686,6 +724,7 @@ private const val IMPORT_PROCESSING_STATUS_INTERVAL_SECONDS = 12
 private const val IMPORT_PROCESSING_THINKING_START_SECONDS = 96
 
 internal const val SOURCE_HEADER_KEY = "import_source_header"
+internal const val PHOTO_HINT_SECTION_KEY = "import_photo_hint_section"
 internal const val PHOTO_SECTION_KEY = "import_photo_section"
 internal const val ORGANIZATION_SECTION_KEY = "import_organization_section"
 internal const val NOTE_SECTION_KEY = "import_note_section"

@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.store
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkResult
@@ -24,6 +26,8 @@ import ru.aleshin.studyassistant.core.common.functional.Either
 import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
+import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.domain.entities.ads.AdRewardChallenge
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationShort
@@ -47,7 +51,8 @@ class ImportWorkProcessorTest {
     @Test
     fun applyDraftMarksAppliedAfterSuccess() = runBlocking {
         val interactor = FakeScheduleImportInteractor()
-        val processor = ImportWorkProcessor.Base(interactor, FakeOrganizationsInteractor())
+        val dateManager = DateManager.Base(workDispatchersProvider = CoroutineManager.Base(Dispatchers.IO,Dispatchers.Default, Dispatchers.Main))
+        val processor = ImportWorkProcessor.Base(interactor, FakeOrganizationsInteractor(), dateManager)
         val session = ScheduleImportSessionUi(
             title = "Week",
             organizationId = "org-1",

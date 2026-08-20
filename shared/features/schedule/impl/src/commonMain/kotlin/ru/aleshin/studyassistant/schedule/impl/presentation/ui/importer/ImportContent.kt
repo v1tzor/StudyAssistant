@@ -26,6 +26,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -250,6 +251,13 @@ internal fun ImportContent(
         onRewarded = { challengeId -> store.dispatchEvent(ImportEvent.RewardedAdGranted(challengeId)) },
         onUnavailable = { store.dispatchEvent(ImportEvent.RewardedAdUnavailable) },
     )
+
+    LaunchedEffect(state.organizations) {
+        if (state.organizations.size == 1 && state.selectedOrganization == null) {
+            val organization = state.organizations.getOrNull(0) ?: return@LaunchedEffect
+            store.dispatchEvent(ImportEvent.SelectOrganization(organization = organization))
+        }
+    }
 
     store.handleEffects { effect ->
         when (effect) {

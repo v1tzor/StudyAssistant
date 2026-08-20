@@ -114,7 +114,8 @@
     <string name="schedule_import_server_error">Schedule recognition is temporarily unavailable.</string>
     <string name="schedule_import_title">Import schedule (Beta)</string>
     <string name="schedule_import_source_title">Import from a photo</string>
-    <string name="schedule_import_source_description">Take or choose a timetable photo, pick your organization, and add a short group hint if the photo contains several classes.</string>
+    <string name="schedule_import_source_description">Take or choose a timetable photo (AI can make mistakes)</string>
+    <string name="schedule_import_large_photo_hint">Please avoid very large or dense timetables — AI may not finish them in time</string>
     <string name="schedule_import_gallery_button">Choose a photo</string>
     <string name="schedule_import_camera_button">Take a photo</string>
     <string name="schedule_import_photo_selected">Photo is ready to import</string>

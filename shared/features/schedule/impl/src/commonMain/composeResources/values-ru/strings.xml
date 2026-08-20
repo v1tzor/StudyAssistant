@@ -114,7 +114,8 @@
     <string name="schedule_import_server_error">Распознавание расписания временно недоступно.</string>
     <string name="schedule_import_title">Импорт расписания (Beta)</string>
     <string name="schedule_import_source_title">Импорт по фото</string>
-    <string name="schedule_import_source_description">Сделайте или выберите фото расписания, укажите организацию и добавьте краткую пометку группы, если на фото несколько классов (Возможны ошибки).</string>
+    <string name="schedule_import_source_description">Сделайте или выберите фото расписания (Возможны ошибки).</string>
+    <string name="schedule_import_large_photo_hint">Пожалуйста, не загружайте слишком детальное расписание всего семестра — ИИ может не успеть его разобрать</string>
     <string name="schedule_import_gallery_button">Выбрать фотографию</string>
     <string name="schedule_import_camera_button">Сделать фотографию</string>
     <string name="schedule_import_photo_selected">Фото готово к импорту</string>

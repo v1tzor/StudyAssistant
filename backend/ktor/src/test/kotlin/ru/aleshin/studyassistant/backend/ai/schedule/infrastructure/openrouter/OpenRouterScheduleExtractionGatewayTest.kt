@@ -92,6 +92,8 @@ class OpenRouterScheduleExtractionGatewayTest {
             assertTrue(capturedBody.contains("Do not calculate calendars"))
             assertTrue(capturedBody.contains("\"max_tokens\":4096"))
             assertTrue(capturedBody.contains("\"exclude\":true"))
+            assertTrue(capturedBody.contains("\"order\":[\"xiaomi\",\"novita\",\"gmicloud\",\"parasail\"]"))
+            assertTrue(capturedBody.contains("\"allow_fallbacks\":false"))
             assertTrue(!capturedBody.contains("\"reasoning\":{\"enabled\":false}"))
             assertTrue(!capturedBody.contains("\"response_format\""))
             assertTrue(!capturedBody.contains("\"json_schema\""))

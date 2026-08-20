@@ -20,10 +20,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * @author Stanislav Aleshin on 18.08.2026.
+ * @author Stanislav Aleshin on 20.08.2026.
  */
 @Serializable
 data class OpenRouterProviderPreferencesDto(
-    @SerialName("require_parameters")
-    val requireParameters: Boolean,
+    val order: List<String>? = null,
+    @SerialName("allow_fallbacks")
+    val allowFallbacks: Boolean? = null,
 )

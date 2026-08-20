@@ -28,6 +28,7 @@ import ru.aleshin.studyassistant.core.common.extensions.randomUUID
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.functional.collectAndHandle
 import ru.aleshin.studyassistant.core.common.functional.handle
+import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.presentation.mappers.organizations.mapToUi
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.OrganizationsInteractor
 import ru.aleshin.studyassistant.schedule.impl.domain.interactors.ScheduleImportInteractor
@@ -38,7 +39,6 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.importing.Sch
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportAction
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportEffect
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportOutput
-import kotlin.time.Clock
 
 /**
  * @author Stanislav Aleshin on 16.08.2026.
@@ -49,6 +49,7 @@ internal interface ImportWorkProcessor :
     class Base(
         private val importInteractor: ScheduleImportInteractor,
         private val organizationsInteractor: OrganizationsInteractor,
+        private val dateManager: DateManager,
     ) : ImportWorkProcessor {
 
         override suspend fun work(command: ImportWorkCommand) = when (command) {
@@ -107,7 +108,8 @@ internal interface ImportWorkProcessor :
                 },
             )
         }.onStart {
-            emit(ActionResult(ImportAction.UpdateAnalysisProgress(isLoading = true, startedAt = Clock.System.now().toEpochMilliseconds())))
+            val startedAt = dateManager.fetchCurrentInstant().toEpochMilliseconds()
+            emit(ActionResult(ImportAction.UpdateAnalysisProgress(isLoading = true, startedAt = startedAt)))
         }.onCompletion {
             emit(ActionResult(ImportAction.UpdateAnalysisProgress(isLoading = false, startedAt = null)))
         }
