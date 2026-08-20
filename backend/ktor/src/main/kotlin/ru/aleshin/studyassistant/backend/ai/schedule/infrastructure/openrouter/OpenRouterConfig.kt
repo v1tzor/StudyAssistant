@@ -35,7 +35,7 @@ data class OpenRouterConfig(
     val baseRetryDelayMs: Long,
     val maxRetryDelayMs: Long,
     val retryJitterMs: Long,
-    val maxConcurrentRequests: Int = 8,
+    val maxConcurrentRequests: Int = 12,
     val queueTimeoutMs: Long = 3_000L,
     val socksHost: String = DEFAULT_SOCKS_HOST,
     val socksPort: Int = DEFAULT_SOCKS_PORT,

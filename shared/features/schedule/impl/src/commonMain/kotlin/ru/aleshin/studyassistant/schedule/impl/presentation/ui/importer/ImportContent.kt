@@ -25,6 +25,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.arkivanov.essenty.backhandler.BackCallback
+import com.arkivanov.essenty.backhandler.BackHandler
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitCameraFacing
 import io.github.vinceglb.filekit.dialogs.FileKitType
@@ -96,6 +99,7 @@ internal fun ImportContent(
         topBar = {
             ImportTopBar(
                 isExpanded = isExpanded,
+                canNavigateBack = !state.isAnalysisInProgress,
                 onBackClick = { store.dispatchEvent(ImportEvent.ClickBack) },
             )
         },
@@ -139,6 +143,7 @@ internal fun ImportContent(
             },
             onAddOrganization = { store.dispatchEvent(ImportEvent.ClickAddOrganization) },
             onExtract = { store.dispatchEvent(ImportEvent.ExtractDraft) },
+            onCancelExtract = { store.dispatchEvent(ImportEvent.CancelExtract) },
             onClassClick = { classId -> editingClassId = classId },
             onReorderDayClasses = { dayOfWeek, repeatWeek, orderedIds ->
                 store.dispatchEvent(ImportEvent.ReorderDayClasses(dayOfWeek, repeatWeek, orderedIds))
@@ -237,6 +242,11 @@ internal fun ImportContent(
         )
     }
 
+    ImportBackLock(
+        backHandler = component.backHandler,
+        isLocked = state.isAnalysisInProgress,
+    )
+
     YandexRewardedAdHost(
         adUnitId = adsConfiguration?.aiScheduleAnalysisRewardedId.orEmpty(),
         requestKey = state.rewardChallengeId,
@@ -251,6 +261,21 @@ internal fun ImportContent(
                 withDismissAction = true,
             )
         }
+    }
+}
+
+@Composable
+private fun ImportBackLock(
+    backHandler: BackHandler,
+    isLocked: Boolean,
+) {
+    val callback = remember {
+        BackCallback(isEnabled = false) { }
+    }
+    callback.isEnabled = isLocked
+    DisposableEffect(backHandler) {
+        backHandler.register(callback)
+        onDispose { backHandler.unregister(callback) }
     }
 }
 

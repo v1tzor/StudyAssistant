@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.backend.ai.schedule.infrastructure.openrouter.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -25,5 +26,7 @@ import kotlinx.serialization.Serializable
 data class OpenRouterReasoningDto(
     val enabled: Boolean? = null,
     val effort: String? = null,
+    @SerialName("max_tokens")
+    val maxTokens: Int? = null,
     val exclude: Boolean? = null,
 )

@@ -16,6 +16,8 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +30,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.ui.views.TopAppBarTitle
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
@@ -42,6 +45,7 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_title
 internal fun ImportTopBar(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
+    canNavigateBack: Boolean = true,
     onBackClick: () -> Unit,
 ) {
     TopAppBar(
@@ -57,11 +61,15 @@ internal fun ImportTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(Res.string.schedule_import_back_description),
-                )
+            if (canNavigateBack) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(Res.string.schedule_import_back_description),
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.size(48.dp))
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

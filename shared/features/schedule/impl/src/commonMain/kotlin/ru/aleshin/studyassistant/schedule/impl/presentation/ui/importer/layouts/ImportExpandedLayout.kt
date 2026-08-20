@@ -45,6 +45,7 @@ internal fun ImportExpandedLayout(
     onOrganizationSelect: (OrganizationShortUi?) -> Unit,
     onAddOrganization: () -> Unit,
     onExtract: () -> Unit,
+    onCancelExtract: () -> Unit,
     onClassClick: (UID) -> Unit,
     onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onSubjectClick: (UID) -> Unit,
@@ -66,6 +67,7 @@ internal fun ImportExpandedLayout(
             state.isAnalysisInProgress -> ImportLoadingSection(
                 modifier = Modifier.fillMaxSize(),
                 startedAt = state.analysisStartedAt,
+                onCancel = onCancelExtract,
             )
             state.isApplied -> ImportSuccessSection(
                 modifier = Modifier

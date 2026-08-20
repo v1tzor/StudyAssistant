@@ -213,7 +213,10 @@ class OpenRouterScheduleExtractionGateway(
             ),
             temperature = EXTRACTION_TEMPERATURE,
             maxTokens = config.maxTokens,
-            reasoning = OpenRouterReasoningDto(enabled = true),
+            reasoning = OpenRouterReasoningDto(
+                maxTokens = REASONING_MAX_TOKENS,
+                exclude = true,
+            ),
         )
     }
 
@@ -355,6 +358,8 @@ class OpenRouterScheduleExtractionGateway(
         const val MILLIS_PER_SECOND = 1_000L
         const val MAX_SHIFT = 30
 
+        const val REASONING_MAX_TOKENS = 4096
+
         val SYSTEM_PROMPT = """
             You are an expert timetable and academic schedule extraction engine.
 
@@ -394,8 +399,8 @@ class OpenRouterScheduleExtractionGateway(
             DATES AND WEEKS:
             - dayOfWeek is an ISO-8601 integer: Понедельник/Monday=1, Вторник/Tuesday=2, Среда/Wednesday=3, Четверг/Thursday=4, Пятница/Friday=5, Суббота/Saturday=6, Воскресенье/Sunday=7.
             - Never use Java/US calendar numbering. Monday is never 2. Sunday is never 1.
-            - Resolve date ranges using todayDate, timeZone and the current school year.
-            - If multiple alternatives occupy the same slot, keep only the one valid on todayDate.
+            - Extract the full visible timetable for all printed days. Do not extract only today.
+            - Do not calculate calendars or weekday-from-date. todayDate is only for mutually exclusive alternatives in the same slot (odd/even, numerator/denominator, date ranges); then keep the variant valid on todayDate.
             - Interpret numerator/denominator, odd/even, I/II and similar alternating-week notation consistently as repeatWeek.
             - Never merge mutually exclusive week/date variants into one event.
 

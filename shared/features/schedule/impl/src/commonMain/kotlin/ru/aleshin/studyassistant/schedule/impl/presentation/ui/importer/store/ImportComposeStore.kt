@@ -300,7 +300,14 @@ internal class ImportComposeStore(
             is ImportEvent.EditSource -> {
                 sendAction(ImportAction.SetupSession(null, null))
             }
+            is ImportEvent.CancelExtract -> with(state) {
+                if (!isAnalysisInProgress) return@handleEvent
+                launchBackgroundWork(BackgroundKey.PROCESS) {
+                    sendAction(ImportAction.UpdateAnalysisProgress(isLoading = false, startedAt = null))
+                }
+            }
             is ImportEvent.ClickBack -> with(state) {
+                if (isAnalysisInProgress) return@handleEvent
                 if (session != null && !isApplied) {
                     sendAction(ImportAction.SetupSession(null, requestId))
                 } else {

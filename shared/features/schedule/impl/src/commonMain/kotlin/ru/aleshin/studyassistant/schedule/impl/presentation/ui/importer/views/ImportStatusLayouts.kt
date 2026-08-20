@@ -16,6 +16,7 @@
 
 package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.views
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -35,12 +36,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,6 +63,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.isoDayNumber
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.functional.UID
@@ -77,6 +81,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.Sched
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.ic_swap_horiz
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_add_button
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_cancel_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_extract_button
@@ -84,7 +89,20 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_de
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_note_placeholder
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_hint
-import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_title
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_assemble
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_clarify
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_days
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_details
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_empty
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_free
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_group
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_intervals
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_looking
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_rows
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_structure
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_subjects
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_thinking
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_processing_status_times
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_review_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_description
@@ -96,6 +114,7 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_swap_da
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teachers_title
 import ru.aleshin.studyassistant.schedule.impl.resources.shared_schedule_header
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 
 /**
@@ -179,11 +198,12 @@ internal fun ImportSourceSection(
 internal fun ImportLoadingSection(
     modifier: Modifier = Modifier,
     startedAt: Long?,
+    onCancel: () -> Unit,
 ) {
-    var nowMillis by remember { mutableLongStateOf(Clock.System.now().toEpochMilliseconds()) }
-    val elapsedSeconds = startedAt?.let { startMillis ->
-        ((nowMillis - startMillis) / 1_000L).toInt().coerceAtLeast(0)
-    } ?: 0
+    var nowMillis by remember {
+        mutableLongStateOf(Clock.System.now().toEpochMilliseconds())
+    }
+    val elapsedSeconds = startedAt?.let { startMillis -> ((nowMillis - startMillis) / 1_000L).toInt().coerceAtLeast(0) } ?: 0
     val elapsedLabel = remember(elapsedSeconds) {
         val minutes = elapsedSeconds / 60
         val seconds = elapsedSeconds % 60
@@ -194,8 +214,12 @@ internal fun ImportLoadingSection(
         if (startedAt == null) return@LaunchedEffect
         while (true) {
             nowMillis = Clock.System.now().toEpochMilliseconds()
-            delay(1_000)
+            delay(1_000.milliseconds)
         }
+    }
+
+    val statusResource = remember(elapsedSeconds) {
+        importProcessingStatusAt(elapsedSeconds)
     }
 
     Box(
@@ -205,18 +229,27 @@ internal fun ImportLoadingSection(
         Column(
             modifier = Modifier.widthIn(max = 360.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             CircularProgressIndicator()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    text = stringResource(Res.string.schedule_import_processing_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                )
+                Crossfade(
+                    modifier = Modifier.fillMaxWidth(),
+                    targetState = statusResource,
+                    label = "import processing status",
+                ) { resource ->
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(resource),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        minLines = 2,
+                    )
+                }
                 Text(
                     text = stringResource(Res.string.schedule_import_processing_hint),
                     style = MaterialTheme.typography.bodyMedium,
@@ -229,6 +262,14 @@ internal fun ImportLoadingSection(
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                 )
+            }
+            TextButton(
+                onClick = onCancel,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(text = stringResource(Res.string.schedule_import_cancel_button))
             }
         }
     }
@@ -617,12 +658,49 @@ internal fun ImportSuccessSection(
         }
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = onDone,
+            onClick = onDone
         ) {
             Text(stringResource(Res.string.schedule_import_done_button))
         }
     }
 }
+
+private data class ImportProcessingStatus(
+    val startSeconds: Int,
+    val text: StringResource,
+)
+
+private fun importProcessingStatusAt(elapsedSeconds: Int): StringResource {
+    val thinkingStart = IMPORT_PROCESSING_THINKING_START_SECONDS
+    if (elapsedSeconds < thinkingStart) {
+        return importProcessingStatuses.last { elapsedSeconds >= it.startSeconds }.text
+    }
+    val thinkingStatuses = importProcessingStatuses.filter { status ->
+        status.startSeconds >= thinkingStart
+    }
+    val step = (elapsedSeconds - thinkingStart) / IMPORT_PROCESSING_STATUS_INTERVAL_SECONDS
+    return thinkingStatuses[step % thinkingStatuses.size].text
+}
+
+private val importProcessingStatuses = listOf(
+    ImportProcessingStatus(0, Res.string.schedule_import_processing_status_looking),
+    ImportProcessingStatus(12, Res.string.schedule_import_processing_status_structure),
+    ImportProcessingStatus(24, Res.string.schedule_import_processing_status_times),
+    ImportProcessingStatus(36, Res.string.schedule_import_processing_status_group),
+    ImportProcessingStatus(48, Res.string.schedule_import_processing_status_subjects),
+    ImportProcessingStatus(60, Res.string.schedule_import_processing_status_days),
+    ImportProcessingStatus(72, Res.string.schedule_import_processing_status_empty),
+    ImportProcessingStatus(84, Res.string.schedule_import_processing_status_rows),
+    ImportProcessingStatus(96, Res.string.schedule_import_processing_status_clarify),
+    ImportProcessingStatus(108, Res.string.schedule_import_processing_status_free),
+    ImportProcessingStatus(120, Res.string.schedule_import_processing_status_intervals),
+    ImportProcessingStatus(132, Res.string.schedule_import_processing_status_details),
+    ImportProcessingStatus(144, Res.string.schedule_import_processing_status_thinking),
+    ImportProcessingStatus(156, Res.string.schedule_import_processing_status_assemble),
+)
+
+private const val IMPORT_PROCESSING_STATUS_INTERVAL_SECONDS = 12
+private const val IMPORT_PROCESSING_THINKING_START_SECONDS = 96
 
 internal const val SOURCE_HEADER_KEY = "import_source_header"
 internal const val PHOTO_SECTION_KEY = "import_photo_section"

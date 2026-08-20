@@ -44,6 +44,7 @@ internal fun ImportCompactLayout(
     onOrganizationSelect: (OrganizationShortUi?) -> Unit,
     onAddOrganization: () -> Unit,
     onExtract: () -> Unit,
+    onCancelExtract: () -> Unit,
     onClassClick: (UID) -> Unit,
     onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onSubjectClick: (UID) -> Unit,
@@ -65,6 +66,7 @@ internal fun ImportCompactLayout(
             state.isAnalysisInProgress -> ImportLoadingSection(
                 modifier = Modifier.fillMaxSize(),
                 startedAt = state.analysisStartedAt,
+                onCancel = onCancelExtract,
             )
             state.isApplied -> ImportSuccessSection(
                 modifier = Modifier.widthIn(max = 600.dp),

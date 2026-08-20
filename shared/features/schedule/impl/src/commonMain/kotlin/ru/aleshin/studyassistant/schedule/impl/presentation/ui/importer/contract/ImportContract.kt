@@ -89,6 +89,7 @@ internal sealed class ImportEvent : StoreEvent {
     data object RewardedAdUnavailable : ImportEvent()
     data object ReconcileReward : ImportEvent()
     data object EditSource : ImportEvent()
+    data object CancelExtract : ImportEvent()
     data object ClickBack : ImportEvent()
     data object ClickAddOrganization : ImportEvent()
     data class ReorderDayClasses(
