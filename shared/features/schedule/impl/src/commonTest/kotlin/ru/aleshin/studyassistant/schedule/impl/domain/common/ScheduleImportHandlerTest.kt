@@ -19,6 +19,7 @@ package ru.aleshin.studyassistant.schedule.impl.domain.common
 import ru.aleshin.studyassistant.core.domain.entities.common.ContactInfo
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Organization
 import ru.aleshin.studyassistant.core.domain.entities.organizations.OrganizationType
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportDraft
@@ -26,6 +27,8 @@ import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.Schedu
 import ru.aleshin.studyassistant.core.domain.entities.schedules.importing.ScheduleImportEventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportClass
+import ru.aleshin.studyassistant.schedule.impl.domain.entities.ScheduleImportSession
 import ru.aleshin.studyassistant.schedule.impl.domain.validation.ScheduleImportValidator
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -424,6 +427,102 @@ internal class ScheduleImportHandlerTest {
     }
 
     @Test
+    fun swapDaysExchangesClassesBetweenSelectedWeekdays() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", dayOfWeek = 2),
+                    entry(subject = "Physics", startTime = "09:00", endTime = "09:40", dayOfWeek = 3),
+                    entry(subject = "History", startTime = "10:00", endTime = "10:40", dayOfWeek = 2, repeatWeek = 2),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val updated = composer.swapDays(session, repeatWeek = 1, firstDay = 2, secondDay = 1)
+
+        val weekOne = updated.classes.filter { classModel -> classModel.repeatWeek == 1 }
+        assertEquals(setOf(1, 3), weekOne.map { classModel -> classModel.dayOfWeek }.toSet())
+        assertEquals("Math", subjectName(updated, weekOne.first { classModel -> classModel.dayOfWeek == 1 }))
+        assertEquals("Physics", subjectName(updated, weekOne.first { classModel -> classModel.dayOfWeek == 3 }))
+        assertEquals(
+            2,
+            updated.classes.first { classModel -> classModel.repeatWeek == 2 }.dayOfWeek,
+        )
+    }
+
+    @Test
+    fun swapDaysIgnoresSameOrInvalidWeekdays() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(entry(subject = "Math", startTime = "08:00", endTime = "08:40", dayOfWeek = 2)),
+            ),
+            organization = organization(),
+        )
+
+        assertEquals(session.classes, composer.swapDays(session, repeatWeek = 1, firstDay = 2, secondDay = 2).classes)
+        assertEquals(session.classes, composer.swapDays(session, repeatWeek = 1, firstDay = 0, secondDay = 2).classes)
+    }
+
+    @Test
+    fun updateStartOfDayShiftsOnlySelectedWeekday() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", dayOfWeek = 1),
+                    entry(subject = "Physics", startTime = "08:00", endTime = "08:40", dayOfWeek = 2),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val updated = composer.updateStartOfDay(session, repeatWeek = 1, dayOfWeek = 1, startTime = "09:00")
+
+        val monday = updated.classes.first { classModel -> classModel.dayOfWeek == 1 }
+        val tuesday = updated.classes.first { classModel -> classModel.dayOfWeek == 2 }
+        assertEquals("09:00", monday.startTime)
+        assertEquals("09:40", monday.endTime)
+        assertEquals("08:00", tuesday.startTime)
+        assertEquals("08:40", tuesday.endTime)
+    }
+
+    @Test
+    fun updateClassesDurationAppliesSpecificExceptionOnSelectedDay() {
+        val session = composer.handleDraft(
+            draft = ScheduleImportDraft(
+                title = "Week",
+                entries = listOf(
+                    entry(subject = "Math", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 1),
+                    entry(subject = "PE", startTime = "08:50", endTime = "09:30", classNumber = 2, dayOfWeek = 1),
+                    entry(subject = "Physics", startTime = "08:00", endTime = "08:40", classNumber = 1, dayOfWeek = 2),
+                ),
+            ),
+            organization = organization(),
+        )
+
+        val updated = composer.updateClassesDuration(
+            session = session,
+            repeatWeek = 1,
+            dayOfWeek = 1,
+            baseDuration = 45 * 60_000L,
+            specificDurations = listOf(NumberedDuration(number = 2, duration = 30 * 60_000L)),
+        )
+
+        val monday = updated.classes.filter { classModel -> classModel.dayOfWeek == 1 }
+            .sortedBy { classModel -> classModel.startTime }
+        val tuesday = updated.classes.first { classModel -> classModel.dayOfWeek == 2 }
+        assertEquals("08:00", monday[0].startTime)
+        assertEquals("08:45", monday[0].endTime)
+        assertEquals("08:55", monday[1].startTime)
+        assertEquals("09:25", monday[1].endTime)
+        assertEquals("08:00", tuesday.startTime)
+        assertEquals("08:40", tuesday.endTime)
+    }
+
+    @Test
     fun deleteClassRemovesOnlyTargetClass() {
         val session = composer.handleDraft(
             draft = ScheduleImportDraft(
@@ -509,6 +608,13 @@ internal class ScheduleImportHandlerTest {
         updatedAt = 1L,
     )
 
+    private fun subjectName(
+        session: ScheduleImportSession,
+        classModel: ScheduleImportClass,
+    ): String {
+        return session.subjects.first { subject -> subject.uid == classModel.subjectId }.name
+    }
+
     private fun employee(
         uid: String,
         firstName: String,
@@ -530,10 +636,11 @@ internal class ScheduleImportHandlerTest {
         endTime: String,
         classNumber: Int? = 1,
         dayOfWeek: Int = 1,
+        repeatWeek: Int = 1,
         office: String? = "101",
         location: String? = null,
     ) = ScheduleImportEntry(
-        repeatWeek = 1,
+        repeatWeek = repeatWeek,
         dayOfWeek = dayOfWeek,
         classNumber = classNumber,
         startTime = startTime,

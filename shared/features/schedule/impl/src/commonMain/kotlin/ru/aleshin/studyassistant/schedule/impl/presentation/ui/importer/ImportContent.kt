@@ -158,14 +158,21 @@ internal fun ImportContent(
             onAddClass = { dayOfWeek, repeatWeek ->
                 store.dispatchEvent(ImportEvent.AddClass(dayOfWeek, repeatWeek))
             },
-            onUpdateStartOfDay = { repeatWeek, startTime ->
-                store.dispatchEvent(ImportEvent.UpdateStartOfDay(repeatWeek, startTime))
+            onUpdateStartOfDay = { repeatWeek, dayOfWeek, startTime ->
+                store.dispatchEvent(ImportEvent.UpdateStartOfDay(repeatWeek, dayOfWeek, startTime))
             },
-            onUpdateClassesDuration = { repeatWeek, duration ->
-                store.dispatchEvent(ImportEvent.UpdateClassesDuration(repeatWeek, duration))
+            onUpdateClassesDuration = { repeatWeek, dayOfWeek, duration, specificDurations ->
+                store.dispatchEvent(
+                    ImportEvent.UpdateClassesDuration(repeatWeek, dayOfWeek, duration, specificDurations),
+                )
             },
-            onUpdateBreaksDuration = { repeatWeek, duration ->
-                store.dispatchEvent(ImportEvent.UpdateBreaksDuration(repeatWeek, duration))
+            onUpdateBreaksDuration = { repeatWeek, dayOfWeek, duration, specificDurations ->
+                store.dispatchEvent(
+                    ImportEvent.UpdateBreaksDuration(repeatWeek, dayOfWeek, duration, specificDurations),
+                )
+            },
+            onSwapDays = { repeatWeek, firstDay, secondDay ->
+                store.dispatchEvent(ImportEvent.SwapDays(repeatWeek, firstDay, secondDay))
             },
             onDone = { store.dispatchEvent(ImportEvent.ClickBack) },
         )

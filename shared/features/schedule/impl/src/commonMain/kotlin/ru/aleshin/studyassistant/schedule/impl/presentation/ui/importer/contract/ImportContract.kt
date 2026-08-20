@@ -70,9 +70,20 @@ internal sealed class ImportEvent : StoreEvent {
     data class DeleteSubject(val subjectId: UID) : ImportEvent()
     data class DeleteEmployee(val employeeId: UID) : ImportEvent()
     data class AddClass(val dayOfWeek: Int, val repeatWeek: Int) : ImportEvent()
-    data class UpdateStartOfDay(val repeatWeek: Int, val startTime: String) : ImportEvent()
-    data class UpdateClassesDuration(val repeatWeek: Int, val baseDuration: Long) : ImportEvent()
-    data class UpdateBreaksDuration(val repeatWeek: Int, val baseDuration: Long) : ImportEvent()
+    data class UpdateStartOfDay(val repeatWeek: Int, val dayOfWeek: Int, val startTime: String) : ImportEvent()
+    data class UpdateClassesDuration(
+        val repeatWeek: Int,
+        val dayOfWeek: Int,
+        val baseDuration: Long,
+        val specificDurations: List<Pair<Int, Long>>,
+    ) : ImportEvent()
+    data class UpdateBreaksDuration(
+        val repeatWeek: Int,
+        val dayOfWeek: Int,
+        val baseDuration: Long,
+        val specificDurations: List<Pair<Int, Long>>,
+    ) : ImportEvent()
+    data class SwapDays(val repeatWeek: Int, val firstDay: Int, val secondDay: Int) : ImportEvent()
     data object ApplySession : ImportEvent()
     data class RewardedAdGranted(val challengeId: String) : ImportEvent()
     data object RewardedAdUnavailable : ImportEvent()

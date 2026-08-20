@@ -87,6 +87,6 @@ interface ScheduleExtractionRemoteApi {
 
     private companion object {
 
-        const val REQUEST_TIMEOUT_MS = 180_000L
+        const val REQUEST_TIMEOUT_MS = 210_000L
     }
 }

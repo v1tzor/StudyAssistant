@@ -24,6 +24,7 @@ import ru.aleshin.studyassistant.core.common.architecture.store.work.WorkScope
 import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.domain.entities.employee.Employee
 import ru.aleshin.studyassistant.core.domain.entities.employee.EmployeePost
+import ru.aleshin.studyassistant.core.domain.entities.organizations.NumberedDuration
 import ru.aleshin.studyassistant.core.domain.entities.subject.EventType
 import ru.aleshin.studyassistant.core.domain.entities.subject.Subject
 import ru.aleshin.studyassistant.core.presentation.mappers.subjects.mapToDomain
@@ -194,6 +195,7 @@ internal class ImportComposeStore(
                 val updated = importHandler.updateStartOfDay(
                     session = current.mapToDomain(),
                     repeatWeek = event.repeatWeek,
+                    dayOfWeek = event.dayOfWeek,
                     startTime = event.startTime,
                 )
                 sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
@@ -203,8 +205,11 @@ internal class ImportComposeStore(
                 val updated = importHandler.updateClassesDuration(
                     session = current.mapToDomain(),
                     repeatWeek = event.repeatWeek,
+                    dayOfWeek = event.dayOfWeek,
                     baseDuration = event.baseDuration,
-                    specificDurations = emptyList(),
+                    specificDurations = event.specificDurations.map { duration ->
+                        NumberedDuration(number = duration.first, duration = duration.second)
+                    },
                 )
                 sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
             }
@@ -213,8 +218,21 @@ internal class ImportComposeStore(
                 val updated = importHandler.updateBreaksDuration(
                     session = current.mapToDomain(),
                     repeatWeek = event.repeatWeek,
+                    dayOfWeek = event.dayOfWeek,
                     baseDuration = event.baseDuration,
-                    specificDurations = emptyList(),
+                    specificDurations = event.specificDurations.map { duration ->
+                        NumberedDuration(number = duration.first, duration = duration.second)
+                    },
+                )
+                sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
+            }
+            is ImportEvent.SwapDays -> with(state) {
+                val current = session ?: return
+                val updated = importHandler.swapDays(
+                    session = current.mapToDomain(),
+                    repeatWeek = event.repeatWeek,
+                    firstDay = event.firstDay,
+                    secondDay = event.secondDay,
                 )
                 sendAction(ImportAction.SetupSession(updated.mapToUi(), requestId))
             }

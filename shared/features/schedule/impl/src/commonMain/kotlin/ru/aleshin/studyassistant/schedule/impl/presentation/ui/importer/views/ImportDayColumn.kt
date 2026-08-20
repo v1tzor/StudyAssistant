@@ -54,27 +54,47 @@ import ru.aleshin.studyassistant.schedule.impl.resources.empty_classes_title
 internal fun ImportDayColumn(
     modifier: Modifier = Modifier,
     dayOfWeek: DayOfWeek,
+    selected: Boolean,
     classes: List<ScheduleImportClassUi>,
     subjects: List<SubjectUi>,
     employees: List<EmployeeUi>,
+    onSelect: () -> Unit,
     onClassClick: (UID) -> Unit,
     onReorderClasses: (List<UID>) -> Unit,
 ) {
     Surface(
         modifier = modifier.size(176.dp, 320.dp),
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        color = if (selected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        },
+        border = if (selected) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            null
+        },
     ) {
         Column {
             Surface(
+                onClick = onSelect,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surfaceContainer,
+                color = if (selected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer
+                },
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                     text = dayOfWeek.mapToSting(),
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmall,

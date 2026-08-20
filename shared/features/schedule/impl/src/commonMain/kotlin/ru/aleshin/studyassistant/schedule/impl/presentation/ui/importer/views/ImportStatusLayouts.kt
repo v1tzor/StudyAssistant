@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -73,6 +75,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.models.schedule.Numb
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract.ImportState
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
+import ru.aleshin.studyassistant.schedule.impl.resources.ic_swap_horiz
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_add_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
@@ -89,6 +92,7 @@ import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_source_
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_subjects_title
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_description
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_success_title
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_swap_days
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_teachers_title
 import ru.aleshin.studyassistant.schedule.impl.resources.shared_schedule_header
 import kotlin.time.Clock
@@ -243,9 +247,10 @@ internal fun ImportReviewSection(
     onAddSubject: () -> Unit,
     onAddTeacher: () -> Unit,
     onAddClass: (Int, Int) -> Unit,
-    onUpdateStartOfDay: (Int, String) -> Unit,
-    onUpdateClassesDuration: (Int, Long) -> Unit,
-    onUpdateBreaksDuration: (Int, Long) -> Unit,
+    onUpdateStartOfDay: (Int, Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Int, Long, List<Pair<Int, Long>>) -> Unit,
+    onUpdateBreaksDuration: (Int, Int, Long, List<Pair<Int, Long>>) -> Unit,
+    onSwapDays: (Int, Int, Int) -> Unit,
 ) {
     val session = state.session ?: return
     val coroutineScope = rememberCoroutineScope()
@@ -321,6 +326,7 @@ internal fun ImportReviewSection(
                 onUpdateStartOfDay = onUpdateStartOfDay,
                 onUpdateClassesDuration = onUpdateClassesDuration,
                 onUpdateBreaksDuration = onUpdateBreaksDuration,
+                onSwapDays = onSwapDays,
                 onWeekSelected = {
                     coroutineScope.launch { schedulesScrollState.animateScrollTo(0) }
                 },
@@ -391,20 +397,30 @@ internal fun ImportWeekSection(
     onClassClick: (UID) -> Unit,
     onReorderDayClasses: (Int, Int, List<UID>) -> Unit,
     onAddClass: (Int, Int) -> Unit,
-    onUpdateStartOfDay: (Int, String) -> Unit,
-    onUpdateClassesDuration: (Int, Long) -> Unit,
-    onUpdateBreaksDuration: (Int, Long) -> Unit,
+    onUpdateStartOfDay: (Int, Int, String) -> Unit,
+    onUpdateClassesDuration: (Int, Int, Long, List<Pair<Int, Long>>) -> Unit,
+    onUpdateBreaksDuration: (Int, Int, Long, List<Pair<Int, Long>>) -> Unit,
+    onSwapDays: (Int, Int, Int) -> Unit,
     onWeekSelected: () -> Unit,
     schedulesScrollState: ScrollState,
 ) {
     var selectedWeek by rememberSaveable { mutableIntStateOf(NumberOfWeekItem.ONE.isoWeekNumber) }
+    var selectedDay by rememberSaveable { mutableIntStateOf(DayOfWeek.MONDAY.isoDayNumber) }
+    var swapDialogOpen by remember { mutableStateOf(false) }
+    val weekClasses = remember(classes, selectedWeek) {
+        classes.filter { classModel -> classModel.repeatWeek == selectedWeek }
+    }
+    val selectedDayClasses = remember(weekClasses, selectedDay) {
+        weekClasses.filter { classModel -> classModel.dayOfWeek == selectedDay }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
@@ -412,6 +428,13 @@ internal fun ImportWeekSection(
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { swapDialogOpen = true }) {
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    painter = painterResource(Res.drawable.ic_swap_horiz),
+                    contentDescription = stringResource(Res.string.schedule_import_swap_days),
+                )
+            }
             ScheduleWeekChip(
                 selected = NumberOfWeekItem.valueOf(selectedWeek),
                 maxNumberOfWeek = maxNumberOfWeek,
@@ -421,15 +444,20 @@ internal fun ImportWeekSection(
                 },
             )
         }
-        val weekClasses = remember(classes, selectedWeek) {
-            classes.filter { classModel -> classModel.repeatWeek == selectedWeek }
-        }
         ImportFastEditBar(
-            weekClasses = weekClasses,
-            onUpdateStartOfDay = { startTime -> onUpdateStartOfDay(selectedWeek, startTime) },
-            onUpdateClassesDuration = { duration -> onUpdateClassesDuration(selectedWeek, duration) },
-            onUpdateBreaksDuration = { duration -> onUpdateBreaksDuration(selectedWeek, duration) },
-            onAddClass = { onAddClass(DayOfWeek.MONDAY.isoDayNumber, selectedWeek) },
+            selectedDay = selectedDay,
+            dayClasses = selectedDayClasses,
+            onSelectDay = { day -> selectedDay = day },
+            onUpdateStartOfDay = { startTime ->
+                onUpdateStartOfDay(selectedWeek, selectedDay, startTime)
+            },
+            onUpdateClassesDuration = { duration, specificDurations ->
+                onUpdateClassesDuration(selectedWeek, selectedDay, duration, specificDurations)
+            },
+            onUpdateBreaksDuration = { duration, specificDurations ->
+                onUpdateBreaksDuration(selectedWeek, selectedDay, duration, specificDurations)
+            },
+            onAddClass = { onAddClass(selectedDay, selectedWeek) },
         )
         Row(
             modifier = Modifier
@@ -439,14 +467,16 @@ internal fun ImportWeekSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             DayOfWeek.entries.forEach { dayOfWeek ->
-                val dayClasses = classes.filter { classModel ->
-                    classModel.dayOfWeek == dayOfWeek.isoDayNumber && classModel.repeatWeek == selectedWeek
+                val dayClasses = weekClasses.filter { classModel ->
+                    classModel.dayOfWeek == dayOfWeek.isoDayNumber
                 }
                 ImportDayColumn(
                     dayOfWeek = dayOfWeek,
+                    selected = dayOfWeek.isoDayNumber == selectedDay,
                     classes = dayClasses,
                     subjects = subjects,
                     employees = employees,
+                    onSelect = { selectedDay = dayOfWeek.isoDayNumber },
                     onClassClick = onClassClick,
                     onReorderClasses = { orderedIds ->
                         onReorderDayClasses(dayOfWeek.isoDayNumber, selectedWeek, orderedIds)
@@ -454,6 +484,23 @@ internal fun ImportWeekSection(
                 )
             }
         }
+    }
+
+    if (swapDialogOpen) {
+        val secondDay = if (selectedDay == DayOfWeek.MONDAY.isoDayNumber) {
+            DayOfWeek.TUESDAY.isoDayNumber
+        } else {
+            selectedDay - 1
+        }
+        ImportSwapDaysDialog(
+            initialFirstDay = selectedDay,
+            initialSecondDay = secondDay,
+            onDismiss = { swapDialogOpen = false },
+            onConfirm = { firstDay, secondDayOfWeek ->
+                onSwapDays(selectedWeek, firstDay, secondDayOfWeek)
+                swapDialogOpen = false
+            },
+        )
     }
 }
 

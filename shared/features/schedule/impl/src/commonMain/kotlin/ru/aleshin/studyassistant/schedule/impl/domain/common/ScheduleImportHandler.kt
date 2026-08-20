@@ -64,19 +64,28 @@ internal interface ScheduleImportHandler {
     fun updateStartOfDay(
         session: ScheduleImportSession,
         repeatWeek: Int,
+        dayOfWeek: Int,
         startTime: String,
     ): ScheduleImportSession
     fun updateClassesDuration(
         session: ScheduleImportSession,
         repeatWeek: Int,
+        dayOfWeek: Int,
         baseDuration: Millis,
         specificDurations: List<NumberedDuration>,
     ): ScheduleImportSession
     fun updateBreaksDuration(
         session: ScheduleImportSession,
         repeatWeek: Int,
+        dayOfWeek: Int,
         baseDuration: Millis,
         specificDurations: List<NumberedDuration>,
+    ): ScheduleImportSession
+    fun swapDays(
+        session: ScheduleImportSession,
+        repeatWeek: Int,
+        firstDay: Int,
+        secondDay: Int,
     ): ScheduleImportSession
     fun mergeOrganizationPlaces(
         organization: Organization,
@@ -338,13 +347,14 @@ internal interface ScheduleImportHandler {
         override fun updateStartOfDay(
             session: ScheduleImportSession,
             repeatWeek: Int,
+            dayOfWeek: Int,
             startTime: String,
         ): ScheduleImportSession {
             val targetStart = validator.parseTime(startTime) ?: return session
             val updatedClasses = session.classes.groupBy { classModel ->
                 classModel.repeatWeek to classModel.dayOfWeek
             }.flatMap { (key, dayClasses) ->
-                if (key.first != repeatWeek) return@flatMap dayClasses
+                if (key.first != repeatWeek || key.second != dayOfWeek) return@flatMap dayClasses
                 val sorted = dayClasses.sortedBy { classModel -> classModel.startTime }
                 val firstStart = sorted.firstOrNull()?.let { classModel ->
                     validator.parseTime(classModel.startTime)
@@ -369,13 +379,14 @@ internal interface ScheduleImportHandler {
         override fun updateClassesDuration(
             session: ScheduleImportSession,
             repeatWeek: Int,
+            dayOfWeek: Int,
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>,
         ): ScheduleImportSession {
             val updatedClasses = session.classes.groupBy { classModel ->
                 classModel.repeatWeek to classModel.dayOfWeek
             }.flatMap { (key, dayClasses) ->
-                if (key.first != repeatWeek) return@flatMap dayClasses
+                if (key.first != repeatWeek || key.second != dayOfWeek) return@flatMap dayClasses
                 val sorted = dayClasses.sortedBy { classModel -> classModel.startTime }
                 var previousEnd: LocalTime? = null
                 var previousOriginalEnd: LocalTime? = null
@@ -415,13 +426,14 @@ internal interface ScheduleImportHandler {
         override fun updateBreaksDuration(
             session: ScheduleImportSession,
             repeatWeek: Int,
+            dayOfWeek: Int,
             baseDuration: Millis,
             specificDurations: List<NumberedDuration>,
         ): ScheduleImportSession {
             val updatedClasses = session.classes.groupBy { classModel ->
                 classModel.repeatWeek to classModel.dayOfWeek
             }.flatMap { (key, dayClasses) ->
-                if (key.first != repeatWeek) return@flatMap dayClasses
+                if (key.first != repeatWeek || key.second != dayOfWeek) return@flatMap dayClasses
                 val sorted = dayClasses.sortedBy { classModel -> classModel.startTime }
                 var previousEnd: LocalTime? = null
                 sorted.mapIndexed { index, classModel ->
@@ -434,10 +446,7 @@ internal interface ScheduleImportHandler {
                         previousEnd = originalEnd
                         classModel
                     } else {
-                        val breakMinutes = (
-                            specificDurations.find { duration -> duration.number == index }?.duration
-                                ?: baseDuration
-                            ) / MILLIS_IN_MINUTE
+                        val breakMinutes = (specificDurations.find { duration -> duration.number == index }?.duration ?: baseDuration) / MILLIS_IN_MINUTE
                         val start = previousEnd.plusMinutes(breakMinutes.toInt().coerceAtLeast(0))
                         val end = start?.plusMinutes(durationMinutes)
                         previousEnd = end
@@ -453,6 +462,27 @@ internal interface ScheduleImportHandler {
                 }
             }
             return session.copy(classes = timeNormalizer.normalize(updatedClasses))
+        }
+
+        override fun swapDays(
+            session: ScheduleImportSession,
+            repeatWeek: Int,
+            firstDay: Int,
+            secondDay: Int,
+        ): ScheduleImportSession {
+            if (firstDay == secondDay) return session
+            if (firstDay !in 1..7 || secondDay !in 1..7) return session
+            return session.copy(
+                classes = session.classes.map { classModel ->
+                    if (classModel.repeatWeek != repeatWeek) {
+                        classModel
+                    } else when (classModel.dayOfWeek) {
+                        firstDay -> classModel.copy(dayOfWeek = secondDay)
+                        secondDay -> classModel.copy(dayOfWeek = firstDay)
+                        else -> classModel
+                    }
+                },
+            )
         }
 
         override fun mergeOrganizationPlaces(
