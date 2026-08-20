@@ -26,10 +26,7 @@ StudyAssistant
   </br>
 </p>
 
-<div align="center">
-</br>
 <img src="config/images/banner_en.png"/>
-<div align="start">
 
 ---
 
