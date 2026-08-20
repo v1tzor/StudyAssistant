@@ -101,7 +101,7 @@
     <string name="create_share_code_title">Создать код</string>
     <string name="homework_share_ready_title">Код домашних заданий готов</string>
     <string name="homework_share_expires_at_label">Действует до</string>
-    <string name="copy_share_link_title">Копировать ссылку</string>
+    <string name="copy_share_link_title">Копировать код</string>
     <string name="receive_homework_share_title">Получить домашние задания</string>
     <string name="share_code_label">Код обмена</string>
     <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>

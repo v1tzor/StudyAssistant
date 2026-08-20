@@ -94,7 +94,7 @@
     <string name="scan_qr_button_title">Scan QR code</string>
     <string name="share_code_ready_title">Code is ready</string>
     <string name="share_expires_at_label">Expires at</string>
-    <string name="copy_link_button_title">Copy link</string>
+    <string name="copy_link_button_title">Copy code</string>
     <string name="new_share_button_title">Create another code</string>
     <string name="share_import_success_title">Schedule imported</string>
     <string name="share_invalid_title">The code was not found or is invalid</string>

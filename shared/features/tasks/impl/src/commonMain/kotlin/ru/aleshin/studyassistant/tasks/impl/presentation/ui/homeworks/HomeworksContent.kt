@@ -223,7 +223,7 @@ internal fun HomeworksContent(
                 }
             },
             confirmButton = {
-                Button(onClick = { clipboard.setText(AnnotatedString(link.deepLink)) }) {
+                Button(onClick = { clipboard.setText(AnnotatedString(link.code)) }) {
                     Text(stringResource(Res.string.copy_share_link_title))
                 }
             },

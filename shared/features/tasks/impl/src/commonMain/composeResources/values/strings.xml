@@ -101,7 +101,7 @@
     <string name="create_share_code_title">Create code</string>
     <string name="homework_share_ready_title">Homework code is ready</string>
     <string name="homework_share_expires_at_label">Expires at</string>
-    <string name="copy_share_link_title">Copy link</string>
+    <string name="copy_share_link_title">Copy code</string>
     <string name="receive_homework_share_title">Receive homework</string>
     <string name="share_code_label">Sharing code</string>
     <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>

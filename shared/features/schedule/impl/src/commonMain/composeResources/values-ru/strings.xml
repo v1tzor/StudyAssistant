@@ -94,7 +94,7 @@
     <string name="scan_qr_button_title">Сканировать QR-код</string>
     <string name="share_code_ready_title">Код готов</string>
     <string name="share_expires_at_label">Действует до</string>
-    <string name="copy_link_button_title">Копировать ссылку</string>
+    <string name="copy_link_button_title">Копировать код</string>
     <string name="new_share_button_title">Создать новый код</string>
     <string name="share_import_success_title">Расписание импортировано</string>
     <string name="share_invalid_title">Код не найден или введён неверно</string>

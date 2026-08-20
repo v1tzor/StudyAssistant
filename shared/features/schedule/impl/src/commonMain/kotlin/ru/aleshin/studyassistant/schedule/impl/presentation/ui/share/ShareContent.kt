@@ -120,19 +120,14 @@ internal fun ShareContent(
             },
             onClaimClick = { store.dispatchEvent(ShareEvent.ClaimShare) },
             onScanClick = { isScannerOpen = true },
-            onCopyLinkClick = {
+            onCopyCodeClick = {
                 state.link?.let { link ->
-                    clipboardManager.setText(AnnotatedString(link.deepLink))
+                    clipboardManager.setText(AnnotatedString(link.code))
                 }
             },
             onResetClick = { store.dispatchEvent(ShareEvent.Reset) },
             onLinkOrganization = { sharedOrganizationId, linkedOrganizationId ->
-                store.dispatchEvent(
-                    ShareEvent.ClickLinkOrganization(
-                        sharedOrganizationId,
-                        linkedOrganizationId,
-                    )
-                )
+                store.dispatchEvent(ShareEvent.ClickLinkOrganization(sharedOrganizationId, linkedOrganizationId))
             },
             onLinkSubjects = { organizationId, subjects ->
                 store.dispatchEvent(ShareEvent.UpdatedLinkedSubjects(organizationId, subjects))
