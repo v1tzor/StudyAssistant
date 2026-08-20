@@ -244,10 +244,10 @@ internal fun ImportLoadingSection(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(resource),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
-                        minLines = 2,
+                        maxLines = 2,
                     )
                 }
                 Text(
