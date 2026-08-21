@@ -32,6 +32,8 @@ import com.yandex.mobile.ads.kmp.banner.BannerAdSize
 import com.yandex.mobile.ads.kmp.banner.BannerEvents
 import com.yandex.mobile.ads.kmp.banner.rememberBannerAdState
 import com.yandex.mobile.ads.kmp.common.AdRequest
+import com.yandex.mobile.ads.kmp.common.AdTheme
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 13.08.2026.
@@ -76,9 +78,12 @@ fun YandexInlineBanner(
             ),
         )
 
+        val isDarkTheme = StudyAssistantRes.colors.isDark
+
         LaunchedEffect(adUnitId, bannerWidth) {
             loadState = AdLoadState.Loading
-            bannerState.loadAd(AdRequest(adUnitId = adUnitId))
+            val theme = if (isDarkTheme) AdTheme.DARK else AdTheme.LIGHT
+            bannerState.loadAd(AdRequest(adUnitId = adUnitId, preferredTheme = theme))
         }
 
         if (loadState != AdLoadState.Failed) {

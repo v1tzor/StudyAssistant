@@ -26,12 +26,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.yandex.mobile.ads.kmp.common.AdError
 import com.yandex.mobile.ads.kmp.common.AdRequest
+import com.yandex.mobile.ads.kmp.common.AdTheme
 import com.yandex.mobile.ads.kmp.common.ImpressionData
 import com.yandex.mobile.ads.kmp.compose.rememberRewardedAdLoader
 import com.yandex.mobile.ads.kmp.rewarded.Reward
 import com.yandex.mobile.ads.kmp.rewarded.RewardedAdEventListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
 
 /**
  * @author Stanislav Aleshin on 13.08.2026.
@@ -40,9 +42,11 @@ import kotlinx.coroutines.launch
 fun YandexRewardedAdHost(
     adUnitId: String,
     requestKey: String?,
+    allowFallback: (RewardedAdErrorType) -> Boolean = { false },
     onRewarded: (String) -> Unit,
     onUnavailable: () -> Unit,
 ) {
+    val currentAllowFallback by rememberUpdatedState(allowFallback)
     val currentOnRewarded by rememberUpdatedState(onRewarded)
     val currentOnUnavailable by rememberUpdatedState(onUnavailable)
     val coroutineScope = rememberCoroutineScope()
@@ -84,6 +88,8 @@ fun YandexRewardedAdHost(
     }
     val loader = rememberRewardedAdLoader()
 
+    val isDarkTheme = StudyAssistantRes.colors.isDark
+
     LaunchedEffect(requestKey, adUnitId) {
         if (requestKey == null || requestKey == handledRequestKey) return@LaunchedEffect
         if (RewardedAdSession.hasRewarded(requestKey)) {
@@ -103,7 +109,8 @@ fun YandexRewardedAdHost(
         handledRequestKey = requestKey
         RewardedAdSession.markPresented(requestKey)
         runCatching {
-            loader.loadAd(AdRequest(adUnitId = adUnitId))
+            val theme = if (isDarkTheme) AdTheme.DARK else AdTheme.LIGHT
+            loader.loadAd(AdRequest(adUnitId = adUnitId, preferredTheme = theme))
         }.onSuccess { ad ->
             var isRewarded = false
             ad.setAdEventListener(
@@ -111,7 +118,16 @@ fun YandexRewardedAdHost(
                     override fun onAdShown() = Unit
 
                     override fun onAdFailedToShow(adError: AdError) {
-                        deliverUnavailable(requestKey)
+                        val errorType = RewardedAdErrorType.parse(adError.description)
+                        if (currentAllowFallback(errorType)) {
+                            if (!isRewarded) {
+                                isRewarded = true
+                                RewardedAdSession.markRewarded(requestKey)
+                                deliverRewarded(requestKey)
+                            }
+                        } else {
+                            deliverUnavailable(requestKey)
+                        }
                     }
 
                     override fun onAdDismissed() {
@@ -137,8 +153,15 @@ fun YandexRewardedAdHost(
                 },
             )
             ad.show()
-        }.onFailure {
-            deliverUnavailable(requestKey)
+        }.onFailure { error ->
+            val errorType = RewardedAdErrorType.parse(error)
+
+            if (currentAllowFallback(errorType)) {
+                RewardedAdSession.markRewarded(requestKey)
+                deliverRewarded(requestKey)
+            } else {
+                deliverUnavailable(requestKey)
+            }
         }
     }
 }
