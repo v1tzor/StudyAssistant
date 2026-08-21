@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.backend.ai.domain.services
 
 import java.time.Instant
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
@@ -31,7 +32,7 @@ class AiAssistantPromptFactoryTest {
             AiAssistantPromptFactory().create(
                 locale = "ru-RU",
                 timeZone = "Europe/Moscow",
-                now = Instant.parse("2026-08-20T09:00:00Z"),
+                now = Instant.parse("2026-08-20T09:45:12Z"),
             ).content,
         )
 
@@ -39,6 +40,25 @@ class AiAssistantPromptFactoryTest {
         assertTrue("create_homework" in prompt)
         assertTrue("never invent" in prompt.lowercase())
         assertTrue("get_subjects" in prompt)
+        assertTrue("rounded to the nearest hour" in prompt)
+        assertTrue("2026-08-20T12:00+03:00[Europe/Moscow]" in prompt)
         assertTrue(prompt.length < 2_000)
+    }
+
+    @Test
+    fun promptIsIdenticalWithinSameHourForCaching() {
+        val factory = AiAssistantPromptFactory()
+        val prompt1 = factory.create(
+            locale = "ru-RU",
+            timeZone = "Europe/Moscow",
+            now = Instant.parse("2026-08-20T09:10:00Z"),
+        ).content
+        val prompt2 = factory.create(
+            locale = "ru-RU",
+            timeZone = "Europe/Moscow",
+            now = Instant.parse("2026-08-20T09:55:59Z"),
+        ).content
+
+        assertEquals(prompt1, prompt2)
     }
 }
