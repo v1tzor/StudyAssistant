@@ -31,6 +31,7 @@ dependencyResolutionManagement {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://artifactory-external.vkpartner.ru/artifactory/maven")
         maven("https://jitpack.io")
+        maven("https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea")
     }
 }
 

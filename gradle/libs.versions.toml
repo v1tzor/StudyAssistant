@@ -55,13 +55,13 @@ zxing = "3.5.4"
 
 # Google
 google-accompanist = "0.36.0"
-paddleocr = "1.6.0"
 
 # RuStore
 rustore-review = "10.5.0"
 rustore-updates = "10.5.0"
-yandex-ads = "8.1.0"
 mytarget-ads = "5.45.3.4"
+yandex-ads = "8.3.0"
+mintegral = "17.0.41.3"
 
 # Crashlytics & Analytics
 tracer = "1.4.0"
@@ -151,6 +151,7 @@ rustore-updates = { module = "ru.rustore.sdk:appupdate", version.ref = "rustore-
 
 # Yandex
 yandex-ads-multiplatform = { module = "com.yandex.ads.multiplatform:mobileads-compose", version.ref = "yandex-ads" }
+yandex-ads-mintegral = { module = "com.yandex.ads.mediation:mobileads-mintegral", version.ref = "mintegral" }
 yandex-ads-core = { module = "com.yandex.android:mobileads", version.ref = "yandex-ads" }
 yandex-ads-compose = { module = "com.yandex.android:mobileads-compose", version.ref = "yandex-ads" }
 yandex-ads-mytarget = { module = "com.yandex.ads.mediation:mobileads-mytarget", version.ref = "mytarget-ads" }
