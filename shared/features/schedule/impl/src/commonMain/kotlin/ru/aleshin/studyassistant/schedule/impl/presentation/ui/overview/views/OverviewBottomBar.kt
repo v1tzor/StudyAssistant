@@ -73,7 +73,7 @@ internal fun OverviewBottomBar(
             val to = currentDate.shiftDay(OVERVIEW_NEXT_DAYS)
             mutableStateOf(TimeRange(from, to))
         }
-        val dateList by derivedStateOf { visibleTimeRange.periodDates() }
+        val dateList by remember { derivedStateOf { visibleTimeRange.periodDates() } }
         LazyRow(
             modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
             state = dateListState,

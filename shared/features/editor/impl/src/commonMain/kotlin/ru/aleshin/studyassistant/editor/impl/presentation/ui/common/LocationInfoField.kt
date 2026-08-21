@@ -380,7 +380,9 @@ internal fun OfficeSelectorBottomSheet(
         addItemView = {
             AnimatedContent(targetState = isEdited) { edit ->
                 if (edit) {
-                    val isConfirmEnabled by derivedStateOf { !offices.contains(editableOffice) }
+                    val isConfirmEnabled by remember(offices, editableOffice) {
+                        derivedStateOf { !offices.contains(editableOffice) }
+                    }
 
                     SelectorTextField(
                         modifier = Modifier.focusRequester(focusRequester),

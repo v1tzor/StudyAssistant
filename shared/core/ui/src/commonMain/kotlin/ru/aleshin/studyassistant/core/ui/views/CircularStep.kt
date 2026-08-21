@@ -56,7 +56,7 @@ fun CircularStepsRow(
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        items(stepsCount) { index ->
+        items(stepsCount, key = { it }) { index ->
             CircularStepView(
                 modifier = Modifier,
                 active = index == currentStep,

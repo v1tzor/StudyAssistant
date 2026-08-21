@@ -67,7 +67,9 @@ internal fun OrganizationsContent(
     val coroutineScope = rememberCoroutineScope()
     val copyMessage = stringResource(Res.string.copy_message)
     val pagerState = rememberPagerState { (state.shortOrganizations?.size ?: 0) + 1 }
-    val pagerOrganizationId by derivedStateOf { state.shortOrganizations?.getOrNull(pagerState.currentPage)?.uid }
+    val pagerOrganizationId by remember {
+        derivedStateOf { state.shortOrganizations?.getOrNull(pagerState.currentPage)?.uid }
+    }
     val layoutMode = currentWindowAdaptiveInfoV2().fetchInfoLayoutMode()
     val organizationId = if (layoutMode == InfoLayoutMode.EXPANDED) {
         state.organizationData?.uid ?: state.shortOrganizations?.firstOrNull()?.uid
