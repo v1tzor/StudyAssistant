@@ -65,7 +65,8 @@ import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.floatSpring
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.toUtcEpochDateMillis
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.presentation.models.schedules.ClassUi
 import ru.aleshin.studyassistant.core.ui.theme.StudyAssistantRes
@@ -143,6 +144,7 @@ internal fun LinkedClassInfoField(
     }
     if (datePickerState) {
         HomeworkDatePicker(
+            selectedDate = selectedDate,
             onDismiss = { datePickerState = false },
             onSelectedDate = { date ->
                 onSelectedDate(date)
@@ -347,10 +349,13 @@ private fun NoneLinkClassItem(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun HomeworkDatePicker(
     modifier: Modifier = Modifier,
+    selectedDate: Instant?,
     onDismiss: () -> Unit,
     onSelectedDate: (Instant?) -> Unit,
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDate?.toUtcEpochDateMillis()
+    )
     val confirmEnabled by remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
 
     DatePickerDialog(
@@ -361,8 +366,8 @@ private fun HomeworkDatePicker(
                 enabled = confirmEnabled,
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                    val birthday = selectedDate.mapEpochTimeToInstant()
-                    onSelectedDate.invoke(birthday)
+                    val date = selectedDate.utcEpochDateToLocalStartOfDay()
+                    onSelectedDate.invoke(date)
                 },
                 content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )

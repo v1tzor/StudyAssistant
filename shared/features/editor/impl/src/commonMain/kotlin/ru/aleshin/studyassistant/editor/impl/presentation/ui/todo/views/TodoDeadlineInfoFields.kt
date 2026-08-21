@@ -43,8 +43,9 @@ import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.setHoursAndMinutes
+import ru.aleshin.studyassistant.core.common.extensions.toUtcEpochDateMillis
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.core.ui.views.ClickableInfoTextField
 import ru.aleshin.studyassistant.core.ui.views.dialog.TimePickerDialog
 import ru.aleshin.studyassistant.core.ui.views.shortWeekdayDayMonthFormat
@@ -147,7 +148,7 @@ private fun TodoDatePicker(
     onSelectedDate: (Instant?) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = deadline?.toEpochMilliseconds()
+        initialSelectedDateMillis = deadline?.toUtcEpochDateMillis()
     )
     val confirmEnabled by remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
 
@@ -159,7 +160,7 @@ private fun TodoDatePicker(
                 enabled = confirmEnabled,
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                    val targetDeadline = selectedDate.mapEpochTimeToInstant().run {
+                    val targetDeadline = selectedDate.utcEpochDateToLocalStartOfDay().run {
                         if (deadline != null) {
                             setHoursAndMinutes(deadline)
                         } else {

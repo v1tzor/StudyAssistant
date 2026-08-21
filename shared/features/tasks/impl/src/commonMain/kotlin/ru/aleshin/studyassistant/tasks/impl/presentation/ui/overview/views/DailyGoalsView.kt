@@ -79,9 +79,9 @@ import ru.aleshin.studyassistant.core.common.extensions.equalsDay
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
 import ru.aleshin.studyassistant.core.common.extensions.handleLazyListScroll
 import ru.aleshin.studyassistant.core.common.extensions.isNextDay
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
 import ru.aleshin.studyassistant.core.common.extensions.shiftDay
-import ru.aleshin.studyassistant.core.common.extensions.startThisDay
+import ru.aleshin.studyassistant.core.common.extensions.toUtcEpochDateMillis
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.core.common.functional.Constants
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
 import ru.aleshin.studyassistant.core.domain.entities.organizations.Millis
@@ -663,7 +663,7 @@ private fun GoalDatePicker(
     onSelectedDate: (Instant) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initSelectedDate.toEpochMilliseconds()
+        initialSelectedDateMillis = initSelectedDate.toUtcEpochDateMillis()
     )
     val confirmEnabled by remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
 
@@ -675,7 +675,7 @@ private fun GoalDatePicker(
                 enabled = confirmEnabled,
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
-                    onSelectedDate.invoke(selectedDate.mapEpochTimeToInstant().startThisDay())
+                    onSelectedDate.invoke(selectedDate.utcEpochDateToLocalStartOfDay())
                 },
                 content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }
             )

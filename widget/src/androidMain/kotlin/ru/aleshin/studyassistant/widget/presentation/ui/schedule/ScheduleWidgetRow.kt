@@ -79,18 +79,8 @@ fun ScheduleWidgetRow(
         WidgetDimensions.timeColumnWidth
     }
     val subjectColor = item.color?.let { ColorProvider(Color(it)) }
-    val container = when (item.status) {
-        WidgetScheduleStatus.ACTIVE -> GlanceTheme.colors.primaryContainer
-        WidgetScheduleStatus.COMPLETED -> GlanceTheme.colors.surfaceVariant
-        WidgetScheduleStatus.UPCOMING -> item.color?.let { color ->
-            tintedSubjectColor(color)
-        } ?: GlanceTheme.colors.primaryContainer
-    }
-    val titleColor = if (item.status == WidgetScheduleStatus.COMPLETED) {
-        GlanceTheme.colors.onSurfaceVariant
-    } else {
-        GlanceTheme.colors.onSurface
-    }
+    val container = item.color?.let { color -> tintedSubjectColor(color) } ?: GlanceTheme.colors.primaryContainer
+    val titleColor = GlanceTheme.colors.onSurface
 
     Row(
         modifier = GlanceModifier.fillMaxWidth().height(rowHeight),
@@ -104,14 +94,22 @@ fun ScheduleWidgetRow(
                 text = formatWidgetTime(item.start),
                 maxLines = 1,
                 style = GlanceTheme.widgetTypography().label.copy(
-                    color = GlanceTheme.colors.onSurface,
+                    color = if (item.status == WidgetScheduleStatus.ACTIVE) {
+                        GlanceTheme.colors.primary
+                    } else {
+                        GlanceTheme.colors.onSurface
+                    },
                 ),
             )
             Text(
                 text = formatWidgetTime(item.end),
                 maxLines = 1,
-                style = GlanceTheme.widgetTypography().caption.copy(
-                    color = GlanceTheme.colors.onSurfaceVariant,
+                style = GlanceTheme.widgetTypography().label.copy(
+                    color = if (item.status == WidgetScheduleStatus.ACTIVE) {
+                        GlanceTheme.colors.primary
+                    } else {
+                        GlanceTheme.colors.onSurface
+                    },
                 ),
             )
         }

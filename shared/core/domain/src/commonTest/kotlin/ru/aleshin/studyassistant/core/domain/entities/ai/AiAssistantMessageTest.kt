@@ -201,7 +201,7 @@ class AiAssistantMessageTest {
         assertEquals(remappedCalls[0].id, remappedTools[0].toolCallId)
         assertEquals(remappedCalls[1].id, remappedTools[1].toolCallId)
         assertEquals("call_1", remappedCalls[0].id)
-        assertEquals("call_1-1", remappedCalls[1].id)
+        assertEquals("assistant-1", remappedCalls[1].id)
     }
 
     @Test

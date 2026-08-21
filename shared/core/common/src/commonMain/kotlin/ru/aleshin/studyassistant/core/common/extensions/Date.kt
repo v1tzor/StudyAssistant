@@ -258,6 +258,16 @@ fun Long.utcEpochDateToLocalStartOfDay(
     ).toInstant(timeZone)
 }
 
+fun Instant.toUtcEpochDateMillis(
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): Long {
+    val localDate = toLocalDateTime(timeZone).date
+    return LocalDateTime(
+        date = localDate,
+        time = LocalTime(0, 0),
+    ).toInstant(TimeZone.UTC).toEpochMilliseconds()
+}
+
 fun Long.toSeconds(): Long {
     return this / Date.MILLIS_IN_SECONDS
 }

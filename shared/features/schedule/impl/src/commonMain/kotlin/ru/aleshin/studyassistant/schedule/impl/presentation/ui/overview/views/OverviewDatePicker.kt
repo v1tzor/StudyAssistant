@@ -25,10 +25,9 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
+import ru.aleshin.studyassistant.core.common.extensions.toUtcEpochDateMillis
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.date_picker_cancel
 import ru.aleshin.studyassistant.schedule.impl.resources.date_picker_confirm
@@ -45,7 +44,7 @@ internal fun OverviewDatePicker(
     onDateSelect: (Instant) -> Unit,
 ) {
     val pickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate?.toPickerMillis(),
+        initialSelectedDateMillis = selectedDate?.toUtcEpochDateMillis(),
     )
     DatePickerDialog(
         modifier = modifier,
@@ -55,7 +54,7 @@ internal fun OverviewDatePicker(
                 enabled = pickerState.selectedDateMillis != null,
                 onClick = {
                     val selectedMillis = pickerState.selectedDateMillis ?: return@TextButton
-                    onDateSelect(selectedMillis.fromPickerMillis())
+                    onDateSelect(selectedMillis.utcEpochDateToLocalStartOfDay())
                     onDismiss()
                 },
             ) {
@@ -73,17 +72,4 @@ internal fun OverviewDatePicker(
             showModeToggle = false,
         )
     }
-}
-
-private fun Instant.toPickerMillis(): Long {
-    return toLocalDateTime(TimeZone.currentSystemDefault()).date
-        .atStartOfDayIn(TimeZone.UTC)
-        .toEpochMilliseconds()
-}
-
-private fun Long.fromPickerMillis(): Instant {
-    return Instant.fromEpochMilliseconds(this)
-        .toLocalDateTime(TimeZone.UTC)
-        .date
-        .atStartOfDayIn(TimeZone.currentSystemDefault())
 }

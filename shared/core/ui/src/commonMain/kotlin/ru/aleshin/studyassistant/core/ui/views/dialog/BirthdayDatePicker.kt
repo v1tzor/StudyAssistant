@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.format.DateTimeComponents
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.extensions.formatByTimeZone
-import ru.aleshin.studyassistant.core.common.extensions.mapEpochTimeToInstant
+import ru.aleshin.studyassistant.core.common.extensions.utcEpochDateToLocalStartOfDay
 import ru.aleshin.studyassistant.core.ui.views.dayMonthYearFormat
 import ru.aleshin.studyassistant.core.ui.resources.Res as CoreRes
 import ru.aleshin.studyassistant.core.ui.resources.cancel_title as core_cancel_title
@@ -62,7 +62,7 @@ fun BirthdayDatePicker(
                 onClick = {
                     val selectedDate = datePickerState.selectedDateMillis ?: return@TextButton
                     val dateFormat = DateTimeComponents.Formats.dayMonthYearFormat()
-                    val birthday = selectedDate.mapEpochTimeToInstant().formatByTimeZone(dateFormat)
+                    val birthday = selectedDate.utcEpochDateToLocalStartOfDay().formatByTimeZone(dateFormat)
                     onSelectedDate.invoke(birthday)
                 },
                 content = { Text(text = stringResource(CoreRes.string.core_select_confirm_title)) }

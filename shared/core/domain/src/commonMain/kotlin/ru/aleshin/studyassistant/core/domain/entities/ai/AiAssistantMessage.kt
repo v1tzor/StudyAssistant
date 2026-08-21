@@ -69,6 +69,17 @@ sealed class AiAssistantMessage {
         override val type = Type.TOOL_CALL
     }
 
+    fun estimatedTokens(): Int {
+        return (estimatedCharacters() + 3) / 4 + 8
+    }
+
+    fun estimatedCharacters(): Int {
+        val toolPayloadSize = (this as? AssistantMessage)?.toolCalls?.sumOf { call ->
+            call.id.length + call.function.name.length + (call.function.arguments?.toString()?.length ?: 0)
+        } ?: 0
+        return (content?.length ?: 0) + toolPayloadSize
+    }
+
     enum class Type {
         USER, ASSISTANT, SYSTEM, TOOL_CALL
     }
@@ -79,7 +90,7 @@ fun List<AiAssistantMessage>.filterNotTools() = filter {
 }
 
 fun List<AiAssistantMessage>.optimisedMessagesForSend(
-    tokenBudget: Int = 6_000,
+    tokenBudget: Int = 30_000,
 ): List<AiAssistantMessage> {
     val messages = this.sortedBy { it.time }
     val systemMessages = messages.filterIsInstance<AiAssistantMessage.SystemMessage>()
@@ -94,11 +105,12 @@ fun List<AiAssistantMessage>.optimisedMessagesForSend(
         remainingTokens -= turnTokens
         if (remainingTokens <= 0) break
     }
+
     return systemMessages + selectedTurns.asReversed().flatten()
 }
 
 fun List<AiAssistantMessage>.preparedMessagesForCompletion(
-    tokenBudget: Int = 6_000,
+    tokenBudget: Int = 25_000,
     maxMessages: Int = 80,
     maxTotalCharacters: Int = 60_000,
 ): List<AiAssistantMessage> {
@@ -137,19 +149,19 @@ internal fun List<AiAssistantMessage>.uniquifyToolCallIds(): List<AiAssistantMes
     val messages = sortedBy(AiAssistantMessage::time)
     val seenIds = mutableSetOf<String>()
     val pendingByOriginalId = mutableMapOf<String, ArrayDeque<String>>()
-    var generatedIndex = 0
+
     return messages.map { message ->
         when (message) {
             is AiAssistantMessage.AssistantMessage -> {
                 pendingByOriginalId.clear()
-                val uniqueCalls = message.toolCalls.orEmpty().map { call ->
+                val uniqueCalls = message.toolCalls.orEmpty().mapIndexed { index, call ->
                     val uniqueId = if (seenIds.add(call.id)) {
                         call.id
                     } else {
-                        generatedIndex += 1
-                        val nextId = "${call.id}-$generatedIndex"
-                        seenIds.add(nextId)
-                        nextId
+                        // Use message ID + index to ensure determinism regardless of history truncation
+                        val stableId = "${message.id}-$index"
+                        seenIds.add(stableId)
+                        stableId
                     }
                     pendingByOriginalId.getOrPut(call.id) { ArrayDeque() }.addLast(uniqueId)
                     call.copy(id = uniqueId)
@@ -176,19 +188,6 @@ private fun List<AiAssistantMessage>.conversationTurns(): List<List<AiAssistantM
         }
         turns
     }
-}
-
-private fun AiAssistantMessage.estimatedTokens(): Int {
-    return (estimatedCharacters() + 3) / 4 + 8
-}
-
-private fun AiAssistantMessage.estimatedCharacters(): Int {
-    val toolPayloadSize = (this as? AiAssistantMessage.AssistantMessage)?.toolCalls
-        ?.sumOf { call ->
-            call.id.length + call.function.name.length + (call.function.arguments?.toString()?.length ?: 0)
-        }
-        ?: 0
-    return (content?.length ?: 0) + toolPayloadSize
 }
 
 suspend fun List<AiAssistantMessage>.dropUnconfirmedMessages(

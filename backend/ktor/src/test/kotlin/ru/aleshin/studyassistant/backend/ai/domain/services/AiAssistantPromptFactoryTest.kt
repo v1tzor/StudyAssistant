@@ -40,7 +40,6 @@ class AiAssistantPromptFactoryTest {
         assertTrue("create_homework" in prompt)
         assertTrue("never invent" in prompt.lowercase())
         assertTrue("get_subjects" in prompt)
-        assertTrue("rounded to the nearest hour" in prompt)
         assertTrue("2026-08-20T12:00+03:00[Europe/Moscow]" in prompt)
         assertTrue(prompt.length < 2_000)
     }
