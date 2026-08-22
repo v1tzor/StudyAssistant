@@ -22,6 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
@@ -46,10 +47,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.ai_chat_disclaimer
 import ru.aleshin.studyassistant.chat.impl.resources.assistant_chat_text_field_placeholder
 import ru.aleshin.studyassistant.core.common.extensions.pxToDp
 import ru.aleshin.studyassistant.core.ui.theme.material.full
@@ -80,57 +83,69 @@ internal fun AssistantBottomBar(
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .bottomBarPadding(),
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            OutlinedTextField(
-                modifier = Modifier.weight(1f),
-                value = textFieldState,
-                enabled = isInputEnabled,
-                singleLine = true,
-                onValueChange = {
-                    textFieldState = it
-                    onUpdateUserQuery(it.text)
-                },
-                shape = MaterialTheme.shapes.full,
-                placeholder = {
-                    Text(
-                        text = stringResource(Res.string.assistant_chat_text_field_placeholder),
-                        maxLines = 1,
-                    )
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    focusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                ),
-                trailingIcon = {
-                    VoiceInputButton(
-                        onResult = {
-                            textFieldState = TextFieldValue(it)
-                            onUpdateUserQuery(it)
-                        },
-                    )
-                }
-            )
-            IconButton(
-                modifier = Modifier.size(32.dp),
-                enabled = !isLoadingChat &&
-                        responseStatus != ResponseStatus.LOADING &&
-                        !isQuotaExpired &&
-                        isInputEnabled &&
-                        textFieldState.text.isNotBlank(),
-                onClick = {
-                    onSendMessage(textFieldState.text)
-                    textFieldState = TextFieldValue()
-                    onUpdateUserQuery("")
-                },
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = textFieldState,
+                    enabled = isInputEnabled,
+                    singleLine = true,
+                    onValueChange = {
+                        textFieldState = it
+                        onUpdateUserQuery(it.text)
+                    },
+                    shape = MaterialTheme.shapes.full,
+                    placeholder = {
+                        Text(
+                            text = stringResource(Res.string.assistant_chat_text_field_placeholder),
+                            maxLines = 1,
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        focusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
+                    trailingIcon = {
+                        VoiceInputButton(
+                            onResult = {
+                                textFieldState = TextFieldValue(it)
+                                onUpdateUserQuery(it)
+                            },
+                        )
+                    }
+                )
+                IconButton(
+                    modifier = Modifier.size(32.dp),
+                    enabled = !isLoadingChat &&
+                            responseStatus != ResponseStatus.LOADING &&
+                            !isQuotaExpired &&
+                            isInputEnabled &&
+                            textFieldState.text.isNotBlank(),
+                    onClick = {
+                        onSendMessage(textFieldState.text)
+                        textFieldState = TextFieldValue()
+                        onUpdateUserQuery("")
+                    },
+                ) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
+                }
             }
+            Text(
+                text = stringResource(Res.string.ai_chat_disclaimer),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }

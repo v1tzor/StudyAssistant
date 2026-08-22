@@ -86,4 +86,5 @@
     <string name="employee_field_label">Teacher</string>
     <string name="office_field_label">Room</string>
     <string name="location_field_label">Location</string>
+    <string name="ai_chat_disclaimer">AI can make mistakes. Please check the information.</string>
 </resources>

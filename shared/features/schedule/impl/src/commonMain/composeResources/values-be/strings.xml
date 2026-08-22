@@ -217,6 +217,7 @@
     <string name="schedule_import_entry_title">Занятак %1$d</string>
     <string name="schedule_import_selected_count">Выбрана %1$d з %2$d</string>
     <string name="schedule_import_back_description">Назад</string>
+    <string name="schedule_import_ai_disclaimer">Дадзеныя распазнаюцца з дапамогай штучнага інтэлекту. Калі ласка, праверце вынік.</string>
     <string name="try_again_button_title">Паспрабаваць зноў</string>
     <string name="ago_suffix">таму</string>
     <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>

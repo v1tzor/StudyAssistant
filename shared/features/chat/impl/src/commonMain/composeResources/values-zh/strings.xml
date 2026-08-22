@@ -86,4 +86,5 @@
     <string name="employee_field_label">教师</string>
     <string name="office_field_label">房间</string>
     <string name="location_field_label">位置</string>
+    <string name="ai_chat_disclaimer">人工智能可能会出错。请检查重要信息。</string>
 </resources>

@@ -74,54 +74,54 @@ internal fun ImportBottomActionBar(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopStart,
     ) {
-    Row(
-        modifier = barModifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Button(
-            onClick = onSaveClick,
-            modifier = Modifier.weight(1f),
-            enabled = enabled,
+        Row(
+            modifier = barModifier,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Crossfade(
-                targetState = isLoadingAccept,
-                animationSpec = spring(
-                    stiffness = Spring.StiffnessMediumLow,
-                    visibilityThreshold = Spring.DefaultDisplacementThreshold,
-                ),
-            ) { loading ->
-                if (!loading) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.PlayCircle,
-                            contentDescription = null,
-                        )
-                        Text(
-                            text = stringResource(Res.string.schedule_import_apply_button),
-                            maxLines = 1,
+            Button(
+                onClick = onSaveClick,
+                modifier = Modifier.weight(1f),
+                enabled = enabled,
+            ) {
+                Crossfade(
+                    targetState = isLoadingAccept,
+                    animationSpec = spring(
+                        stiffness = Spring.StiffnessMediumLow,
+                        visibilityThreshold = Spring.DefaultDisplacementThreshold,
+                    ),
+                ) { loading ->
+                    if (!loading) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.PlayCircle,
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = stringResource(Res.string.schedule_import_apply_button),
+                                maxLines = 1,
+                            )
+                        }
+                    } else {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 3.dp,
                         )
                     }
-                } else {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 3.dp,
-                    )
                 }
             }
+            FilledTonalButton(
+                onClick = onEditSourceClick,
+                enabled = enabled,
+            ) {
+                Text(
+                    text = stringResource(Res.string.schedule_import_edit_source_button),
+                    maxLines = 1,
+                )
+            }
         }
-        FilledTonalButton(
-            onClick = onEditSourceClick,
-            enabled = enabled,
-        ) {
-            Text(
-                text = stringResource(Res.string.schedule_import_edit_source_button),
-                maxLines = 1,
-            )
-        }
-    }
     }
 }

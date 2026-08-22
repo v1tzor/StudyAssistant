@@ -217,6 +217,7 @@
     <string name="schedule_import_entry_title">%1$d-сабақ</string>
     <string name="schedule_import_selected_count">%2$d-ден %1$d таңдалды</string>
     <string name="schedule_import_back_description">Артқа</string>
+    <string name="schedule_import_ai_disclaimer">Деректер жасанды интеллект көмегімен танылады. Нәтижені тексеріңіз.</string>
     <string name="try_again_button_title">Қайтадан көру</string>
     <string name="ago_suffix">бұрын</string>
     <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>

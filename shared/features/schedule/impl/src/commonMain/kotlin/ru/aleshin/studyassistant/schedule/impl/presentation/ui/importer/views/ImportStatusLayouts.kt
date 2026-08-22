@@ -83,6 +83,7 @@ import ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer.contract
 import ru.aleshin.studyassistant.schedule.impl.presentation.ui.share.views.ScheduleWeekChip
 import ru.aleshin.studyassistant.schedule.impl.resources.Res
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_add_button
+import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_ai_disclaimer
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_cancel_button
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_catalog_existing_label
 import ru.aleshin.studyassistant.schedule.impl.resources.schedule_import_done_button
@@ -185,12 +186,24 @@ internal fun ImportSourceSection(
             )
         }
         item(key = EXTRACT_SECTION_KEY) {
-            Button(
-                onClick = onExtract,
+            Column(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                enabled = enabled && state.preparedImage != null && state.selectedOrganization != null,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(stringResource(Res.string.schedule_import_extract_button))
+                Button(
+                    onClick = onExtract,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enabled && state.preparedImage != null && state.selectedOrganization != null,
+                ) {
+                    Text(stringResource(Res.string.schedule_import_extract_button))
+                }
+                Text(
+                    text = stringResource(Res.string.schedule_import_ai_disclaimer),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }

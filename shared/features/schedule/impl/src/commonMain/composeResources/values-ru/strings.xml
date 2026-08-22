@@ -213,6 +213,7 @@
     <string name="schedule_import_entry_title">Занятие %1$d</string>
     <string name="schedule_import_selected_count">Выбрано %1$d из %2$d</string>
     <string name="schedule_import_back_description">Назад</string>
+    <string name="schedule_import_ai_disclaimer">Данные распознаются с помощью ИИ. Пожалуйста, проверьте результат.</string>
     <string name="try_again_button_title">Попробовать снова</string>
     <string name="ago_suffix">назад</string>
     <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>

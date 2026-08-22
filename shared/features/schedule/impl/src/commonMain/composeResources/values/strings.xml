@@ -213,6 +213,7 @@
     <string name="schedule_import_entry_title">Class %1$d</string>
     <string name="schedule_import_selected_count">%1$d of %2$d selected</string>
     <string name="schedule_import_back_description">Back</string>
+    <string name="schedule_import_ai_disclaimer">Data is recognized using AI. Please check the result.</string>
     <string name="try_again_button_title">Try again</string>
     <string name="ago_suffix">ago</string>
     <string name="other_error_message">Error! Contact the developer!</string>

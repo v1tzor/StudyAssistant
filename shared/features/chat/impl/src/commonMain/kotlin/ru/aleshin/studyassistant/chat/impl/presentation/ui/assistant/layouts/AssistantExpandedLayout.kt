@@ -16,7 +16,6 @@
 
 package ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.layouts
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -29,15 +28,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.AiChatHistoryUi
 import ru.aleshin.studyassistant.chat.impl.presentation.models.ai.ResponseStatus
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantChatBody
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantExpandedTopBar
 import ru.aleshin.studyassistant.chat.impl.presentation.ui.assistant.views.AssistantInputIsland
+import ru.aleshin.studyassistant.chat.impl.resources.Res
+import ru.aleshin.studyassistant.chat.impl.resources.ai_chat_disclaimer
 
 /**
  * @author Stanislav Aleshin on 17.08.2026.
@@ -95,14 +100,14 @@ internal fun AssistantExpandedLayout(
             onRequestQuotaReward = onRequestQuotaReward,
             onResolveToolCall = onResolveToolCall,
         )
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(
                     insets = WindowInsets.ime.union(WindowInsets.navigationBars).only(WindowInsetsSides.Bottom)
                 )
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 16.dp),
-            contentAlignment = Alignment.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             AssistantInputIsland(
                 modifier = Modifier
@@ -115,6 +120,13 @@ internal fun AssistantExpandedLayout(
                 userQuery = userQuery,
                 onUpdateUserQuery = onUpdateUserQuery,
                 onSendMessage = onSendMessage,
+            )
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = stringResource(Res.string.ai_chat_disclaimer),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }

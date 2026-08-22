@@ -86,4 +86,5 @@
     <string name="employee_field_label">Преподаватель</string>
     <string name="office_field_label">Аудитория</string>
     <string name="location_field_label">Место</string>
+    <string name="ai_chat_disclaimer">ИИ может ошибаться. Проверяйте важную информацию.</string>
 </resources>
