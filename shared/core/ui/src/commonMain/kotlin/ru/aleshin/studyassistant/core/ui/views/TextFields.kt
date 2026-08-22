@@ -131,7 +131,7 @@ fun InfoTextField(
             readOnly = readOnly,
             value = value ?: "",
             onValueChange = { text ->
-                if (text.length <= maxLength) {
+                if (text.length <= maxLength || text.length < (value?.length ?: 0)) {
                     onValueChange(text)
                 }
             },
@@ -206,7 +206,7 @@ fun InfoTextField(
             readOnly = readOnly,
             value = value ?: "",
             onValueChange = { text ->
-                if (text.length <= maxLength) {
+                if (text.length <= maxLength || text.length < (value?.length ?: 0)) {
                     onValueChange(text)
                 }
             },
@@ -281,7 +281,7 @@ fun InfoTextField(
             readOnly = readOnly,
             value = value,
             onValueChange = { value1 ->
-                if (value1.text.length <= maxLength) {
+                if (value1.text.length <= maxLength || value1.text.length < (value.text.length)) {
                     onValueChange(value1)
                 }
             },
@@ -355,7 +355,7 @@ fun VerticalInfoTextField(
             readOnly = readOnly,
             value = value ?: "",
             onValueChange = { text ->
-                if (text.length <= maxLength) {
+                if (text.length <= maxLength || text.length < (value?.length ?: 0)) {
                     onValueChange(text)
                 }
             },
@@ -437,7 +437,7 @@ fun VerticalInfoTextField(
             readOnly = readOnly,
             value = value,
             onValueChange = { fieldValue ->
-                if (fieldValue.text.length <= maxLength) {
+                if (fieldValue.text.length <= maxLength || fieldValue.text.length < (value.text.length)) {
                     onValueChange(fieldValue)
                 }
             },

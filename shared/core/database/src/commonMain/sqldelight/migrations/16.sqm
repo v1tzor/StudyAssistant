@@ -1,0 +1,1 @@
+ALTER TABLE generalSettingsEntity ADD COLUMN is_review_requested INTEGER NOT NULL DEFAULT 0;

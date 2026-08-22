@@ -25,6 +25,7 @@ data class GeneralSettings(
     val isFirstStart: Boolean = true,
     val isUnfinishedSetup: UID? = null,
     val isSetup: Boolean = false,
+    val isReviewRequested: Boolean = false,
     val languageType: LanguageType = LanguageType.DEFAULT,
     val themeType: ThemeType = ThemeType.DEFAULT,
 )

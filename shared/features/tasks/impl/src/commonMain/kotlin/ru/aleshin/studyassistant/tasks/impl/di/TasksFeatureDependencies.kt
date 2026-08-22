@@ -22,11 +22,13 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworkShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -44,6 +46,7 @@ public interface TasksFeatureDependencies : BaseFeatureDependencies {
     public val organizationsRepository: OrganizationsRepository
     public val profileRepository: ProfileRepository
     public val calendarSettingsRepository: CalendarSettingsRepository
+    public val generalSettingsRepository: GeneralSettingsRepository
     public val homeworkRepository: HomeworksRepository
     public val homeworkShareRepository: HomeworkShareRepository
     public val todoRepository: TodoRepository
@@ -53,5 +56,6 @@ public interface TasksFeatureDependencies : BaseFeatureDependencies {
     public val connectionManager: Konnection
     public val coroutineManager: CoroutineManager
     public val crashlyticsService: CrashlyticsService
+    public val reviewService: ReviewService
     public val analyticsService: AnalyticsService
 }

@@ -40,6 +40,7 @@ import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.managers.TimeOverlayManager
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.EndClassesReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.HomeworksReminderManager
 import ru.aleshin.studyassistant.core.domain.managers.reminders.StartClassesReminderManager
@@ -189,12 +190,14 @@ val featureModule = DI.Module("Feature") {
             override val todoRepository = instance<TodoRepository>()
             override val todoReminderManager = instance<TodoReminderManager>()
             override val calendarSettingsRepository = instance<CalendarSettingsRepository>()
+            override val generalSettingsRepository = instance<GeneralSettingsRepository>()
             override val subjectsRepository = instance<SubjectsRepository>()
             override val connectionManager = instance<Konnection>()
             override val dateManager = instance<DateManager>()
             override val coroutineManager = instance<CoroutineManager>()
             override val crashlyticsService = instance<CrashlyticsService>()
             override val analyticsService = instance<AnalyticsService>()
+            override val reviewService = instance<ReviewService>()
         }
     }
     bind<TasksFeatureController>() with scoped(FeatureControllerScope).singleton {

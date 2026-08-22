@@ -33,6 +33,7 @@ import ru.aleshin.studyassistant.core.common.functional.FlowDomainResult
 import ru.aleshin.studyassistant.core.common.functional.TimeRange
 import ru.aleshin.studyassistant.core.common.functional.UnitDomainResult
 import ru.aleshin.studyassistant.core.common.managers.DateManager
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.domain.entities.common.numberOfRepeatWeek
 import ru.aleshin.studyassistant.core.domain.entities.goals.Goal
 import ru.aleshin.studyassistant.core.domain.entities.goals.GoalTime
@@ -47,6 +48,7 @@ import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.tasks.impl.domain.common.TasksEitherWrapper
 import ru.aleshin.studyassistant.tasks.impl.domain.entities.HomeworksCompleteProgress
@@ -71,6 +73,8 @@ internal interface HomeworksInteractor {
         private val baseScheduleRepository: BaseScheduleRepository,
         private val customScheduleRepository: CustomScheduleRepository,
         private val calendarSettingsRepository: CalendarSettingsRepository,
+        private val generalSettingsRepository: GeneralSettingsRepository,
+        private val reviewService: ReviewService,
         private val dateManager: DateManager,
         private val eitherWrapper: TasksEitherWrapper,
     ) : HomeworksInteractor {
@@ -213,6 +217,12 @@ internal interface HomeworksInteractor {
             if (linkedGoal != null && !linkedGoal.isDone) completeLinkedGoal(linkedGoal)
 
             homeworksRepository.addOrUpdateHomework(updatedHomework)
+
+            val settings = generalSettingsRepository.fetchSettings().first()
+            if (!settings.isReviewRequested) {
+                reviewService.requestReview()
+                generalSettingsRepository.updateSettings(settings.copy(isReviewRequested = true))
+            }
         }
 
         override suspend fun skipHomework(homework: Homework) = eitherWrapper.wrapUnit {

@@ -16,10 +16,8 @@
 
 package ru.aleshin.studyassistant.core.data.handlers
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.common.functional.DeviceInfoProvider
 import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.managers.DateManager
@@ -101,15 +99,8 @@ internal interface AiConversationHandler {
         private suspend fun completeResponse(
             messages: List<AiAssistantMessage>,
         ): AiAssistantResponse {
-            val tokensBefore = messages.sumOf { it.estimatedTokens() }
             val optimisedMessages = messages.preparedMessagesForCompletion()
-            val tokensAfter = optimisedMessages.sumOf { it.estimatedTokens() }
 
-            Logger.e(LOGGER_TAG) { "-------------------------" }
-            Logger.e(LOGGER_TAG) { "> tokens before = $tokensBefore" }
-            Logger.e(LOGGER_TAG) { "> tokens after = $tokensAfter" }
-            Logger.e(LOGGER_TAG) { "> MESSAGES: ${messages.size} to --> ${optimisedMessages.size}" }
-            Logger.e(LOGGER_TAG) { "-------------------------" }
             val request = AiCompletionRequestPojo(
                 messageId = optimisedMessages.last { message -> message is AiAssistantMessage.UserMessage }.id,
                 locale = deviceInfoProvider.fetchDeviceLanguage(),

@@ -18,6 +18,7 @@ package ru.aleshin.studyassistant.schedule.impl.presentation.ui.importer
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -133,7 +134,7 @@ internal fun ImportContent(
         },
     ) { contentPadding ->
         ImportLayout(
-            modifier = Modifier.padding(contentPadding),
+            modifier = Modifier.padding(contentPadding).imePadding(),
             state = state,
             layoutMode = layoutMode,
             onSelectPhoto = { galleryLauncher.launch() },
@@ -165,14 +166,10 @@ internal fun ImportContent(
                 store.dispatchEvent(ImportEvent.UpdateStartOfDay(repeatWeek, dayOfWeek, startTime))
             },
             onUpdateClassesDuration = { repeatWeek, dayOfWeek, duration, specificDurations ->
-                store.dispatchEvent(
-                    ImportEvent.UpdateClassesDuration(repeatWeek, dayOfWeek, duration, specificDurations),
-                )
+                store.dispatchEvent(ImportEvent.UpdateClassesDuration(repeatWeek, dayOfWeek, duration, specificDurations))
             },
             onUpdateBreaksDuration = { repeatWeek, dayOfWeek, duration, specificDurations ->
-                store.dispatchEvent(
-                    ImportEvent.UpdateBreaksDuration(repeatWeek, dayOfWeek, duration, specificDurations),
-                )
+                store.dispatchEvent(ImportEvent.UpdateBreaksDuration(repeatWeek, dayOfWeek, duration, specificDurations))
             },
             onSwapDays = { repeatWeek, firstDay, secondDay ->
                 store.dispatchEvent(ImportEvent.SwapDays(repeatWeek, firstDay, secondDay))

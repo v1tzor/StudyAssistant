@@ -31,6 +31,7 @@ internal data class GeneralSettingsUi(
     val isFirstStart: Boolean = true,
     val isUnfinishedSetup: UID? = null,
     val isSetup: Boolean = false,
+    val isReviewRequested: Boolean = false,
     val languageType: LanguageUiType = LanguageUiType.DEFAULT,
     val themeType: ThemeUiType = ThemeUiType.DEFAULT,
 )

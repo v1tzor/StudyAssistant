@@ -23,9 +23,6 @@ import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -34,7 +31,6 @@ import org.kodein.di.DI
 import org.kodein.di.bindProvider
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import ru.aleshin.studyassistant.core.common.functional.Constants.App.LOGGER_TAG
 import ru.aleshin.studyassistant.core.remote.BuildKonfig
 import ru.aleshin.studyassistant.core.remote.api.ads.AdRewardRemoteApi
 import ru.aleshin.studyassistant.core.remote.api.ai.AiRemoteApi
@@ -78,14 +74,6 @@ val coreRemoteModule = DI.Module("CoreRemote") {
             defaultRequest {
                 url(BuildKonfig.BACKEND_BASE_URL)
                 contentType(ContentType.Application.Json)
-            }
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        co.touchlab.kermit.Logger.i(LOGGER_TAG) { message }
-                    }
-                }
-                level = LogLevel.ALL
             }
             install(HttpTimeout) {
                 connectTimeoutMillis = 10_000

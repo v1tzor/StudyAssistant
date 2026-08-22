@@ -28,6 +28,7 @@ fun GeneralSettingsEntity.mapToDomain() = GeneralSettings(
     isFirstStart = is_first_start == 1L,
     isUnfinishedSetup = is_unfinished_setup,
     isSetup = is_setup == 1L,
+    isReviewRequested = is_review_requested == 1L,
     themeType = ThemeType.valueOf(theme),
     languageType = LanguageType.valueOf(language),
 )
@@ -37,6 +38,7 @@ fun GeneralSettings.mapToLocalData() = GeneralSettingsEntity(
     is_first_start = if (isFirstStart) 1L else 0L,
     is_unfinished_setup = isUnfinishedSetup,
     is_setup = if (isSetup) 1L else 0L,
+    is_review_requested = if (isReviewRequested) 1L else 0L,
     theme = themeType.name,
     language = languageType.name,
 )

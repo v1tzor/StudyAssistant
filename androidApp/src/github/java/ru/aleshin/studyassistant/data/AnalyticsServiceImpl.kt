@@ -15,6 +15,7 @@
  */
 package ru.aleshin.studyassistant.data
 
+import android.app.Application
 import android.content.Context
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
@@ -23,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 
 /**
- * @author Stanislav Aleshin on 13.04.2025.
+ * @author Stanislav Aleshin on 22.08.2026.
  */
 class AnalyticsServiceImpl(
     private val context: Context,
@@ -34,9 +35,17 @@ class AnalyticsServiceImpl(
     }
 
     override fun initializeService() {
-        val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY).build()
+        val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+            .withLocationTracking(false)
+            .withCrashReporting(true)
+            .withAnrMonitoring(true)
+            .let { builder -> if (BuildConfig.DEBUG) builder.withLogs() else builder }
+            .build()
         AppMetrica.activate(context.applicationContext, config)
-        AppMetrica.putAppEnvironmentValue("store", "googleplay")
+        AppMetrica.putAppEnvironmentValue("store", BuildConfig.FLAVOR)
+        (context.applicationContext as? Application)?.let { application ->
+            AppMetrica.enableActivityAutoTracking(application)
+        }
     }
 
     override fun setupUserId(id: UID) {

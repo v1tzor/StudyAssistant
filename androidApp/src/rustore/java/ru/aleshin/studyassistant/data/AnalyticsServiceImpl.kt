@@ -24,7 +24,7 @@ import ru.aleshin.studyassistant.core.common.functional.UID
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 
 /**
- * @author Stanislav Aleshin on 13.04.2025.
+ * @author Stanislav Aleshin on 22.08.2026.
  */
 class AnalyticsServiceImpl(
     private val context: Context,
@@ -42,7 +42,7 @@ class AnalyticsServiceImpl(
             .let { builder -> if (BuildConfig.DEBUG) builder.withLogs() else builder }
             .build()
         AppMetrica.activate(context.applicationContext, config)
-        AppMetrica.putAppEnvironmentValue("store", "rustore")
+        AppMetrica.putAppEnvironmentValue("store", BuildConfig.FLAVOR)
         (context.applicationContext as? Application)?.let { application ->
             AppMetrica.enableActivityAutoTracking(application)
         }

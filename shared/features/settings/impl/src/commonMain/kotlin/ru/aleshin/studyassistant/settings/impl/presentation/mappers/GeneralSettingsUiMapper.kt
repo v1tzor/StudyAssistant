@@ -28,6 +28,7 @@ internal fun GeneralSettings.mapToUi() = GeneralSettingsUi(
     isFirstStart = isFirstStart,
     isUnfinishedSetup = isUnfinishedSetup,
     isSetup = isSetup,
+    isReviewRequested = isReviewRequested,
     languageType = languageType.mapToUi(),
     themeType = themeType.mapToUi(),
 )
@@ -36,6 +37,7 @@ internal fun GeneralSettingsUi.mapToDomain() = GeneralSettings(
     isFirstStart = isFirstStart,
     isUnfinishedSetup = isUnfinishedSetup,
     isSetup = isSetup,
+    isReviewRequested = isReviewRequested,
     languageType = languageType.mapToDomain(),
     themeType = themeType.mapToDomain(),
 )

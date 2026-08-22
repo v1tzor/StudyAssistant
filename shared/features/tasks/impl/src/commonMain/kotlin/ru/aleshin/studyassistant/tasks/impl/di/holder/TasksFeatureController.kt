@@ -25,11 +25,13 @@ import ru.aleshin.studyassistant.core.common.managers.CoroutineManager
 import ru.aleshin.studyassistant.core.common.managers.DateManager
 import ru.aleshin.studyassistant.core.common.platform.services.AnalyticsService
 import ru.aleshin.studyassistant.core.common.platform.services.CrashlyticsService
+import ru.aleshin.studyassistant.core.common.platform.services.ReviewService
 import ru.aleshin.studyassistant.core.domain.managers.reminders.TodoReminderManager
 import ru.aleshin.studyassistant.core.domain.repositories.BaseScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CalendarSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.CustomScheduleRepository
 import ru.aleshin.studyassistant.core.domain.repositories.DailyGoalsRepository
+import ru.aleshin.studyassistant.core.domain.repositories.GeneralSettingsRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworkShareRepository
 import ru.aleshin.studyassistant.core.domain.repositories.HomeworksRepository
 import ru.aleshin.studyassistant.core.domain.repositories.OrganizationsRepository
@@ -64,6 +66,7 @@ public class TasksFeatureController(
         bindSingleton<SubjectsRepository> { dependencies.subjectsRepository }
         bindSingleton<TodoRepository> { dependencies.todoRepository }
         bindSingleton<CalendarSettingsRepository> { dependencies.calendarSettingsRepository }
+        bindSingleton<GeneralSettingsRepository> { dependencies.generalSettingsRepository }
 
         bindSingleton<TodoReminderManager> { dependencies.todoReminderManager }
         bindSingleton<Konnection> { dependencies.connectionManager }
@@ -72,6 +75,7 @@ public class TasksFeatureController(
 
         bindSingleton<CrashlyticsService> { dependencies.crashlyticsService }
         bindSingleton<AnalyticsService> { dependencies.analyticsService }
+        bindSingleton<ReviewService> { dependencies.reviewService }
 
         bindSingleton<TasksFeatureApi> {
             object : TasksFeatureApi {
