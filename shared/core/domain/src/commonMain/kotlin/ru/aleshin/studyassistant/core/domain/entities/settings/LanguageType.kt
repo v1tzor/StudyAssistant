@@ -20,5 +20,5 @@ package ru.aleshin.studyassistant.core.domain.entities.settings
  * @author Stanislav Aleshin on 24.04.2024.
  */
 enum class LanguageType {
-    DEFAULT, EN, RU
+    DEFAULT, EN, RU, ZH, BE, KK
 }

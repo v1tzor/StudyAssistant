@@ -26,7 +26,10 @@ import kotlinx.serialization.Serializable
 @Immutable
 enum class StudyAssistantLanguage(val code: String) {
     EN("en"),
-    RU("ru")
+    RU("ru"),
+    ZH("zh"),
+    BE("be"),
+    KK("kk")
 }
 
 @Immutable
@@ -34,7 +37,10 @@ enum class StudyAssistantLanguage(val code: String) {
 enum class LanguageUiType(val code: String?) {
     DEFAULT(null),
     EN("en"),
-    RU("ru")
+    RU("ru"),
+    ZH("zh"),
+    BE("be"),
+    KK("kk")
 }
 
 val LocalStudyAssistantLanguage = staticCompositionLocalOf<StudyAssistantLanguage> {
@@ -44,6 +50,9 @@ val LocalStudyAssistantLanguage = staticCompositionLocalOf<StudyAssistantLanguag
 fun fetchAppLanguage(language: String) = when (language) {
     "ru" -> StudyAssistantLanguage.RU
     "en" -> StudyAssistantLanguage.EN
+    "zh" -> StudyAssistantLanguage.ZH
+    "be" -> StudyAssistantLanguage.BE
+    "kk" -> StudyAssistantLanguage.KK
     else -> StudyAssistantLanguage.EN
 }
 
@@ -51,4 +60,7 @@ fun fetchAppLanguage(languageType: LanguageUiType) = when (languageType) {
     LanguageUiType.DEFAULT -> fetchAppLanguage(Locale.current.language)
     LanguageUiType.EN -> StudyAssistantLanguage.EN
     LanguageUiType.RU -> StudyAssistantLanguage.RU
+    LanguageUiType.ZH -> StudyAssistantLanguage.ZH
+    LanguageUiType.BE -> StudyAssistantLanguage.BE
+    LanguageUiType.KK -> StudyAssistantLanguage.KK
 }

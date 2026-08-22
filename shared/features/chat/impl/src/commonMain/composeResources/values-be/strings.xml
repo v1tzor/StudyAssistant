@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="assistant_top_bar_title">Асістэнт (Beta)</string>
+    <string name="assistant_expanded_header">Асістэнт</string>
+    <string name="assistant_quota_remaining">Засталося %1$d з %2$d паведамленняў сёння</string>
+    <string name="assistant_send_action_description">Адправіць паведамленне</string>
+    <string name="assistant_clear_history_description">Ачысціць гісторыю чата</string>
+    <string name="assistant_sender_badge">Асістэнт</string>
+    <string name="chat_assistant_error_message">Памылка пры працы асістэнта</string>
+    <string name="functional_chat_suggestion">Што ты ўмееш?</string>
+    <string name="homework_chat_suggestion">Што задалі на заўтра?</string>
+    <string name="assistant_chat_text_field_placeholder">Адпраўце любы запыт</string>
+    <string name="assistant_empty_chat_title">Чым я магу вам дапамагчы?</string>
+    <string name="failure_response_text">На жаль, не ўдалося выканаць запыт</string>
+    <string name="quota_expired_title">Ліміт на сёння (%d паведамленняў) вычарпаны.</string>
+    <string name="quota_reset_suggestion_text">Паглядзіце кароткую рэкламу, каб падтрымаць каманду і атрымаць яшчэ %1$d паведамленняў. Даступна сёння: %2$d з %3$d.</string>
+    <string name="quota_rewards_exhausted_text">Усе %d узнагароды за рэкламу на сёння выкарыстаны. Квота адновіцца аўтаматычна заўтра.</string>
+    <string name="watch_ad_reward_button">Паглядзець рэкламу · +%d паведамленняў</string>
+    <string name="ai_settings_button">Наладзіць AI</string>
+    <string name="quota_error_message">Дзённая квота з %d паведамленняў вычарпана</string>
+    <string name="reward_unavailable_error_message">Рэклама зараз недаступная. Паспрабуйце яшчэ раз пазней (адключыце VPN).</string>
+    <string name="invalid_request_error_message">Асістэнт не змог апрацаваць запыт. Праверце паведамленне і паўтарыце спробу</string>
+    <string name="offline_error_message">Няма падключэння да інтэрнэту</string>
+    <string name="rate_limit_error_message">Занадта шмат запытаў. Паспрабуйце крыху пазней</string>
+    <string name="server_unavailable_error_message">AI-сэрвіс часова недаступны</string>
+    <string name="try_again_button">Паўтарыць спробу</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+    <string name="confirm_todo_creation_title">Стварыць гэтую задачу?</string>
+    <string name="confirm_todo_update_title">Змяніць гэтую задачу?</string>
+    <string name="confirm_todo_completion_title">Змяніць статус гэтай задачы?</string>
+    <string name="confirm_todo_deletion_title">Выдаліць гэтую задачу?</string>
+    <string name="confirm_homework_creation_title">Стварыць гэтае дамашняе заданне?</string>
+    <string name="confirm_homework_update_title">Змяніць гэтае дамашняе заданне?</string>
+    <string name="confirm_homework_completion_title">Змяніць статус дамашняга задання?</string>
+    <string name="confirm_homework_deletion_title">Выдаліць гэтае дамашняе заданне?</string>
+    <string name="confirm_class_creation_title">Дадаць гэты занятак?</string>
+    <string name="confirm_class_update_title">Змяніць гэты занятак?</string>
+    <string name="confirm_class_deletion_title">Выдаліць гэты занятак?</string>
+    <string name="confirm_subject_creation_title">Стварыць гэты прадмет?</string>
+    <string name="confirm_subject_update_title">Змяніць гэты прадмет?</string>
+    <string name="confirm_employee_creation_title">Дадаць гэтага выкладчыка?</string>
+    <string name="confirm_employee_update_title">Змяніць даныя выкладчыка?</string>
+    <string name="confirm_goal_creation_title">Дадаць гэтую мэту?</string>
+    <string name="confirm_goal_update_title">Змяніць гэтую мэту?</string>
+    <string name="confirm_goal_completion_title">Змяніць статус гэтай мэты?</string>
+    <string name="confirm_goal_deletion_title">Выдаліць гэтую мэту?</string>
+    <string name="confirm_generic_change_title">Ужыць гэтае змяненне?</string>
+    <string name="confirm_change_description">Асістэнт падрыхтаваў змяненне. Праверце яго перад захаваннем на прыладзе.</string>
+    <string name="confirm_change_button">Пацвердзіць</string>
+    <string name="reject_change_button">Адхіліць</string>
+    <string name="name_field_label">Назва</string>
+    <string name="description_field_label">Апісанне</string>
+    <string name="deadline_field_label">Тэрмін</string>
+    <string name="priority_field_label">Прыярытэт</string>
+    <string name="theoretical_tasks_field_label">Тэорыя</string>
+    <string name="practical_tasks_field_label">Практыка</string>
+    <string name="presentation_tasks_field_label">Прэзентацыя</string>
+    <string name="test_topic_field_label">Тэма тэста</string>
+    <string name="schedule_import_action_description">Імпарт раскладу па фота</string>
+    <string name="target_field_label">Аб’ект</string>
+    <string name="completed_field_label">Выканана</string>
+    <string name="class_field_label">Занятак</string>
+    <string name="organization_field_label">Арганізацыя</string>
+    <string name="subject_field_label">Прадмет</string>
+    <string name="date_field_label">Дата</string>
+    <string name="start_time_field_label">Пачатак</string>
+    <string name="end_time_field_label">Заканчэнне</string>
+    <string name="event_type_field_label">Тып занятку</string>
+    <string name="custom_data_field_label">Назва занятку</string>
+    <string name="employee_field_label">Выкладчык</string>
+    <string name="office_field_label">Аўдыторыя</string>
+    <string name="location_field_label">Месца</string>
+</resources>

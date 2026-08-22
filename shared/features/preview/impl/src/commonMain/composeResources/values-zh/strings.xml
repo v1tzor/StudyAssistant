@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="continue_label">下一步</string>
+    <string name="setup_label">设置应用</string>
+    <string name="back_label">返回</string>
+    <string name="study_intro_title">完全免费</string>
+    <string name="study_intro_body">今日课程、实时进度和本周负载——尽在一个主屏幕。无订阅，无隐藏限制。</string>
+    <string name="analytics_intro_title">作业和任务尽在掌控</string>
+    <string name="analytics_intro_body">作业、待办和目标集中在一处。一眼便知今日到期的事项。</string>
+    <string name="ai_intro_title">AI 代理驱动整个应用</string>
+    <string name="ai_intro_body">只需输入——AI 代理即可创建课程、作业和任务。您只需确认。</string>
+    <string name="ai_intro_highlight">AI 代理</string>
+    <string name="sharing_intro_title">分享日程和作业</string>
+    <string name="sharing_intro_body">通过代码或二维码将您的时间表或作业发送给同学。无需账户，无需注册。</string>
+    <string name="step_title">第\u0020</string>
+    <string name="profile_step_title">完善您的个人资料</string>
+    <string name="profile_button_label">保存</string>
+    <string name="organization_step_title">创建您的第一个教育机构</string>
+    <string name="organization_button_label">创建</string>
+    <string name="calendar_step_title">选择日程中的周数</string>
+    <string name="calendar_button_label">继续</string>
+    <string name="schedule_step_title">填写日程并开始使用应用！</string>
+    <string name="schedule_fill_out_button_label">去填写</string>
+    <string name="schedule_import_ai_button_label">拍照即得</string>
+    <string name="schedule_start_button_label">开始使用</string>
+    <string name="username_label">显示名称 *</string>
+
+    <string name="email_label">电子邮件</string>
+    <string name="birthday_label">生日</string>
+    <string name="birthday_placeholder">选择日期</string>
+    <string name="gender_label">性别</string>
+    <string name="gender_placeholder">选择您的性别</string>
+    <string name="short_name_label">简称 *</string>
+    <string name="short_name_placeholder">输入名称</string>
+    <string name="organization_type_label">机构类型 *</string>
+    <string name="organization_type_placeholder">选择类型</string>
+    <string name="phone_number_label">电话号码</string>
+    <string name="website_label">网站</string>
+    <string name="privacy_policy_disclaimer_start">继续使用即表示您同意我们的 </string>
+    <string name="privacy_policy_disclaimer_link">隐私政策</string>
+    <string name="privacy_policy_disclaimer_suffix"></string>
+    <string name="other_error_message">错误！请联系开发者！</string>
+</resources>

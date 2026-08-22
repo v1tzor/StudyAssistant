@@ -155,9 +155,6 @@ internal fun ImportSourceSection(
                 )
             }
         }
-        item(key = PHOTO_HINT_SECTION_KEY) {
-            ImportLargePhotoHint()
-        }
         item(key = PHOTO_SECTION_KEY) {
             ImportSourceActions(
                 enabled = enabled,

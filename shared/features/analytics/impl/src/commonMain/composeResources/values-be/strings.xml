@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="analytics_header">Аналітыка</string>
+    <string name="analytics_back_desc">Назад</string>
+    <string name="analytics_calendar_desc">Выбраць дыяпазон дат</string>
+    <string name="analytics_previous_period_desc">Папярэдні перыяд</string>
+    <string name="analytics_next_period_desc">Наступны перыяд</string>
+    <string name="analytics_period_week">Тыдзень</string>
+    <string name="analytics_period_month">Месяц</string>
+    <string name="analytics_period_year">Год</string>
+    <string name="analytics_period_custom">Перыяд</string>
+    <string name="analytics_month_january">Студзень</string>
+    <string name="analytics_month_february">Люты</string>
+    <string name="analytics_month_march">Сакавік</string>
+    <string name="analytics_month_april">Красавік</string>
+    <string name="analytics_month_may">Май</string>
+    <string name="analytics_month_june">Чэрвень</string>
+    <string name="analytics_month_july">Ліпень</string>
+    <string name="analytics_month_august">Жнівень</string>
+    <string name="analytics_month_september">Верасень</string>
+    <string name="analytics_month_october">Кастрычнік</string>
+    <string name="analytics_month_november">Лістапад</string>
+    <string name="analytics_month_december">Снежань</string>
+    <string name="analytics_date_picker_title">Выберыце дату</string>
+    <string name="analytics_range_picker_title">Выберыце перыяд</string>
+    <string name="analytics_confirm">Ужыць</string>
+    <string name="analytics_cancel">Адмена</string>
+    <string name="analytics_retry">Паўтарыць</string>
+    <string name="analytics_error_title">Не ўдалося загрузіць аналітыку</string>
+    <string name="analytics_error_body">Праверце даныя і паспрабуйце яшчэ раз.</string>
+    <string name="analytics_empty_title">За гэты перыяд даных няма</string>
+    <string name="analytics_empty_body">Тут з’явяцца заняткі і задачы з датамі ўнутры выбранага перыяду.</string>
+    <string name="analytics_error_message">Штосьці пайшло не так. Паспрабуйце яшчэ раз.</string>
+    <string name="analytics_summary_title">Вынікі перыяду</string>
+    <string name="analytics_insights_title">Што відаць па перыядзе</string>
+    <string name="analytics_workload_title">Нагрузка і расклад</string>
+    <string name="analytics_tasks_title">Заданні</string>
+    <string name="analytics_goals_title">Мэты</string>
+    <string name="analytics_goals_duration">Кантроль часу</string>
+    <string name="analytics_organizations_title">Арганізацыі</string>
+    <string name="analytics_subjects_title">Прадметы</string>
+    <string name="analytics_employees_title">Выкладчыкі</string>
+    <string name="analytics_regularity_title">Рытм тыдня</string>
+    <string name="analytics_regularity_chart_label">Сярэдняя вучэбная нагрузка па днях</string>
+    <string name="analytics_scheduled_hours">Па раскладзе</string>
+    <string name="analytics_classes">Заняткі</string>
+    <string name="analytics_commitments">ДЗ і TODO</string>
+    <string name="analytics_completed">Выканана</string>
+    <string name="analytics_on_time">У тэрмін</string>
+    <string name="analytics_late">Са спазненнем</string>
+    <string name="analytics_no_overloads">Перагрузак няма</string>
+    <string name="analytics_overdue">Пратэрмінавана</string>
+    <string name="analytics_upcoming">Чакаецца</string>
+    <string name="analytics_backlog">Без дэдлайна</string>
+    <string name="analytics_invalid_completion">Без даты выканання</string>
+    <string name="analytics_previous_period">да мінулага перыяду</string>
+    <string name="analytics_organizations_count">Арганізацыі</string>
+    <string name="analytics_average_workload">Сярэдняя нагрузка</string>
+    <string name="analytics_peak_load">Пікавая нагрузка</string>
+    <string name="analytics_overload_days">Дзён вышэй за %1$d</string>
+    <string name="analytics_homeworks">ДЗ</string>
+    <string name="analytics_todos">TODO</string>
+    <string name="analytics_tests">Тэсты</string>
+    <string name="analytics_theory">Тэарэтычныя часткі</string>
+    <string name="analytics_practice">Практычныя часткі</string>
+    <string name="analytics_presentations">Прэзентацыі</string>
+    <string name="analytics_standard_priority">Звычайны прыярытэт</string>
+    <string name="analytics_medium_priority">Сярэдні прыярытэт</string>
+    <string name="analytics_high_priority">Высокі прыярытэт</string>
+    <string name="analytics_planned">Запланавана</string>
+    <string name="analytics_goal_homeworks">Мэты па ДЗ</string>
+    <string name="analytics_goal_todos">Мэты па TODO</string>
+    <string name="analytics_desired_time">Жаданы час</string>
+    <string name="analytics_actual_time">Фактычны час</string>
+    <string name="analytics_active_timer">Таймер актыўны</string>
+    <string name="analytics_share">Доля нагрузкі</string>
+    <string name="analytics_on_time_rate">Выканана ў тэрмін</string>
+    <string name="analytics_subject_count">Прадметы</string>
+    <string name="analytics_organization_count">Арганізацыі</string>
+    <string name="analytics_frequent_day">Часцей за ўсё</string>
+    <string name="analytics_not_specified">Не пазначаны</string>
+    <string name="analytics_not_available">—</string>
+    <string name="analytics_show_all">Паказаць усё</string>
+    <string name="analytics_show_less">Згарнуць</string>
+    <string name="analytics_study_days">Вучэбныя дні</string>
+    <string name="analytics_completion_days">Дні з выкананымі задачамі</string>
+    <string name="analytics_longest_streak">Максімальная серыя</string>
+    <string name="analytics_days_suffix">дзён</string>
+    <string name="analytics_hours_minutes">%1$d г %2$d хв</string>
+    <string name="analytics_minutes">%1$d хв</string>
+    <string name="analytics_percent">%1$s</string>
+    <string name="analytics_percent_symbol">%</string>
+    <string name="analytics_decimal_separator">,</string>
+    <string name="analytics_number">%1$d</string>
+    <string name="analytics_workload_value">%1$s</string>
+    <string name="analytics_chart_workload_desc">Нагрузка %1$s, заняткаў %2$d, ДЗ %3$d, TODO %4$d</string>
+    <string name="analytics_chart_completion_desc">%1$s: выканана ДЗ %2$d, TODO %3$d</string>
+    <string name="analytics_chart_empty">Няма даных для графіка</string>
+    <string name="analytics_chart_regularity_desc">%1$s: сярэдняя нагрузка %2$s</string>
+    <string name="analytics_insight_peak">Пікавая нагрузка склала %1$s.</string>
+    <string name="analytics_insight_overload">У %1$d днях нагрузка была вышэй за парог.</string>
+    <string name="analytics_insight_late">%1$s выкананых заданняў завершаны са спазненнем.</string>
+    <string name="analytics_insight_organization">%1$s нагрузкі прыпадае на %2$s.</string>
+    <string name="analytics_insight_subject">%1$s нагрузкі прыпадае на %2$s.</string>
+    <string name="analytics_completion_dynamics">Дынаміка выканання</string>
+    <string name="analytics_status_distribution">Размеркаванне статусаў</string>
+    <string name="analytics_task_structure">Структура ДЗ</string>
+    <string name="analytics_todo_priorities">Прыярытэты TODO</string>
+    <string name="analytics_detail_organization">Аналітыка арганізацыі</string>
+    <string name="analytics_detail_subject">Аналітыка прадмета</string>
+    <string name="analytics_detail_employee">Аналітыка выкладчыка</string>
+</resources>

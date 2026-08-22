@@ -33,6 +33,9 @@ internal actual fun applyApplicationLanguage(
         LanguageUiType.DEFAULT -> userDefaults.removeObjectForKey(APPLE_LANGUAGES_KEY)
         LanguageUiType.EN -> userDefaults.setObject(listOf(LanguageUiType.EN.code), APPLE_LANGUAGES_KEY)
         LanguageUiType.RU -> userDefaults.setObject(listOf(LanguageUiType.RU.code), APPLE_LANGUAGES_KEY)
+        LanguageUiType.ZH -> userDefaults.setObject(listOf(LanguageUiType.ZH.code), APPLE_LANGUAGES_KEY)
+        LanguageUiType.BE -> userDefaults.setObject(listOf(LanguageUiType.BE.code), APPLE_LANGUAGES_KEY)
+        LanguageUiType.KK -> userDefaults.setObject(listOf(LanguageUiType.KK.code), APPLE_LANGUAGES_KEY)
     }
     userDefaults.synchronize()
 

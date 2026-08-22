@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="organizations_header">机构</string>
+    <string name="new_organization_bottom_title">新机构</string>
+    <string name="none_organization_title">添加机构</string>
+    <string name="add_organization_title">添加</string>
+    <string name="edit_organization_title">编辑</string>
+    <string name="organization_status_label">状态</string>
+    <string name="main_organization_status">主要</string>
+    <string name="classes_duration_in_week_label">每周小时数</string>
+    <string name="number_of_classes_in_week_label">每周课程数</string>
+    <string name="contact_info_section_title">联系信息</string>
+    <string name="website_title">网站</string>
+    <string name="employees_section_title">教师</string>
+    <string name="subjects_section_title">科目</string>
+    <string name="copy_message">数据已成功复制！</string>
+    <string name="none_employee_subject_title">没有课程</string>
+    <string name="subjects_search_bar_placeholder">搜索科目</string>
+    <string name="employee_search_bar_placeholder">搜索教师</string>
+    <string name="alphabetic_sorted_type">按字母顺序</string>
+    <string name="teacher_sorted_type">按教师</string>
+    <string name="event_type_sorted_type">按活动</string>
+    <string name="office_sorted_type">按房间</string>
+    <string name="location_sorted_type">按位置</string>
+    <string name="organization_selector_header">机构</string>
+    <string name="organization_selector_title">选择所需的机构</string>
+    <string name="subject_sorted_type_selector_header">排序</string>
+    <string name="subject_sorted_type_selector_title">选择排序类型</string>
+    <string name="delete_subject_warning_title">您确定要删除此科目吗？之后，某些课程可能无法正确显示</string>
+    <string name="delete_employee_warning_title">您确定要删除此教师吗？之后，某些课程可能无法正确显示</string>
+    <string name="show_all_items_title">显示全部</string>
+    <string name="other_error_message">错误！请联系开发者！</string>
+</resources>

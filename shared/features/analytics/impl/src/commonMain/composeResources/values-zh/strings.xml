@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="analytics_header">分析</string>
+    <string name="analytics_back_desc">返回</string>
+    <string name="analytics_calendar_desc">选择日期范围</string>
+    <string name="analytics_previous_period_desc">上一个周期</string>
+    <string name="analytics_next_period_desc">下一个周期</string>
+    <string name="analytics_period_week">周</string>
+    <string name="analytics_period_month">月</string>
+    <string name="analytics_period_year">年</string>
+    <string name="analytics_period_custom">自定义周期</string>
+    <string name="analytics_month_january">一月</string>
+    <string name="analytics_month_february">二月</string>
+    <string name="analytics_month_march">三月</string>
+    <string name="analytics_month_april">四月</string>
+    <string name="analytics_month_may">五月</string>
+    <string name="analytics_month_june">六月</string>
+    <string name="analytics_month_july">七月</string>
+    <string name="analytics_month_august">八月</string>
+    <string name="analytics_month_september">九月</string>
+    <string name="analytics_month_october">十月</string>
+    <string name="analytics_month_november">十一月</string>
+    <string name="analytics_month_december">十二月</string>
+    <string name="analytics_date_picker_title">选择日期</string>
+    <string name="analytics_range_picker_title">选择周期</string>
+    <string name="analytics_confirm">应用</string>
+    <string name="analytics_cancel">取消</string>
+    <string name="analytics_retry">重试</string>
+    <string name="analytics_error_title">无法加载分析</string>
+    <string name="analytics_error_body">请检查数据并重试。</string>
+    <string name="analytics_empty_title">此期间没有数据</string>
+    <string name="analytics_empty_body">日期在所选周期内的课程和任务将显示在这里。</string>
+    <string name="analytics_error_message">发生了一些错误。请重试。</string>
+    <string name="analytics_summary_title">期间摘要</string>
+    <string name="analytics_insights_title">关键发现</string>
+    <string name="analytics_workload_title">工作量和日程</string>
+    <string name="analytics_tasks_title">分配任务</string>
+    <string name="analytics_goals_title">目标</string>
+    <string name="analytics_regularity_chart_label">每日平均学业负荷</string>
+    <string name="analytics_goals_duration">时间控制</string>
+    <string name="analytics_organizations_title">机构</string>
+    <string name="analytics_subjects_title">科目</string>
+    <string name="analytics_employees_title">教师</string>
+    <string name="analytics_regularity_title">每周节奏</string>
+    <string name="analytics_scheduled_hours">已安排</string>
+    <string name="analytics_classes">课程</string>
+    <string name="analytics_commitments">作业和待办</string>
+    <string name="analytics_completed">已完成</string>
+    <string name="analytics_on_time">准时</string>
+    <string name="analytics_late">逾期完成</string>
+    <string name="analytics_overdue">已过期</string>
+    <string name="analytics_upcoming">即将到来</string>
+    <string name="analytics_backlog">无截止日期</string>
+    <string name="analytics_invalid_completion">无完成日期</string>
+    <string name="analytics_previous_period">较上一周期</string>
+    <string name="analytics_average_workload">平均负荷</string>
+    <string name="analytics_peak_load">峰值负荷</string>
+    <string name="analytics_overload_days">超过 %1$d 的天数</string>
+    <string name="analytics_homeworks">作业</string>
+    <string name="analytics_todos">待办</string>
+    <string name="analytics_tests">测试</string>
+    <string name="analytics_theory">理论部分</string>
+    <string name="analytics_practice">实践部分</string>
+    <string name="analytics_presentations">演示</string>
+    <string name="analytics_standard_priority">标准优先级</string>
+    <string name="analytics_medium_priority">中等优先级</string>
+    <string name="analytics_high_priority">高优先级</string>
+    <string name="analytics_planned">已计划</string>
+    <string name="analytics_goal_homeworks">作业目标</string>
+    <string name="analytics_goal_todos">待办目标</string>
+    <string name="analytics_desired_time">期望时间</string>
+    <string name="analytics_actual_time">实际时间</string>
+    <string name="analytics_active_timer">活动计时器</string>
+    <string name="analytics_share">工作量占比</string>
+    <string name="analytics_on_time_rate">准时率</string>
+    <string name="analytics_subject_count">科目数</string>
+    <string name="analytics_organization_count">机构数</string>
+    <string name="analytics_frequent_day">最频繁的日子</string>
+    <string name="analytics_not_specified">未指定</string>
+    <string name="analytics_not_available">—</string>
+    <string name="analytics_show_all">显示全部</string>
+    <string name="analytics_show_less">显示较少</string>
+    <string name="analytics_study_days">学习天数</string>
+    <string name="analytics_completion_days">有完成任务的天数</string>
+    <string name="analytics_longest_streak">最长连续天数</string>
+    <string name="analytics_days_suffix">天</string>
+    <string name="analytics_hours_minutes">%1$d 时 %2$d 分</string>
+    <string name="analytics_minutes">%1$d 分</string>
+    <string name="analytics_percent">%1$s</string>
+    <string name="analytics_percent_symbol">%</string>
+    <string name="analytics_decimal_separator">.</string>
+    <string name="analytics_number">%1$d</string>
+    <string name="analytics_workload_value">%1$s</string>
+    <string name="analytics_chart_workload_desc">负荷 %1$s，课程 %2$d，作业 %3$d，待办 %4$d</string>
+    <string name="analytics_chart_completion_desc">%1$s: 已完成作业 %2$d，已完成待办 %3$d</string>
+    <string name="analytics_chart_empty">图表无数据</string>
+    <string name="analytics_chart_regularity_desc">%1$s: 平均负荷 %2$s</string>
+    <string name="analytics_insight_peak">峰值负荷为 %1$s。</string>
+    <string name="analytics_insight_overload">有 %1$d 天超过了负荷阈值。</string>
+    <string name="analytics_insight_late">已完成的分配任务中有 %1$s 是逾期的。</string>
+    <string name="analytics_insight_organization">%1$s 的负荷集中在 %2$s。</string>
+    <string name="analytics_insight_subject">%1$s 的负荷集中在 %2$s。</string>
+    <string name="analytics_organizations_count">机构数</string>
+    <string name="analytics_completion_dynamics">完成动态</string>
+    <string name="analytics_no_overloads">无过载</string>
+    <string name="analytics_status_distribution">状态分布</string>
+    <string name="analytics_task_structure">任务结构</string>
+    <string name="analytics_todo_priorities">待办优先级</string>
+    <string name="analytics_detail_organization">机构分析</string>
+    <string name="analytics_detail_subject">科目分析</string>
+    <string name="analytics_detail_employee">教师分析</string>
+</resources>

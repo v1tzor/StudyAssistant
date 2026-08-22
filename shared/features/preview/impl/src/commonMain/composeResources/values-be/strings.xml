@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="continue_label">Далей</string>
+    <string name="setup_label">Наладзіць прыкладанне</string>
+    <string name="back_label">Назад</string>
+    <string name="study_intro_title">Цалкам бясплатна</string>
+    <string name="study_intro_body">Расклад на сёння, ход пар і нагрузка на тыдзень — адразу на галоўным. Без падпісак і схаваных лімітаў.</string>
+    <string name="analytics_intro_title">ДЗ і задачы — пад кантролем</string>
+    <string name="analytics_intro_body">Дамашнія, TODO і мэты ў адным месцы. Адразу відаць, што гарыць сёння і што можна закрыць.</string>
+    <string name="ai_intro_title">ІІ-агент вядзе ўсё прыкладанне</string>
+    <string name="ai_intro_body">Пішыце як ёсць — ІІ-агент сам створыць пары, ДЗ, задачы і праўкі. Вы толькі пацвярджаеце.</string>
+    <string name="ai_intro_highlight">ІІ-агент</string>
+    <string name="sharing_intro_title">Падзяліцеся раскладам і ДЗ</string>
+    <string name="sharing_intro_body">Код ці QR — і аднагрупнік забярэ ваш расклад ці дамашку. Без акаўнта і рэгістрацыі.</string>
+    <string name="step_title">Крок\u0020</string>
+    <string name="profile_step_title">Запоўніце ваш профіль</string>
+    <string name="profile_button_label">Захаваць</string>
+    <string name="organization_step_title">Стварыце вашу першую адукацыйную арганізацыю</string>
+    <string name="organization_button_label">Стварыць</string>
+    <string name="calendar_step_title">Выберыце колькасць тыдняў у вашым раскладзе</string>
+    <string name="calendar_button_label">Працягнуць</string>
+    <string name="schedule_step_title">Запоўніце расклады і пачніце карыстацца прыкладаннем!</string>
+    <string name="schedule_fill_out_button_label">Запоўніць</string>
+    <string name="schedule_import_ai_button_label">Сфоткай — гатова</string>
+    <string name="schedule_start_button_label">Пачаць карыстацца</string>
+    <string name="username_label">Імя для адлюстравання *</string>
+
+    <string name="email_label">Email</string>
+    <string name="birthday_label">Дзень нараджэння</string>
+    <string name="birthday_placeholder">Выберыце дату</string>
+    <string name="gender_label">Пол</string>
+    <string name="gender_placeholder">Выберыце ваш пол</string>
+    <string name="short_name_label">Кароткая назва *</string>
+    <string name="short_name_placeholder">Увядзіце назву</string>
+    <string name="organization_type_label">Від арганізацыі *</string>
+    <string name="organization_type_placeholder">Выберыце падыходны від</string>
+    <string name="phone_number_label">Тэлефон</string>
+    <string name="website_label">Сайт</string>
+    <string name="privacy_policy_disclaimer_start">Працягваючы карыстацца, вы згаджаецеся з нашай </string>
+    <string name="privacy_policy_disclaimer_link">палітыкай канфідэнцыяльнасці</string>
+    <string name="privacy_policy_disclaimer_suffix"></string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+</resources>

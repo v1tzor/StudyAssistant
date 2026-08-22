@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="settings_header">Баптаулар</string>
+    <string name="general_tab_header">Жалпы</string>
+    <string name="notifications_tab_header">Хабарландырулар</string>
+    <string name="calendar_tab_header">Күнтізбе</string>
+    <string name="ai_tab_header">AI</string>
+    <string name="about_app_tab_header">Қолданба туралы</string>
+    <string name="language_chooser_view_title">Қолданба тілі</string>
+    <string name="theme_chooser_view_title">Тақырып</string>
+    <string name="delete_schedule_button">Ағымдағы кестені жою</string>
+    <string name="delete_schedule_warning_title">Кестені жою керек пе?</string>
+    <string name="delete_schedule_warning_text">Тек таңдалған ұйымдардың кестесі жойылады. Ұйымдар, оқытушылар мен пәндер қалады.</string>
+    <string name="delete_schedule_organizations_title">Ұйымдар</string>
+    <string name="delete_schedule_main_label">Негізгі</string>
+    <string name="delete_schedule_select_all">Барлығын таңдау</string>
+    <string name="delete_schedule_empty_organizations">Алдымен ұйым жасаңыз.</string>
+    <string name="delete_all_data_button">Барлық деректерді жою</string>
+    <string name="delete_all_data_warning_title">Барлық деректерді жою керек пе?</string>
+    <string name="delete_all_data_warning_text">Профиль, ұйымдар, оқытушылар, пәндер, кесте, тапсырмалар және чат тарихы біржолата жойылады. Осыдан кейін алғашқы баптау ашылады.</string>
+    <string name="number_of_repeat_week_view_title">Кестедегі апта саны</string>
+    <string name="begging_of_classes_notify_title">Сабақтың басталуы туралы хабарлау</string>
+    <string name="begging_of_classes_notify_description">Таңдалған ұйымдар үшін сабақтың басталуы туралы ескертулер</string>
+    <string name="end_of_classes_notify_title">Сабақтың аяқталуы туралы хабарлау</string>
+    <string name="end_of_classes_notify_description">Таңдалған ұйымдар үшін сабақ аяқталғандағы хабарландыру</string>
+    <string name="before_time_prefix">\u0020бұрын</string>
+    <string name="unfinished_homeworks_notify_title">Үй тапсырмасы туралы ескерту</string>
+    <string name="unfinished_homeworks_notify_description">Орындалмаған үй тапсырмасы туралы ескертулер мен кейбір ұсыныстар аласыз</string>
+    <string name="reminder_time_prefix">Уақыты:\u0020</string>
+    <string name="high_workload_warning_notify_title">Жоғары жүктеме туралы ескерту</string>
+    <string name="high_workload_warning_notify_description">Келесі күнді талдаудан кейін шекті мәнге жеткенде жіберіледі</string>
+    <string name="exception_organizations_dialog_header">Ұйымдар</string>
+    <string name="exception_organizations_dialog_title">Хабарландыру алғыңыз келмейтін ұйымдарды таңдаңыз</string>
+    <string name="add_exception_chip_label">Ерекшелік қосу</string>
+    <string name="exceptions_chip_label_prefix">Ерекшеліктер:\u0020</string>
+    <string name="holidays_view_title">Каникулдар</string>
+    <string name="holidays_editor_header">Каникулдар</string>
+    <string name="holidays_start_label">Басталуы</string>
+    <string name="holidays_end_label">Аяқталуы</string>
+    <string name="holidays_date_placeholder">Күнді көрсетіңіз</string>
+    <string name="holidays_organizations_placeholder">Ұйымдарды көрсетіңіз</string>
+    <string name="holidays_organizations_label">Ұйымдар</string>
+    <string name="holidays_date_picker_headline">Күні</string>
+    <string name="holidays_organizations_selector_header">Ұйымдар</string>
+    <string name="ai_settings_title">AI-көмекші</string>
+    <string name="ai_settings_description">AI сұраныстарын StudyAssistant қорғалған сервері өңдейді. API кілті мен аккаунт қажет емес.</string>
+    <string name="backend_ai_title">StudyAssistant AI</string>
+    <string name="backend_ai_description">Чат, әрекеттер және кестені тану үшін бірыңғай қауіпсіз режим</string>
+    <string name="ai_quota_title">Бүгінгі хабарламалар: %1$d / %2$d. Жарнамалық сыйлықтар: %3$d / %4$d.</string>
+    <string name="ai_privacy_title">Оқу деректері сіздің бақылауыңызда қалады</string>
+    <string name="ai_privacy_description">Жауап беру үшін тек қажетті мәнмәтін жіберіледі. Тапсырмалар мен кестені өзгерту растауды талап етеді.</string>
+    <string name="about_app_header">Қолданба туралы</string>
+    <string name="version_name_title">Нұсқасы</string>
+    <string name="version_code_title">Жинақ нөмірі</string>
+    <string name="developer_title">Әзірлеуші</string>
+    <string name="license_title">Лицензия</string>
+    <string name="github_title">Github</string>
+    <string name="ask_question_title">Сұрақ қою</string>
+    <string name="website_title">Қолданба сайты</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+</resources>

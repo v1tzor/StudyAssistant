@@ -37,6 +37,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import ru.aleshin.studyassistant.core.domain.entities.settings.LanguageType
 import ru.aleshin.studyassistant.core.domain.entities.settings.ThemeType
+import ru.aleshin.studyassistant.core.ui.theme.tokens.LanguageUiType
 import ru.aleshin.studyassistant.widget.R
 import ru.aleshin.studyassistant.widget.presentation.state.WidgetStateKeys
 import ru.aleshin.studyassistant.widget.presentation.theme.tokens.WidgetShapes
@@ -153,7 +154,10 @@ fun TextStyle.withColor(color: ColorProvider): TextStyle = copy(color = color)
 
 private fun widgetLocale(language: LanguageType): Locale = when (language) {
     LanguageType.EN -> Locale.ENGLISH
-    LanguageType.RU -> Locale.forLanguageTag("ru")
+    LanguageType.RU -> Locale.forLanguageTag(LanguageUiType.RU.code)
+    LanguageType.ZH -> Locale.forLanguageTag(LanguageUiType.ZH.code)
+    LanguageType.BE -> Locale.forLanguageTag(LanguageUiType.BE.code)
+    LanguageType.KK -> Locale.forLanguageTag(LanguageUiType.KK.code)
     LanguageType.DEFAULT -> Locale.getDefault()
 }
 

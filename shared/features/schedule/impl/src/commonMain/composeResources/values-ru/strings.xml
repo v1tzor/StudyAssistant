@@ -79,7 +79,7 @@
     <string name="second_week_title">2 неделя</string>
     <string name="thirty_week_title">3 неделя</string>
     <string name="accept_shared_schedule_button_title">Посмотреть рекламу и принять</string>
-    <string name="schedule_reward_unavailable_error">Реклама сейчас недоступна. Попробуйте ещё раз позже.</string>
+    <string name="schedule_reward_unavailable_error">Реклама сейчас недоступна. Попробуйте ещё раз позже (отключите VPN).</string>
     <string name="reject_shared_schedule_button_title">Отклонить</string>
     <string name="create_share_title">Передать расписание</string>
     <string name="create_share_description">Выберите организации и создайте временный код. В него войдёт только их расписание — без профиля и аккаунта.</string>

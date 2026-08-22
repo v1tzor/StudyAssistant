@@ -120,6 +120,9 @@
     <string name="default_title">По умолчанию</string>
     <string name="english_language_title">English</string>
     <string name="russian_language_title">Русский</string>
+    <string name="chinese_language_title">Китайский</string>
+    <string name="belarusian_language_title">Белорусский</string>
+    <string name="kazakh_language_title">Казахский</string>
     <string name="light_theme_title">Светлая</string>
     <string name="dark_theme_title">Тёмная</string>
     <string name="exceeding_limit_image_size_message">Изображение должно быть &lt;5 MB</string>

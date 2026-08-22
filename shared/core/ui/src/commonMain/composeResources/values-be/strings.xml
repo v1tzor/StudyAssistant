@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="app_name">Study Assistant</string>
+    <string name="cancel_title">Адмяніць</string>
+    <string name="add_title">Дадаць</string>
+    <string name="select_confirm_title">Выбраць</string>
+    <string name="create_confirm_title">Стварыць</string>
+    <string name="save_confirm_title">Захаваць</string>
+    <string name="change_confirm_title">Змяніць</string>
+    <string name="ok_confirm_title">ОК</string>
+    <string name="delete_confirm_title">Выдаліць</string>
+    <string name="hide_title">Схаваць</string>
+    <string name="time_picker_dialog_header">Выберыце час</string>
+    <string name="date_picker_dialog_header">Выберыце дату</string>
+    <string name="warning_dialog_title">Папярэджанне!</string>
+    <string name="warning_delete_confirm_title">Выдаліць</string>
+    <string name="minute_suffix">хв</string>
+    <string name="hour_suffix">г</string>
+    <string name="day_suffix">д</string>
+    <string name="separator">:</string>
+    <string name="am_format_title">AM</string>
+    <string name="pm_format_title">PM</string>
+    <string name="clear_search_bar_desk">Ачысціць пошук</string>
+    <string name="back_title">Назад</string>
+    <string name="none_title">Няма</string>
+    <string name="absent_title">Адсутнічае</string>
+    <string name="warning_granted_permission_message">Доступ да адпраўкі апавяшчэнняў забаронены!</string>
+    <string name="schedule_bottom_item">Расклад</string>
+    <string name="tasks_bottom_item">Заданні</string>
+    <string name="chat_bottom_item">Асістэнт</string>
+    <string name="info_bottom_item">Інфармацыя</string>
+    <string name="profile_bottom_item">Профіль</string>
+    <string name="back_icon_desc">Назад</string>
+    <string name="none_gender">Не выбраны</string>
+    <string name="male_gender">Мужчынскі</string>
+    <string name="female_gender">Жаночы</string>
+    <string name="one_week_plural">1 тыдзень</string>
+    <string name="two_week_plural">2 тыдні</string>
+    <string name="three_week_plural">3 тыдні</string>
+    <string name="january_title">Студзеня</string>
+    <string name="february_title">Лютага</string>
+    <string name="march_title">Сакавіка</string>
+    <string name="april_title">Красавіка</string>
+    <string name="may_title">Мая</string>
+    <string name="june_title">Чэрвеня</string>
+    <string name="july_title">Ліпеня</string>
+    <string name="august_title">Жніўня</string>
+    <string name="september_title">Верасня</string>
+    <string name="october_title">Кастрычніка</string>
+    <string name="november_title">Лістапада</string>
+    <string name="december_title">Снежня</string>
+    <string name="monday_title">Панядзелак</string>
+    <string name="monday_short_title">Пан</string>
+    <string name="tuesday_title">Аўторак</string>
+    <string name="tuesday_short_title">Аўт</string>
+    <string name="wednesday_title">Серада</string>
+    <string name="wednesday_short_title">Сер</string>
+    <string name="thursday_title">Чацвер</string>
+    <string name="thursday_short_title">Чац</string>
+    <string name="friday_title">Пятніца</string>
+    <string name="friday_short_title">Пят</string>
+    <string name="saturday_title">Субота</string>
+    <string name="saturday_short_title">Суб</string>
+    <string name="sunday_title">Нядзеля</string>
+    <string name="sunday_short_title">Няд</string>
+    <string name="school_organization_type">Школа</string>
+    <string name="lyceum_organization_type">Ліцэй</string>
+    <string name="seminary_organization_type">Семінарыя</string>
+    <string name="gymnasium_organization_type">Гімназія</string>
+    <string name="college_organization_type">Каледж</string>
+    <string name="university_organization_type">Універсітэт</string>
+    <string name="additional_education_organization_type">Дадатковая адукацыя</string>
+    <string name="courses_organization_type">Адукацыйныя курсы</string>
+    <string name="pcs_unit_suffix">шт.</string>
+    <string name="specify_title">Пазначце</string>
+    <string name="hours_title">Гадзіны</string>
+    <string name="minutes_title">Хвіліны</string>
+    <string name="event_type_lesson">Урок</string>
+    <string name="event_type_lecture">Лекцыя</string>
+    <string name="event_type_practice">Практыка</string>
+    <string name="event_type_seminar">Семінар</string>
+    <string name="event_type_class">Занятак</string>
+    <string name="event_type_online_class">Анлайн занятак</string>
+    <string name="event_type_webinar">Вебінар</string>
+    <string name="post_employee">Супрацоўнік</string>
+    <string name="post_teacher">Выкладчык</string>
+    <string name="post_director">Дырэктар</string>
+    <string name="post_mentor">Настаўнік</string>
+    <string name="post_tutor">Куратар</string>
+    <string name="post_manager">Менеджар</string>
+    <string name="not_selected_title">Не выбрана</string>
+    <string name="avatar_desc">Выбраць фота профілю</string>
+    <string name="contact_info_label">Назва</string>
+    <string name="contact_info_value">Даныя *</string>
+    <string name="standard_priority_title">Звычайна</string>
+    <string name="medium_priority_title">Важна</string>
+    <string name="high_priority_title">Вельмі важна</string>
+    <string name="theoretical_tasks_title">Тэорыя</string>
+    <string name="practical_tasks_title">Практыка</string>
+    <string name="presentations_tasks_title">Даклад</string>
+    <string name="no_result_title">Няма вынікаў</string>
+    <string name="today_title">Сёння</string>
+    <string name="tomorrow_title">Заўтра</string>
+    <string name="default_title">Па змаўчанні</string>
+    <string name="english_language_title">English</string>
+    <string name="russian_language_title">Русский</string>
+    <string name="chinese_language_title">Кітайская</string>
+    <string name="belarusian_language_title">Беларуская</string>
+    <string name="kazakh_language_title">Қазақша</string>
+    <string name="light_theme_title">Светлая</string>
+    <string name="dark_theme_title">Цёмная</string>
+    <string name="exceeding_limit_image_size_message">Выява павінна быць &lt;5 MB</string>
+    <string name="homeworks_reminder_title">Дэдлайн дамашніх заданняў блізка!</string>
+    <string name="homeworks_reminder_body_prefix">Вось прадметы, якія вам яшчэ трэба выканаць:</string>
+    <string name="homeworks_recommendation_title">На заўтра заданняў няма!</string>
+    <string name="homeworks_recommendation_body_prefix">Аднак паслязаўтра табе трэба будзе выканаць:\u0020</string>
+    <string name="homeworks_recommendation_body_suffix">заданняў. Ты мог выканаць іх сёння ці зрабіць частку з іх</string>
+    <string name="start_classes_reminder_title_suffix">\u0020у цябе пачнуцца заняткі!</string>
+    <string name="start_classes_reminder_title_prefix">Праз\u0020</string>
+    <string name="end_classes_reminder_title">Заняткі скончыліся! Засталося выканаць зададзеныя заданні</string>
+    <string name="ongoing_class_reminder_body">Занятак ідзе · %1$s</string>
+    <string name="ongoing_class_reminder_unknown_title">Бягучы занятак</string>
+    <string name="high_workload_warning_title">Папярэджанне! Заўтра будзе складаны дзень.</string>
+    <string name="high_workload_warning_body">Табе варта набрацца сіл і быць гатовым на ўсе 100%!</string>
+    <string name="todo_reminder_title_suffix">Дэдлайн задачы заканчваецца праз:\u0020</string>
+    <string name="network_error_message">Адсутнічае падключэнне да інтэрнэту! Паўтарыце спробу пазней</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+    <string name="voice_input_promt">Гаварыце...</string>
+</resources>

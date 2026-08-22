@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">Study Assistant</string>
+    <string name="cancel_title">取消</string>
+    <string name="add_title">添加</string>
+    <string name="select_confirm_title">选择</string>
+    <string name="create_confirm_title">创建</string>
+    <string name="save_confirm_title">保存</string>
+    <string name="change_confirm_title">更改</string>
+    <string name="ok_confirm_title">确定</string>
+    <string name="delete_confirm_title">删除</string>
+    <string name="hide_title">隐藏</string>
+    <string name="time_picker_dialog_header">选择的时间</string>
+    <string name="date_picker_dialog_header">选择的日期</string>
+    <string name="warning_dialog_title">警告！</string>
+    <string name="warning_delete_confirm_title">删除</string>
+    <string name="minute_suffix">分</string>
+    <string name="hour_suffix">时</string>
+    <string name="day_suffix">天</string>
+    <string name="separator">:</string>
+    <string name="am_format_title">上午</string>
+    <string name="pm_format_title">下午</string>
+    <string name="clear_search_bar_desk">清空搜索</string>
+    <string name="back_title">返回</string>
+    <string name="none_title">无</string>
+    <string name="absent_title">缺席</string>
+    <string name="warning_granted_permission_message">禁止发送通知！</string>
+    <string name="schedule_bottom_item">课程表</string>
+    <string name="tasks_bottom_item">任务</string>
+    <string name="chat_bottom_item">助手</string>
+    <string name="info_bottom_item">信息</string>
+    <string name="profile_bottom_item">个人中心</string>
+    <string name="back_icon_desc">返回</string>
+    <string name="none_gender">未注明</string>
+    <string name="male_gender">男</string>
+    <string name="female_gender">女</string>
+    <string name="one_week_plural">1 周</string>
+    <string name="two_week_plural">2 周</string>
+    <string name="three_week_plural">3 周</string>
+    <string name="january_title">一月</string>
+    <string name="february_title">二月</string>
+    <string name="march_title">三月</string>
+    <string name="april_title">四月</string>
+    <string name="may_title">五月</string>
+    <string name="june_title">六月</string>
+    <string name="july_title">七月</string>
+    <string name="august_title">八月</string>
+    <string name="september_title">九月</string>
+    <string name="october_title">十月</string>
+    <string name="november_title">十一月</string>
+    <string name="december_title">十二月</string>
+    <string name="monday_title">星期一</string>
+    <string name="monday_short_title">周一</string>
+    <string name="tuesday_title">星期二</string>
+    <string name="tuesday_short_title">周二</string>
+    <string name="wednesday_title">星期三</string>
+    <string name="wednesday_short_title">周三</string>
+    <string name="thursday_title">星期四</string>
+    <string name="thursday_short_title">周四</string>
+    <string name="friday_title">星期五</string>
+    <string name="friday_short_title">周五</string>
+    <string name="saturday_title">星期六</string>
+    <string name="saturday_short_title">周六</string>
+    <string name="sunday_title">星期日</string>
+    <string name="sunday_short_title">周日</string>
+    <string name="school_organization_type">学校</string>
+    <string name="lyceum_organization_type">学园</string>
+    <string name="seminary_organization_type">神学院</string>
+    <string name="gymnasium_organization_type">文理中学</string>
+    <string name="college_organization_type">学院</string>
+    <string name="university_organization_type">大学</string>
+    <string name="additional_education_organization_type">附加教育</string>
+    <string name="courses_organization_type">教育课程</string>
+    <string name="pcs_unit_suffix">个</string>
+    <string name="specify_title">指定</string>
+    <string name="hours_title">小时</string>
+    <string name="minutes_title">分钟</string>
+    <string name="event_type_lesson">课</string>
+    <string name="event_type_lecture">讲座</string>
+    <string name="event_type_practice">实践</string>
+    <string name="event_type_seminar">研讨会</string>
+    <string name="event_type_class">课程</string>
+    <string name="event_type_online_class">在线课程</string>
+    <string name="event_type_webinar">网络研讨会</string>
+    <string name="post_employee">员工</string>
+    <string name="post_teacher">教师</string>
+    <string name="post_director">主任</string>
+    <string name="post_mentor">导师</string>
+    <string name="post_tutor">辅导员</string>
+    <string name="post_manager">经理</string>
+    <string name="not_selected_title">未选择</string>
+    <string name="avatar_desc">选择个人头像</string>
+    <string name="contact_info_label">名称</string>
+    <string name="contact_info_value">数据 *</string>
+    <string name="standard_priority_title">普通</string>
+    <string name="medium_priority_title">重要</string>
+    <string name="high_priority_title">非常重要</string>
+    <string name="theoretical_tasks_title">理论</string>
+    <string name="practical_tasks_title">实践</string>
+    <string name="presentations_tasks_title">演示</string>
+    <string name="no_result_title">无结果</string>
+    <string name="today_title">今天</string>
+    <string name="tomorrow_title">明天</string>
+    <string name="default_title">默认</string>
+    <string name="english_language_title">English</string>
+    <string name="russian_language_title">Русский</string>
+    <string name="chinese_language_title">简体中文</string>
+    <string name="light_theme_title">浅色</string>
+    <string name="dark_theme_title">深色</string>
+    <string name="exceeding_limit_image_size_message">图片必须小于 5 MB</string>
+    <string name="homeworks_reminder_title">作业截止日期将至！</string>
+    <string name="homeworks_reminder_body_prefix">以下是您仍需完成的科目：</string>
+    <string name="homeworks_recommendation_title">明天没有任务！</string>
+    <string name="homeworks_recommendation_body_prefix">但是，后天您将需要完成：\u0020</string>
+    <string name="homeworks_recommendation_body_suffix">\u0020个任务。您可以今天完成或先完成一部分。</string>
+    <string name="start_classes_reminder_title_suffix">！</string>
+    <string name="start_classes_reminder_title_prefix">您的课程将在\u0020</string>
+    <string name="end_classes_reminder_title">课程结束！剩下的就是完成分配的任务</string>
+    <string name="ongoing_class_reminder_body">正在上课 · %1$s</string>
+    <string name="ongoing_class_reminder_unknown_title">当前课程</string>
+    <string name="high_workload_warning_title">警告！明天将是艰难的一天。</string>
+    <string name="high_workload_warning_body">你应该养精蓄锐，做好充分准备！</string>
+    <string name="todo_reminder_title_suffix">待办事项的截止时间还剩：\u0020</string>
+    <string name="network_error_message">没有网络连接！请稍后再试</string>
+    <string name="other_error_message">错误！请联系开发者！</string>
+    <string name="voice_input_promt">请说话...</string>
+</resources>

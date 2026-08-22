@@ -54,5 +54,6 @@
     <string name="website_label">Website</string>
     <string name="privacy_policy_disclaimer_start">By continuing to use, you agree to our </string>
     <string name="privacy_policy_disclaimer_link">privacy policy</string>
+    <string name="privacy_policy_disclaimer_suffix"></string>
     <string name="other_error_message">Error! Contact the developer!</string>
 </resources>

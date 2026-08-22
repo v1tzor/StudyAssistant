@@ -31,6 +31,9 @@ internal actual fun applyApplicationLanguage(
         LanguageUiType.DEFAULT -> Resources.getSystem().configuration.locales
         LanguageUiType.EN -> LocaleList.forLanguageTags(LanguageUiType.EN.code)
         LanguageUiType.RU -> LocaleList.forLanguageTags(LanguageUiType.RU.code)
+        LanguageUiType.ZH -> LocaleList.forLanguageTags(LanguageUiType.ZH.code)
+        LanguageUiType.BE -> LocaleList.forLanguageTags(LanguageUiType.BE.code)
+        LanguageUiType.KK -> LocaleList.forLanguageTags(LanguageUiType.KK.code)
     }
     LocaleList.setDefault(locales)
     return fetchAppLanguage(locales[0].language)

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="organizations_header">Ұйымдар</string>
+    <string name="new_organization_bottom_title">Жаңа ұйым</string>
+    <string name="none_organization_title">Ұйым қосыңыз</string>
+    <string name="add_organization_title">Қосу</string>
+    <string name="edit_organization_title">Өңдеу</string>
+    <string name="organization_status_label">Мәртебесі</string>
+    <string name="main_organization_status">Негізгі</string>
+    <string name="classes_duration_in_week_label">Аптасына сағат саны</string>
+    <string name="number_of_classes_in_week_label">Аптасына сабақ саны</string>
+    <string name="contact_info_section_title">Жалпы ақпарат</string>
+    <string name="website_title">Сайт</string>
+    <string name="employees_section_title">Қызметкерлер</string>
+    <string name="subjects_section_title">Пәндер</string>
+    <string name="copy_message">Деректер көшірілді!</string>
+    <string name="none_employee_subject_title">Сабақтар жоқ</string>
+    <string name="subjects_search_bar_placeholder">Пәндерді іздеу</string>
+    <string name="employee_search_bar_placeholder">Оқытушыларды іздеу</string>
+    <string name="alphabetic_sorted_type">Әліпби бойынша</string>
+    <string name="teacher_sorted_type">Оқытушылар бойынша</string>
+    <string name="event_type_sorted_type">Оқиғалар бойынша</string>
+    <string name="office_sorted_type">Кабинеттер бойынша</string>
+    <string name="location_sorted_type">Орындар бойынша</string>
+    <string name="organization_selector_header">Ұйым</string>
+    <string name="organization_selector_title">Қажетті ұйымды таңдаңыз</string>
+    <string name="subject_sorted_type_selector_header">Сұрыптау</string>
+    <string name="subject_sorted_type_selector_title">Сұрыптау түрін таңдаңыз</string>
+    <string name="delete_subject_warning_title">Бұл пәнді жойғыңыз келетініне сенімдісіз бе? Осыдан кейін кейбір сабақтар дұрыс көрсетілмеуі мүмкін</string>
+    <string name="delete_employee_warning_title">Бұл қызметкерді жойғыңыз келетініне сенімдісіз бе? Осыдан кейін кейбір сабақтар дұрыс көрсетілмеуі мүмкін</string>
+    <string name="show_all_items_title">Барлығын көрсету</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+</resources>

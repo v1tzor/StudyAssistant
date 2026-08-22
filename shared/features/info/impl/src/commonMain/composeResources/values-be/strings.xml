@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="organizations_header">Арганізацыі</string>
+    <string name="new_organization_bottom_title">Новая арганізацыя</string>
+    <string name="none_organization_title">Дадайце арганізацыю</string>
+    <string name="add_organization_title">Дадаць</string>
+    <string name="edit_organization_title">Рэдагаваць</string>
+    <string name="organization_status_label">Статус</string>
+    <string name="main_organization_status">Галоўная</string>
+    <string name="classes_duration_in_week_label">Гадзін на тыдзень</string>
+    <string name="number_of_classes_in_week_label">Заняткаў на тыдзень</string>
+    <string name="contact_info_section_title">Агульная інфармацыя</string>
+    <string name="website_title">Сайт</string>
+    <string name="employees_section_title">Супрацоўнікі</string>
+    <string name="subjects_section_title">Прадметы</string>
+    <string name="copy_message">Даныя скапіяваны!</string>
+    <string name="none_employee_subject_title">Заняткі адсутнічаюць</string>
+    <string name="subjects_search_bar_placeholder">Пошук прадметаў</string>
+    <string name="employee_search_bar_placeholder">Пошук выкладчыкаў</string>
+    <string name="alphabetic_sorted_type">Па алфавіце</string>
+    <string name="teacher_sorted_type">Па выкладчыках</string>
+    <string name="event_type_sorted_type">Па падзеях</string>
+    <string name="office_sorted_type">Па кабінетах</string>
+    <string name="location_sorted_type">Па месцах</string>
+    <string name="organization_selector_header">Арганізацыя</string>
+    <string name="organization_selector_title">Выберыце неабходную арганізацыю</string>
+    <string name="subject_sorted_type_selector_header">Сартаванне</string>
+    <string name="subject_sorted_type_selector_title">Выберыце тып сартавання</string>
+    <string name="delete_subject_warning_title">Вы ўпэўнены што хочаце выдаліць дадзены прадмет? Пасля гэтага некаторыя заняткі могуць адлюстроўвацца некарэктна</string>
+    <string name="delete_employee_warning_title">Вы ўпэўнены што хочаце выдаліць дадзенага супрацоўніка? Пасля гэтага некаторыя заняткі могуць адлюстроўвацца некарэктна</string>
+    <string name="show_all_items_title">Паказаць усё</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+</resources>

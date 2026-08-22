@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="continue_label">Әрі қарай</string>
+    <string name="setup_label">Қолданбаны баптау</string>
+    <string name="back_label">Артқа</string>
+    <string name="study_intro_title">Толықтай тегін</string>
+    <string name="study_intro_body">Бүгінгі кесте, сабақтардың барысы және апталық жүктеме — барлығы басты бетте. Жазылымсыз және жасырын шектеусіз.</string>
+    <string name="analytics_intro_title">ҮТ мен тапсырмалар — бақылауда</string>
+    <string name="analytics_intro_body">Үй тапсырмалары, TODO және мақсаттар бір жерде. Бүгін не маңызды екені және нені аяқтауға болатыны бірден көрінеді.</string>
+    <string name="ai_intro_title">AI-агент бүкіл қолданбаны басқарады</string>
+    <string name="ai_intro_body">Қалай болса солай жазыңыз — AI-агент сабақтарды, ҮТ-ны, тапсырмаларды және түзетулерді өзі жасайды. Сіз тек растайсыз.</string>
+    <string name="ai_intro_highlight">AI-агент</string>
+    <string name="sharing_intro_title">Кесте және ҮТ-мен бөлісіңіз</string>
+    <string name="sharing_intro_body">Код немесе QR арқылы курстасыңыз кестеңізді немесе үй тапсырмаңызды ала алады. Аккаунтсыз және тіркелусіз.</string>
+    <string name="step_title">Қадам\u0020</string>
+    <string name="profile_step_title">Профильді толтырыңыз</string>
+    <string name="profile_button_label">Сақтау</string>
+    <string name="organization_step_title">Алғашқы оқу ұйымын жасаңыз</string>
+    <string name="organization_button_label">Жасау</string>
+    <string name="calendar_step_title">Кестедегі апта санын таңдаңыз</string>
+    <string name="calendar_button_label">Жалғастыру</string>
+    <string name="schedule_step_title">Кестені толтырып, қолданбаны пайдалануды бастаңыз!</string>
+    <string name="schedule_fill_out_button_label">Толтыру</string>
+    <string name="schedule_import_ai_button_label">Фотоға түсір — дайын</string>
+    <string name="schedule_start_button_label">Пайдалануды бастау</string>
+    <string name="username_label">Көрсетілетін есім *</string>
+
+    <string name="email_label">Email</string>
+    <string name="birthday_label">Туған күні</string>
+    <string name="birthday_placeholder">Күнді таңдаңыз</string>
+    <string name="gender_label">Жынысы</string>
+    <string name="gender_placeholder">Жынысыңызды таңдаңыз</string>
+    <string name="short_name_label">Қысқаша атауы *</string>
+    <string name="short_name_placeholder">Атауын енгізіңіз</string>
+    <string name="organization_type_label">Ұйым түрі *</string>
+    <string name="organization_type_placeholder">Сәйкес келетін түрді таңдаңыз</string>
+    <string name="phone_number_label">Телефон</string>
+    <string name="website_label">Сайт</string>
+    <string name="privacy_policy_disclaimer_start">Пайдалануды жалғастыра отырып, сіз біздің </string>
+    <string name="privacy_policy_disclaimer_link">құпиялылық саясатымызбен</string>
+    <string name="privacy_policy_disclaimer_suffix"> келісесіз</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="settings_header">设置</string>
+    <string name="general_tab_header">通用</string>
+    <string name="notifications_tab_header">通知</string>
+    <string name="calendar_tab_header">日历</string>
+    <string name="ai_tab_header">AI</string>
+    <string name="about_app_tab_header">关于应用</string>
+    <string name="language_chooser_view_title">应用语言</string>
+    <string name="theme_chooser_view_title">主题</string>
+    <string name="delete_schedule_button">删除当前日程</string>
+    <string name="delete_schedule_warning_title">删除日程？</string>
+    <string name="delete_schedule_warning_text">这仅会移除所选机构的时间表。机构、教师和科目将保留。</string>
+    <string name="delete_schedule_organizations_title">机构</string>
+    <string name="delete_schedule_main_label">主要</string>
+    <string name="delete_schedule_select_all">全选</string>
+    <string name="delete_schedule_empty_organizations">请先创建一个机构。</string>
+    <string name="delete_all_data_button">删除所有数据</string>
+    <string name="delete_all_data_warning_title">删除所有数据？</string>
+    <string name="delete_all_data_warning_text">这将永久删除个人资料、机构、教师、科目、日程、任务和聊天记录。您将需要重新进行设置。</string>
+    <string name="number_of_repeat_week_view_title">日程中的周数</string>
+    <string name="begging_of_classes_notify_title">通知课程开始</string>
+    <string name="begging_of_classes_notify_description">关于所选机构课程开始的提醒</string>
+    <string name="end_of_classes_notify_title">通知课程结束</string>
+    <string name="end_of_classes_notify_description">所选机构课程结束时的通知</string>
+    <string name="before_time_prefix">在\u0020</string>
+    <string name="unfinished_homeworks_notify_title">作业提醒</string>
+    <string name="unfinished_homeworks_notify_description">您将收到关于未完成作业的提醒以及一些建议</string>
+    <string name="reminder_time_prefix">在\u0020</string>
+    <string name="high_workload_warning_notify_title">高负荷警告</string>
+    <string name="high_workload_warning_notify_description">在分析第二天并达到临界点后发送</string>
+    <string name="exception_organizations_dialog_header">机构</string>
+    <string name="exception_organizations_dialog_title">选择您不想接收通知的机构</string>
+    <string name="add_exception_chip_label">添加例外</string>
+    <string name="exceptions_chip_label_prefix">例外：\u0020</string>
+    <string name="holidays_view_title">假期</string>
+    <string name="holidays_editor_header">假期</string>
+    <string name="holidays_start_label">开始</string>
+    <string name="holidays_end_label">结束</string>
+    <string name="holidays_date_placeholder">指定日期</string>
+    <string name="holidays_organizations_placeholder">指定机构</string>
+    <string name="holidays_organizations_label">机构</string>
+    <string name="holidays_date_picker_headline">日期</string>
+    <string name="holidays_organizations_selector_header">机构</string>
+    <string name="ai_settings_title">AI 助手</string>
+    <string name="ai_settings_description">AI 请求由受保护的 StudyAssistant 后端处理。无需 API 密钥或账户。</string>
+    <string name="backend_ai_title">StudyAssistant AI</string>
+    <string name="backend_ai_description">适用于聊天、工具和日程识别的一种安全模式</string>
+    <string name="ai_quota_title">今日还剩消息：%1$d / %2$d。还剩广告奖励：%3$d / %4$d。</string>
+    <string name="ai_privacy_title">您的学习数据始终由您掌控</string>
+    <string name="ai_privacy_description">仅发送回答所需的对话上下文。对任务和日程的更改需要确认。</string>
+    <string name="about_app_header">关于应用</string>
+    <string name="version_name_title">版本</string>
+    <string name="version_code_title">版本号</string>
+    <string name="developer_title">开发者</string>
+    <string name="license_title">许可证</string>
+    <string name="github_title">Github</string>
+    <string name="ask_question_title">提问</string>
+    <string name="website_title">应用网站</string>
+    <string name="other_error_message">错误！请联系开发者！</string>
+</resources>

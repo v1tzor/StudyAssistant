@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="widget_schedule_name">StudyAssistant: 课程表</string>
+    <string name="widget_schedule_description">包含时间、活动类型和房间的今日课程</string>
+    <string name="widget_homeworks_name">StudyAssistant: 作业</string>
+    <string name="widget_homeworks_description">按日期分组的待办作业</string>
+    <string name="widget_todos_name">StudyAssistant: 待办</string>
+    <string name="widget_todos_description">支持快速完成的活动任务</string>
+    <string name="widget_goals_name">StudyAssistant: 每日目标</string>
+    <string name="widget_goals_description">今日学习目标和进度</string>
+
+    <string name="widget_schedule_title">课程表</string>
+    <string name="widget_homeworks_title">作业</string>
+    <string name="widget_todos_title">待办</string>
+    <string name="widget_goals_title">每日目标</string>
+    <string name="widget_today">今天</string>
+    <string name="widget_loading">正在加载…</string>
+    <string name="widget_error">无法更新</string>
+    <string name="widget_stale">数据可能已过期</string>
+    <string name="widget_schedule_empty">今日无课</string>
+    <string name="widget_homeworks_empty">无待办作业</string>
+    <string name="widget_todos_empty">无活动任务</string>
+    <string name="widget_goals_empty">今日无目标</string>
+
+    <string name="widget_refresh_description">刷新小组件</string>
+    <string name="widget_add_schedule_description">编辑今日日程</string>
+    <string name="widget_add_homework_description">添加作业</string>
+    <string name="widget_add_todo_description">添加任务</string>
+    <string name="widget_add_goal_description">添加每日目标</string>
+    <string name="widget_complete_todo_description">完成任务</string>
+    <string name="widget_room_description">房间</string>
+    <string name="widget_no_subject">无科目</string>
+
+    <string name="widget_event_lesson">课</string>
+    <string name="widget_event_lecture">讲座</string>
+    <string name="widget_event_practice">实践</string>
+    <string name="widget_event_seminar">研讨会</string>
+    <string name="widget_event_class">课程</string>
+    <string name="widget_event_online_class">在线课程</string>
+    <string name="widget_event_webinar">网络研讨会</string>
+
+    <string name="widget_theory_description">理论任务</string>
+    <string name="widget_practice_description">实践任务</string>
+    <string name="widget_presentation_description">演示任务</string>
+    <string name="widget_homework_complete">已完成</string>
+    <string name="widget_homework_wait">期限将至</string>
+    <string name="widget_homework_future">即将到来</string>
+    <string name="widget_homework_skipped">已跳过</string>
+    <string name="widget_homework_overdue">已逾期</string>
+
+    <string name="widget_goal_without_timer">无计时器</string>
+    <string name="widget_goal_homework">作业目标</string>
+    <string name="widget_goal_todo">任务目标</string>
+</resources>

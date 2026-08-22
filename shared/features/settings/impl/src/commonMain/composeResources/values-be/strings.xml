@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="settings_header">Наладкі</string>
+    <string name="general_tab_header">Агульныя</string>
+    <string name="notifications_tab_header">Апавяшчэнні</string>
+    <string name="calendar_tab_header">Каляндар</string>
+    <string name="ai_tab_header">AI</string>
+    <string name="about_app_tab_header">Аб прыкладанні</string>
+    <string name="language_chooser_view_title">Мова прыкладання</string>
+    <string name="theme_chooser_view_title">Тэма</string>
+    <string name="delete_schedule_button">Выдаліць бягучы расклад</string>
+    <string name="delete_schedule_warning_title">Выдаліць расклад?</string>
+    <string name="delete_schedule_warning_text">Будзе выдалены расклад толькі выбраных арганізацый. Самы арганізацыі, настаўнікі і прадметы застануцца.</string>
+    <string name="delete_schedule_organizations_title">Арганізацыі</string>
+    <string name="delete_schedule_main_label">Галоўная</string>
+    <string name="delete_schedule_select_all">Выбраць усё</string>
+    <string name="delete_schedule_empty_organizations">Спачатку стварыце арганізацыю.</string>
+    <string name="delete_all_data_button">Выдаліць усе даныя</string>
+    <string name="delete_all_data_warning_title">Выдаліць усе даныя?</string>
+    <string name="delete_all_data_warning_text">Будуць беззваротна выдалены профіль, арганізацыі, настаўнікі, прадметы, расклад, заданні і гісторыя чата. Пасля гэтага адкрыецца першасная наладка.</string>
+    <string name="number_of_repeat_week_view_title">Тыдняў у раскладзе</string>
+    <string name="begging_of_classes_notify_title">Апавяшчаць аб пачатку заняткаў</string>
+    <string name="begging_of_classes_notify_description">Напаміны аб пачатку заняткаў для выбраных арганізацый</string>
+    <string name="end_of_classes_notify_title">Апавяшчаць аб канцы заняткаў</string>
+    <string name="end_of_classes_notify_description">Апавяшчэнне калі скончацца заняткі для выбраных арганізацый</string>
+    <string name="before_time_prefix">За\u0020</string>
+    <string name="unfinished_homeworks_notify_title">Напамін аб дамашнім заданні</string>
+    <string name="unfinished_homeworks_notify_description">Вы будзеце атрымліваць напаміны аб невыкананым дамашнім заданні, а таксама некаторыя рэкамендацыі</string>
+    <string name="reminder_time_prefix">У\u0020</string>
+    <string name="high_workload_warning_notify_title">Папярэджанне аб высокай загружанасці</string>
+    <string name="high_workload_warning_notify_description">Адпраўляецца пасля аналізу наступнага дня пры дасягненні крытычнай адзнакі</string>
+    <string name="exception_organizations_dialog_header">Арганізацыі</string>
+    <string name="exception_organizations_dialog_title">Выберыце арганізацыі для якіх вы не хочаце атрымліваць апавяшчэнні</string>
+    <string name="add_exception_chip_label">Дадаць выключэнне</string>
+    <string name="exceptions_chip_label_prefix">Выключэнні:\u0020</string>
+    <string name="holidays_view_title">Канікулы</string>
+    <string name="holidays_editor_header">Канікулы</string>
+    <string name="holidays_start_label">Пачатак</string>
+    <string name="holidays_end_label">Канец</string>
+    <string name="holidays_date_placeholder">Пазначце дату</string>
+    <string name="holidays_organizations_placeholder">Пазначце арганізацыі</string>
+    <string name="holidays_organizations_label">Арганізацыі</string>
+    <string name="holidays_date_picker_headline">Дата</string>
+    <string name="holidays_organizations_selector_header">Арганізацыі</string>
+    <string name="ai_settings_title">AI-асістэнт</string>
+    <string name="ai_settings_description">AI-запыты апрацоўвае абаронены backend StudyAssistant. API-ключ і акаўнт не патрэбны.</string>
+    <string name="backend_ai_title">StudyAssistant AI</string>
+    <string name="backend_ai_description">Адзіны бяспечны рэжым для чата, дзеянняў і распазнавання раскладу</string>
+    <string name="ai_quota_title">Засталося паведамленняў сёння: %1$d з %2$d. Узнагарод за рэкламу: %3$d з %4$d.</string>
+    <string name="ai_privacy_title">Вучэбныя даныя застаюцца пад вашым кантролем</string>
+    <string name="ai_privacy_description">Адпраўляецца толькі кантэкст, неабходны для адказу. Змены задач і раскладу патрабуюць пацвярджэння.</string>
+    <string name="about_app_header">Аб прыкладанні</string>
+    <string name="version_name_title">Версія</string>
+    <string name="version_code_title">Нумар зборкі</string>
+    <string name="developer_title">Распрацоўшчык</string>
+    <string name="license_title">Ліцэнзія</string>
+    <string name="github_title">Github</string>
+    <string name="ask_question_title">Задаць пытанне</string>
+    <string name="website_title">Вэб-сайт прыкладання</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+</resources>

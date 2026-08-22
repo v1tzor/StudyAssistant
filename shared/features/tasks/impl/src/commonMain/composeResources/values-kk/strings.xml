@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="overview_header">Тапсырмаларға шолу</string>
+    <string name="homeworks_header">Үй тапсырмалары</string>
+    <string name="todos_header">Тапсырмалар</string>
+    <string name="daily_goals_section_header">Күндік мақсаттар</string>
+    <string name="goals_view_progress_title">Прогресс</string>
+    <string name="goals_view_progress_homework_label">Үй тапсырмалары</string>
+    <string name="goals_view_progress_todo_label">Тапсырмалар</string>
+    <string name="goals_view_closest_title">Жақын күндерге арналған мақсаттар</string>
+    <string name="goals_view_list_title">Мақсаттар тізімі</string>
+    <string name="goals_view_list_empty_title">Мақсаттар тізімі бос</string>
+    <string name="delete_goal_warning_title">Ескерту!</string>
+    <string name="delete_goal_warning_text">Күндік мақсатты шынымен жойғыңыз келе ме?</string>
+    <string name="goal_creator_headline">Жоспарлау</string>
+    <string name="goal_creator_title">Күндік мақсатты белгілеңіз</string>
+    <string name="goal_creator_date_field_title">Күні</string>
+    <string name="goal_creator_date_field_placeholder">Күнді таңдаңыз</string>
+    <string name="goal_creator_desired_time_field_title">Қажетті ұзақтығы</string>
+    <string name="goal_creator_confirm_title">Жоспарлау</string>
+    <string name="goal_sheet_time_control_title">Орындалу уақыты</string>
+    <string name="goal_sheet_desired_time_label">Жоспарланған</string>
+    <string name="goal_sheet_desired_time_picker_title">Жоспарланған уақыт</string>
+    <string name="goal_sheet_real_time_label">Нақты</string>
+    <string name="goal_sheet_time_type_stopwatch">Секундомер</string>
+    <string name="goal_sheet_time_type_timer">Таймер</string>
+    <string name="goal_sheet_time_type_none">Бақылаусыз</string>
+    <string name="goal_sheet_left_time_label">Қалды</string>
+    <string name="goal_sheet_elapsed_time_label">Өтті</string>
+    <string name="goal_sheet_homework_tasks_title">Тапсырмалар</string>
+    <string name="goal_sheet_delete_action_label">Жою</string>
+    <string name="goal_sheet_complete_action_label">Орындау</string>
+    <string name="goal_sheet_cancel_action_label">Бас тарту</string>
+    <string name="homeworks_tasks_tab">Үй тапсырмалары</string>
+    <string name="todos_tasks_tab">Тапсырмалар</string>
+    <string name="share_homeworks_header">Тапсырмалармен алмасу</string>
+    <string name="share_homeworks_button_title">Бөлісу</string>
+    <string name="tasks_progress_tomorrow_label">Ертеңге</string>
+    <string name="tasks_progress_in_the_week_label">Аптаға</string>
+    <string name="homework_errors_title">Қателер</string>
+    <string name="homeworks_completed_title">Орындалды</string>
+    <string name="homework_execution_analysis_header">Орындалу аналитикасы</string>
+    <string name="coming_homeworks_execution_analysis_title">Жақын арада</string>
+    <string name="all_homeworks_execution_analysis_title">Барлық уақытта</string>
+    <string name="scope_of_homeworks_header">Тапсырмалар көлемі</string>
+    <string name="homeworks_section_header">Үй тапсырмаларына шолу</string>
+    <string name="add_homework_title">Тапсырма қосу</string>
+    <string name="show_all_title">Барлығын көру</string>
+    <string name="homeworks_section_subtitle">Ағымдағы апта</string>
+    <string name="none_tasks_title">Тапсырмалар жоқ</string>
+    <string name="none_todos_title">Тапсырмалар жоқ</string>
+    <string name="theoretical_tasks_bar_name">Теория</string>
+    <string name="practical_tasks_bar_name">Тәжірибе</string>
+    <string name="presentations_tasks_bar_name">Баяндамалар</string>
+    <string name="in_progress_todos_section_header">Орындалуда</string>
+    <string name="error_todos_section_header">Өткізіп алынды</string>
+    <string name="completed_todos_section_header">Аптада орындалды</string>
+    <string name="show_all_todos_title">Барлығын көрсету</string>
+    <string name="until_deadline_date_suffix">дейін</string>
+    <string name="none_deadline_title">Мерзімсіз</string>
+    <string name="overdue_deadline_title">Мерзімі өткен</string>
+    <string name="overall_homeworks_progress">Жалпы прогресс</string>
+    <string name="homework_test_label">Тест</string>
+    <string name="overdue_homeworks_header">Өткізіп алынған тапсырмалар</string>
+    <string name="detached_active_homeworks_header">Белсенді бөлек тапсырмалар</string>
+    <string name="overdue_todos_header">Өткізіп алынған тапсырмалар</string>
+    <string name="none_errors_title">Қателер жоқ</string>
+    <string name="accept_homework_title">Қабылдау</string>
+    <string name="ago_suffix">бұрын</string>
+    <string name="apply_shared_homeworks_title">Қосу</string>
+    <string name="homeworks_linked_header">Тапсырмаларды қосу</string>
+    <string name="homeworks_linked_label">Пәндер мен сабақтарды атауы бойынша байланыстырыңыз</string>
+    <string name="target_user_subjects_title">Пайдаланушы</string>
+    <string name="current_user_subjects_title">Сіз</string>
+    <string name="specify_subject_label">Көрсету</string>
+    <string name="classes_not_found_label">Сабақтар табылмады</string>
+    <string name="subject_selector_header">Пән</string>
+    <string name="subject_selector_title">Сәйкес пәнді таңдаңыз</string>
+    <string name="linked_class_selector_header">Сабақ</string>
+    <string name="linked_class_selector_title">Сәйкес сабақты таңдаңыз</string>
+    <string name="number_of_class_suffix">сабақ</string>
+    <string name="attach_classes_label">Тапсырманы бекітіңіз</string>
+    <string name="selection_subject_step_header">1. Пәндерді таңдау</string>
+    <string name="selection_subject_step_label">Бөліскіңіз келетін пәндерді таңдаңыз</string>
+    <string name="create_share_code_title">Код жасау</string>
+    <string name="homework_share_ready_title">Үй тапсырмасы коды дайын</string>
+    <string name="homework_share_expires_at_label">Мерзімі</string>
+    <string name="copy_share_link_title">Кодты көшіру</string>
+    <string name="receive_homework_share_title">Үй тапсырмаларын алу</string>
+    <string name="share_code_label">Алмасу коды</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="open_share_title">Ашу</string>
+    <string name="scan_qr_button_title">QR-кодты сканерлеу</string>
+    <string name="homework_share_imported_title">Үй тапсырмалары қосылды</string>
+    <string name="homework_share_subject_item">• %1$s</string>
+    <string name="duplicate_homework_share_title">Бұл тапсырмалар бұл құрылғыға бұрын қосылған</string>
+    <string name="invalid_homework_share_title">Код табылмады немесе қате енгізілді</string>
+    <string name="expired_homework_share_title">Кодтың мерзімі өтіп кеткен</string>
+    <string name="share_rate_limit_message">Әрекеттер тым көп. Кейінірек қайталап көріңіз</string>
+    <string name="share_daily_limit_message">Жариялау шегіне жетті. Бір күннен кейін көріңіз</string>
+    <string name="share_item_limit_message">Бір уақытта 20-дан астам тапсырмамен бөлісуге болмайды</string>
+    <string name="share_payload_limit_message">Таңдалған тапсырмалар тым үлкен</string>
+    <string name="current_time_range_desc">Ағымдағы күндерді көрсету</string>
+    <string name="test_label">Тест</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+    <string name="open_analytics_desc">Аналитиканы ашу</string>
+</resources>

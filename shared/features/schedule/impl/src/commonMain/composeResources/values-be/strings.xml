@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="overview_header">Агляд</string>
+    <string name="details_header">Расклад</string>
+    <string name="share_header">Абмен раскладам</string>
+    <string name="current_week_title">Бягучы тыдзень</string>
+    <string name="previous_week_title">Папярэдні тыдзень</string>
+    <string name="next_week_title">Наступны тыдзень</string>
+    <string name="common_schedule_view_type">Агульны выгляд</string>
+    <string name="vertical_schedule_view_type">Вертыкальны выгляд</string>
+    <string name="test_label">Тэст</string>
+    <string name="empty_classes_title">Заняткі адсутнічаюць</string>
+    <string name="until_end_class_title">Да канца занятку</string>
+    <string name="until_start_class_title">Да пачатку занятку</string>
+    <string name="tasks_progress_title">Выканана заданняў</string>
+    <string name="complete_schedule_title">Няма бліжэйшых падзей</string>
+    <string name="analysis_day_title">Аналіз дня</string>
+    <string name="analysis_workload_title">Загружанасць</string>
+    <string name="overview_pane_header">Расклад</string>
+    <string name="overview_today_desc">Перайсці да сёння</string>
+    <string name="overview_week_view_desc">Тыднёвы расклад</string>
+    <string name="overview_edit_desc">Рэдагаваць расклад</string>
+    <string name="previous_date_desc">Папярэдні дзень</string>
+    <string name="next_date_desc">Наступны дзень</string>
+    <string name="choose_date_desc">Выбраць дату</string>
+    <string name="date_picker_confirm">Выбраць</string>
+    <string name="date_picker_cancel">Адмяніць</string>
+    <string name="analysis_homeworks_label">Заданні</string>
+    <string name="analysis_tests_label">Тэсты</string>
+    <string name="analysis_classes_label">Заняткі</string>
+    <string name="analysis_movement_label">Перамяшчэнні</string>
+    <string name="analysis_tasks_label">Задачы</string>
+    <string name="class_sheet_task_title">Заданне</string>
+    <string name="none_homework_title">Заданне адсутнічае</string>
+    <string name="homework_is_complete_title">Выканана</string>
+    <string name="homework_is_complete_short_title">ДЗ гатова</string>
+    <string name="homework_in_progress_title">Выконваецца\u0020</string>
+    <string name="homework_in_progress_short_title">ДЗ у працэсе</string>
+    <string name="homework_is_set_title">Заданне зададзена</string>
+    <string name="homework_is_set_short_title">ДЗ зададзена</string>
+    <string name="homework_is_not_complete_title">Заданне не выканана</string>
+    <string name="homework_is_not_complete_short_title">ДЗ не выканана</string>
+    <string name="homework_is_skipped_title">Заданне прапушчана</string>
+    <string name="homework_is_skipped_short_title">ДЗ прапушчана</string>
+    <string name="again_homework_title">Зноў</string>
+    <string name="complete_homework_title">Выканаць</string>
+    <string name="add_homework_title">Дадаць заданне</string>
+    <string name="shared_schedule_sender_header">Адпраўнік</string>
+    <string name="shared_schedule_header">Расклад</string>
+    <string name="new_and_linked_data_section_label">Новыя і прывязаныя даныя</string>
+    <string name="shared_organization_header">Арганізацыі</string>
+    <string name="organization_linker_dialog_header">Арганізацыі</string>
+    <string name="organization_linker_dialog_title">Калі арганізацыя ўжо створана, выберыце яе, каб прывязаць</string>
+    <string name="shared_subjects_header">Прадметы</string>
+    <string name="subject_linker_dialog_header">Прадметы</string>
+    <string name="subject_linker_dialog_title">Калі прадмет ужо створаны, выберыце яго, каб прывязаць</string>
+    <string name="shared_employees_header">Супрацоўнікі</string>
+    <string name="employee_linker_dialog_header">Супрацоўнікі</string>
+    <string name="employee_linker_dialog_title">Калі профіль супрацоўніка ўжо створаны, выберыце яго, каб прывязаць</string>
+    <string name="link_button_title">Прывязаць</string>
+    <string name="unlink_button_title">Адвязаць</string>
+    <string name="first_week_title">1 тыдзень</string>
+    <string name="second_week_title">2 тыдзень</string>
+    <string name="thirty_week_title">3 тыдзень</string>
+    <string name="accept_shared_schedule_button_title">Паглядзець рэкламу і прыняць</string>
+    <string name="schedule_reward_unavailable_error">Рэклама зараз недаступная. Паспрабуйце яшчэ раз пазней (адключыце VPN).</string>
+    <string name="reject_shared_schedule_button_title">Адхіліць</string>
+    <string name="create_share_title">Перадаць расклад</string>
+    <string name="create_share_description">Выберыце арганізацыі і стварыце часовы код. У яго ўвойдзе толькі іх расклад — без профілю і акаўнта.</string>
+    <string name="create_share_button_title">Стварыць код</string>
+    <string name="share_organizations_title">Якімі арганізацыямі падзяліцца</string>
+    <string name="share_organizations_empty">Няма заняткаў у бягучым раскладзе — спачатку запоўніце тыдзень.</string>
+    <string name="share_organization_main_label">Асноўная</string>
+    <string name="receive_share_title">Атрымаць расклад</string>
+    <string name="share_code_label">Код абмену</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="receive_share_button_title">Адкрыць</string>
+    <string name="scan_qr_button_title">Сканіраваць QR-код</string>
+    <string name="share_code_ready_title">Код гатовы</string>
+    <string name="share_expires_at_label">Дзейнічае да</string>
+    <string name="copy_link_button_title">Капіяваць код</string>
+    <string name="new_share_button_title">Стварыць новы код</string>
+    <string name="share_import_success_title">Расклад імпартаваны</string>
+    <string name="share_invalid_title">Код не знойдзены ці ўведзены няправільна</string>
+    <string name="share_expired_title">Тэрмін дзеяння кода скончыўся</string>
+    <string name="share_claimed_title">Расклад зараз імпартуецца на іншай прыладзе</string>
+    <string name="share_consumed_title">Гэты расклад ужо быў прыняты</string>
+    <string name="share_offline_title">Для абмену патрэбна падключэнне да інтэрнэту</string>
+    <string name="share_rate_limit_message">Занадта шмат спроб. Паспрабуйце пазней</string>
+    <string name="share_daily_limit_message">Дасягнуты ліміт публікацый. Паспрабуйце праз суткі</string>
+    <string name="share_item_limit_message">За раз можна перадаць не больш за 20 запісаў раскладу</string>
+    <string name="share_payload_limit_message">Расклад займае занадта шмат месца</string>
+    <string name="schedule_import_quota_error">Дзённая AI-квота вычарпана. Паўтарыце пасля яе абнаўлення.</string>
+    <string name="schedule_import_rate_limit_error">Занадта шмат AI-запытаў. Паспрабуйце крыху пазней.</string>
+    <string name="schedule_import_invalid_error">Праверце фота, арганізацыю і кожны выбраны занятак.</string>
+    <string name="schedule_import_invalid_image_error">Выберыце карэктную выяву JPEG, PNG, WebP, HEIC ці AVIF.</string>
+    <string name="schedule_import_image_too_large_error">Выява занадта вялікая. Выберыце файл памерам да 20 МБ.</string>
+    <string name="schedule_import_server_error">Распазнаванне раскладу часова недаступна.</string>
+    <string name="schedule_import_title">Імпарт раскладу (Beta)</string>
+    <string name="schedule_import_source_title">Імпарт па фота</string>
+    <string name="schedule_import_source_description">Зрабіце ці выберыце фота раскладу (Магчымы памылкі).</string>
+    <string name="schedule_import_large_photo_hint">Калі ласка, не загружайце занадта дэталёвы расклад усяго семестра — ІІ можа не паспець яго разабраць</string>
+    <string name="schedule_import_gallery_button">Выбраць фатаграфію</string>
+    <string name="schedule_import_camera_button">Зрабіць фатаграфію</string>
+    <string name="schedule_import_photo_selected">Фота гатова да імпарту</string>
+    <string name="schedule_import_organization_label">Арганізацыя</string>
+    <string name="schedule_import_organization_placeholder">Выберыце арганізацыю</string>
+    <string name="schedule_import_organization_selector_header">Арганізацыя</string>
+    <string name="schedule_import_organization_selector_title">Куды імпартаваць расклад</string>
+    <string name="schedule_import_note_label">Паметка групы ці класа</string>
+    <string name="schedule_import_note_placeholder">9б ці group:251-361</string>
+    <string name="schedule_import_note_description">Калі ў раскладзе некалькі груп ці класаў, пазначце кароткую паметку, каб атрымаць толькі вашу.</string>
+    <string name="schedule_import_extract_button">Імпартаваць</string>
+    <string name="schedule_import_processing_title">Апрацоўваем расклад</string>
+    <string name="schedule_import_processing_hint">Гэта можа заняць да 3 хвілін</string>
+    <string name="schedule_import_cancel_button">Адмяніць</string>
+    <string name="schedule_import_processing_status_looking">Глядзім фота і шукаем табліцу раскладу</string>
+    <string name="schedule_import_processing_status_structure">Вызначаем дні тыдня, калонкі і структуру</string>
+    <string name="schedule_import_processing_status_times">Счытваем час і нумары заняткаў</string>
+    <string name="schedule_import_processing_status_group">Шукаем вашу групу ці клас на фота</string>
+    <string name="schedule_import_processing_status_subjects">Чытаем прадметы, кабінеты і прозвішчы настаўнікаў</string>
+    <string name="schedule_import_processing_status_days">Разбіраем заняткі па кожным дні</string>
+    <string name="schedule_import_processing_status_empty">Аддзяляем пустыя слоты і перапынкі ад заняткаў</string>
+    <string name="schedule_import_processing_status_rows">Правяраем, што час супадае са сваім радком</string>
+    <string name="schedule_import_processing_status_clarify">Гэта займае крыху даўжэй: удакладняем неясныя радкі і абрэзаныя подпісы</string>
+    <string name="schedule_import_processing_status_free">Яшчэ раз правяраем прочаркі, пустыя ячэйкі і свабодныя інтэрвалы</string>
+    <string name="schedule_import_processing_status_intervals">Свяраем інтэрвалы, каб урокі не склеіліся</string>
+    <string name="schedule_import_processing_status_details">Удакладняем кабінеты, настаўнікаў і месца правядзення</string>
+    <string name="schedule_import_processing_status_thinking">Думаем даўжэй і яшчэ раз свяраем табліцу</string>
+    <string name="schedule_import_processing_status_assemble">Збіраем расклад і правяраем яго яшчэ раз</string>
+    <string name="schedule_import_review_title">Рэдагаванне раскладу</string>
+    <string name="schedule_import_review_description">Прызначце існуючыя прадметы і выкладчыкаў ці змяніце любыя імпартаваныя і ўжо захаваныя даныя перад запісам.</string>
+    <string name="schedule_import_unparsed_title">Некаторыя дэталі патрабуюць увагі</string>
+    <string name="schedule_import_apply_button">Захаваць</string>
+    <string name="schedule_import_edit_source_button">Змяніць фота</string>
+    <string name="schedule_import_success_title">Расклад імпартаваны</string>
+    <string name="schedule_import_success_description">Выбраныя заняткі, прадметы і настаўнікі захаваны лакальна.</string>
+    <string name="schedule_import_subjects_title">Прадметы</string>
+    <string name="schedule_import_teachers_title">Настаўнікі</string>
+    <string name="schedule_import_new_badge">Новы</string>
+    <string name="schedule_import_move_to_day">Перанесці на іншы дзень</string>
+    <string name="schedule_import_swap_class">Памяняць месцамі</string>
+    <string name="schedule_import_done_button">Гатова</string>
+    <string name="schedule_import_week_value">Тыдзень %1$d</string>
+    <string name="schedule_import_day_label">Дзень</string>
+    <string name="schedule_import_week_label">Тыдзень</string>
+    <string name="schedule_import_subject_label">Прадмет</string>
+    <string name="schedule_import_start_label">Пачатак</string>
+    <string name="schedule_import_end_label">Канец</string>
+    <string name="schedule_import_teacher_label">Выкладчык</string>
+    <string name="schedule_import_office_label">Аўдыторыя</string>
+    <string name="schedule_import_location_label">Месца</string>
+    <string name="schedule_import_event_type_label">Тып занятку</string>
+    <string name="schedule_import_event_type_placeholder">Выберыце тып занятку</string>
+    <string name="schedule_import_first_name_label">Імя</string>
+    <string name="schedule_import_second_name_label">Прозвішча</string>
+    <string name="schedule_import_patronymic_label">Імя па бацьку</string>
+    <string name="schedule_import_subject_placeholder">Выберыце прадмет</string>
+    <string name="schedule_import_teacher_placeholder">Выберыце выкладчыка</string>
+    <string name="schedule_import_time_placeholder">Выберыце час</string>
+    <string name="schedule_import_subject_selector_header">Прадмет</string>
+    <string name="schedule_import_subject_selector_title">Імпартаваныя і прадметы арганізацыі</string>
+    <string name="schedule_import_teacher_selector_header">Выкладчык</string>
+    <string name="schedule_import_teacher_selector_title">Імпартаваныя і выкладчыкі арганізацыі</string>
+    <string name="schedule_import_event_type_selector_header">Тып занятку</string>
+    <string name="schedule_import_event_type_selector_title">Выберыце тып занятку</string>
+    <string name="schedule_import_day_selector_header">Дзень</string>
+    <string name="schedule_import_day_selector_title">Выберыце дзень тыдня</string>
+    <string name="schedule_import_catalog_existing_label">У арганізацыі</string>
+    <string name="schedule_import_new_subject_name">Новы прадмет</string>
+    <string name="schedule_import_new_teacher_name">Новы выкладчык</string>
+    <string name="schedule_import_add_button">Дадаць</string>
+    <string name="schedule_import_fast_edit_start">Пачатак дня</string>
+    <string name="schedule_import_fast_edit_classes">Працягласць заняткаў</string>
+    <string name="schedule_import_fast_edit_breaks">Працягласць перапынкаў</string>
+    <string name="schedule_import_fast_edit_add_class">Дадаць урок</string>
+    <string name="schedule_import_fast_edit_start_header">Пачатак дня</string>
+    <string name="schedule_import_fast_edit_start_title">Зрух усіх заняткаў адносна 1 занятку</string>
+    <string name="schedule_import_fast_edit_start_field">Пачатак заняткаў</string>
+    <string name="schedule_import_fast_edit_start_placeholder">Увядзіце патрэбны час</string>
+    <string name="schedule_import_fast_edit_classes_header">Заняткі</string>
+    <string name="schedule_import_fast_edit_classes_title">Змяніце працягласць заняткаў</string>
+    <string name="schedule_import_fast_edit_breaks_header">Перапынкі</string>
+    <string name="schedule_import_fast_edit_breaks_title">Змяніце працягласць перапынкаў</string>
+    <string name="schedule_import_fast_edit_all">Усе</string>
+    <string name="schedule_import_fast_edit_except">Акрамя</string>
+    <string name="schedule_import_fast_edit_add_exception">Дадаць</string>
+    <string name="schedule_import_fast_edit_duration">Працягласць</string>
+    <string name="schedule_import_fast_edit_number">Нумар</string>
+    <string name="schedule_import_swap_days">Памяняць дні</string>
+    <string name="schedule_import_swap_days_title">Абмяняць заняткі паміж двума днямі тыдня</string>
+    <string name="schedule_import_swap_days_first">Першы дзень</string>
+    <string name="schedule_import_swap_days_second">Другі дзень</string>
+    <string name="schedule_import_class_editor_title">Занятак</string>
+    <string name="schedule_import_subject_editor_title">Прадмет</string>
+    <string name="schedule_import_teacher_editor_title">Выкладчык</string>
+    <string name="schedule_import_entry_title">Занятак %1$d</string>
+    <string name="schedule_import_selected_count">Выбрана %1$d з %2$d</string>
+    <string name="schedule_import_back_description">Назад</string>
+    <string name="try_again_button_title">Паспрабаваць зноў</string>
+    <string name="ago_suffix">таму</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+</resources>

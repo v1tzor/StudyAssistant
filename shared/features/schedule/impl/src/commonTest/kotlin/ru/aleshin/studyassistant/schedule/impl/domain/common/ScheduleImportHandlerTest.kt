@@ -639,6 +639,45 @@ internal class ScheduleImportHandlerTest {
         assertTrue(updated.subjects.all { subject -> subject.teacher == null })
     }
 
+    @Test
+    fun handleDraftDoesNotMatchDifferentSubjectsWithSameSuffix() {
+        val organization = organization(
+            subjects = listOf(subject(uid = "subj-english", name = "Английский язык")),
+        )
+        val draft = ScheduleImportDraft(
+            title = "Week",
+            entries = listOf(
+                entry(subject = "русский язык", startTime = "8.00", endTime = "8:40"),
+                entry(subject = "английский язык", startTime = "8.50", endTime = "9:30"),
+            )
+        )
+
+        val session = composer.handleDraft(draft, organization)
+
+        val createdSubject = session.subjects.first { it.uid != "subj-english" }
+
+        assertEquals("Русский Язык", createdSubject.name)
+    }
+
+    @Test
+    fun handleDraftExcludesDashSubjects() {
+        val draft = ScheduleImportDraft(
+            title = "Week",
+            entries = listOf(
+                entry(subject = "Math", startTime = "08:00", endTime = "08:45"),
+                entry(subject = "---", startTime = "09:00", endTime = "09:45"),
+                entry(subject = ".", startTime = "10:00", endTime = "10:45"),
+            ),
+        )
+
+        val session = composer.handleDraft(draft, organization())
+
+        assertEquals(3, session.classes.size)
+        assertTrue(session.classes.first { it.startTime == "08:00" }.included)
+        assertFalse(session.classes.first { it.startTime == "09:00" }.included)
+        assertFalse(session.classes.first { it.startTime == "10:00" }.included)
+    }
+
     private fun organization(
         subjects: List<Subject> = emptyList(),
         employees: List<Employee> = emptyList(),

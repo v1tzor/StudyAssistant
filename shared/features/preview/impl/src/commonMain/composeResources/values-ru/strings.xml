@@ -54,5 +54,6 @@
     <string name="website_label">Сайт</string>
     <string name="privacy_policy_disclaimer_start">Продолжая пользоваться, вы соглашаетесь с нашей </string>
     <string name="privacy_policy_disclaimer_link">политикой конфиденциальности</string>
+    <string name="privacy_policy_disclaimer_suffix"></string>
     <string name="other_error_message">Ошибка! Обратитесь к разработчику!</string>
 </resources>

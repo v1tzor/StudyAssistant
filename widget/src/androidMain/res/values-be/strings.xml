@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="widget_schedule_name">StudyAssistant: Расклад</string>
+    <string name="widget_schedule_description">Заняткі на сёння з часам, тыпам і кабінетам</string>
+    <string name="widget_homeworks_name">StudyAssistant: Дамашнія заданні</string>
+    <string name="widget_homeworks_description">Будучыя дамашнія заданні па датах</string>
+    <string name="widget_todos_name">StudyAssistant: Задачы</string>
+    <string name="widget_todos_description">Актыўныя задачы з хуткім завяршэннем</string>
+    <string name="widget_goals_name">StudyAssistant: Мэты на дзень</string>
+    <string name="widget_goals_description">Вучэбныя мэты і прагрэс на сёння</string>
+
+    <string name="widget_schedule_title">Расклад</string>
+    <string name="widget_homeworks_title">Дамашнія заданні</string>
+    <string name="widget_todos_title">Задачы</string>
+    <string name="widget_goals_title">Мэты на дзень</string>
+    <string name="widget_today">Сёння</string>
+    <string name="widget_loading">Загрузка…</string>
+    <string name="widget_error">Не ўдалося абнавіць</string>
+    <string name="widget_stale">Даныя могуць быць састарэлымі</string>
+    <string name="widget_schedule_empty">Сёння няма заняткаў</string>
+    <string name="widget_homeworks_empty">Няма будучых заданняў</string>
+    <string name="widget_todos_empty">Няма актыўных задач</string>
+    <string name="widget_goals_empty">На сёння няма мэтаў</string>
+
+    <string name="widget_refresh_description">Абнавіць віджэты</string>
+    <string name="widget_add_schedule_description">Змяніць расклад на сёння</string>
+    <string name="widget_add_homework_description">Дадаць дамашняе заданне</string>
+    <string name="widget_add_todo_description">Дадаць задачу</string>
+    <string name="widget_add_goal_description">Дадаць мэту на дзень</string>
+    <string name="widget_complete_todo_description">Завяршыць задачу</string>
+    <string name="widget_room_description">Кабінет</string>
+    <string name="widget_no_subject">Без прадмета</string>
+
+    <string name="widget_event_lesson">Урок</string>
+    <string name="widget_event_lecture">Лекцыя</string>
+    <string name="widget_event_practice">Практыка</string>
+    <string name="widget_event_seminar">Семінар</string>
+    <string name="widget_event_class">Занятак</string>
+    <string name="widget_event_online_class">Анлайн-занятак</string>
+    <string name="widget_event_webinar">Вебінар</string>
+
+    <string name="widget_theory_description">Тэарэтычныя заданні</string>
+    <string name="widget_practice_description">Практычныя заданні</string>
+    <string name="widget_presentation_description">Прэзентацыі</string>
+    <string name="widget_homework_complete">Выканана</string>
+    <string name="widget_homework_wait">Хутка тэрмін</string>
+    <string name="widget_homework_future">Будзе</string>
+    <string name="widget_homework_skipped">Прапушчана</string>
+    <string name="widget_homework_overdue">Пратэрмінавана</string>
+
+    <string name="widget_goal_without_timer">Без таймера</string>
+    <string name="widget_goal_homework">Мэта па дамашнім заданні</string>
+    <string name="widget_goal_todo">Мэта па задачы</string>
+</resources>

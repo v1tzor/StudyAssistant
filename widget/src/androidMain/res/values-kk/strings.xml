@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="widget_schedule_name">StudyAssistant: Кесте</string>
+    <string name="widget_schedule_description">Бүгінгі сабақтар уақытымен, түрімен және кабинетімен</string>
+    <string name="widget_homeworks_name">StudyAssistant: Үй тапсырмалары</string>
+    <string name="widget_homeworks_description">Күндер бойынша алдағы үй тапсырмалары</string>
+    <string name="widget_todos_name">StudyAssistant: Тапсырмалар</string>
+    <string name="widget_todos_description">Жылдам аяқтау мүмкіндігі бар белсенді тапсырмалар</string>
+    <string name="widget_goals_name">StudyAssistant: Күндік мақсаттар</string>
+    <string name="widget_goals_description">Бүгінгі оқу мақсаттары мен прогресс</string>
+
+    <string name="widget_schedule_title">Кесте</string>
+    <string name="widget_homeworks_title">Үй тапсырмалары</string>
+    <string name="widget_todos_title">Тапсырмалар</string>
+    <string name="widget_goals_title">Күндік мақсаттар</string>
+    <string name="widget_today">Бүгін</string>
+    <string name="widget_loading">Жүктелуде…</string>
+    <string name="widget_error">Жаңарту мүмкін болмады</string>
+    <string name="widget_stale">Деректер ескірген болуы мүмкін</string>
+    <string name="widget_schedule_empty">Бүгін сабақ жоқ</string>
+    <string name="widget_homeworks_empty">Алдағы тапсырмалар жоқ</string>
+    <string name="widget_todos_empty">Белсенді тапсырмалар жоқ</string>
+    <string name="widget_goals_empty">Бүгінге мақсаттар жоқ</string>
+
+    <string name="widget_refresh_description">Виджеттерді жаңарту</string>
+    <string name="widget_add_schedule_description">Бүгінгі кестені өзгерту</string>
+    <string name="widget_add_homework_description">Үй тапсырмасын қосу</string>
+    <string name="widget_add_todo_description">Тапсырма қосу</string>
+    <string name="widget_add_goal_description">Күндік мақсат қосу</string>
+    <string name="widget_complete_todo_description">Тапсырманы аяқтау</string>
+    <string name="widget_room_description">Кабинет</string>
+    <string name="widget_no_subject">Пәнсіз</string>
+
+    <string name="widget_event_lesson">Сабақ</string>
+    <string name="widget_event_lecture">Дәріс</string>
+    <string name="widget_event_practice">Тәжірибе</string>
+    <string name="widget_event_seminar">Семинар</string>
+    <string name="widget_event_class">Сабақ</string>
+    <string name="widget_event_online_class">Онлайн-сабақ</string>
+    <string name="widget_event_webinar">Вебинар</string>
+
+    <string name="widget_theory_description">Теориялық тапсырмалар</string>
+    <string name="widget_practice_description">Тәжірибелік тапсырмалар</string>
+    <string name="widget_presentation_description">Презентациялар</string>
+    <string name="widget_homework_complete">Орындалды</string>
+    <string name="widget_homework_wait">Мерзімі жақын</string>
+    <string name="widget_homework_future">Алда</string>
+    <string name="widget_homework_skipped">Өткізіп алынды</string>
+    <string name="widget_homework_overdue">Мерзімі өткен</string>
+
+    <string name="widget_goal_without_timer">Таймерсіз</string>
+    <string name="widget_goal_homework">Үй тапсырмасы бойынша мақсат</string>
+    <string name="widget_goal_todo">Тапсырма бойынша мақсат</string>
+</resources>

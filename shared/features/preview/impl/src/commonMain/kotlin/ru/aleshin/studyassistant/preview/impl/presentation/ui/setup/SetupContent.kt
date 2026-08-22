@@ -82,6 +82,7 @@ import ru.aleshin.studyassistant.preview.impl.presentation.ui.setup.views.SetupT
 import ru.aleshin.studyassistant.preview.impl.resources.Res
 import ru.aleshin.studyassistant.preview.impl.resources.privacy_policy_disclaimer_link
 import ru.aleshin.studyassistant.preview.impl.resources.privacy_policy_disclaimer_start
+import ru.aleshin.studyassistant.preview.impl.resources.privacy_policy_disclaimer_suffix
 import ru.aleshin.studyassistant.preview.impl.resources.schedule_import_ai_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.schedule_start_button_label
 import ru.aleshin.studyassistant.preview.impl.resources.step_title
@@ -424,6 +425,7 @@ private fun SetupPageNavigationSection(
                 )
                 val privacyPolicyDisclaimerStart = stringResource(Res.string.privacy_policy_disclaimer_start)
                 val privacyPolicyDisclaimerLink = stringResource(Res.string.privacy_policy_disclaimer_link)
+                val privacyPolicyDisclaimerSuffix = stringResource(Res.string.privacy_policy_disclaimer_suffix)
                 val annotatedString = buildAnnotatedString {
                     append(privacyPolicyDisclaimerStart)
                     withLink(
@@ -434,6 +436,7 @@ private fun SetupPageNavigationSection(
                     ) {
                         append(privacyPolicyDisclaimerLink)
                     }
+                    append(privacyPolicyDisclaimerSuffix)
                 }
                 Text(
                     modifier = Modifier.fillMaxWidth(),

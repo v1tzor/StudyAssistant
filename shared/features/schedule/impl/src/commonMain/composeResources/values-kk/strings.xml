@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="overview_header">Шолу</string>
+    <string name="details_header">Кесте</string>
+    <string name="share_header">Кестемен алмасу</string>
+    <string name="current_week_title">Ағымдағы апта</string>
+    <string name="previous_week_title">Алдыңғы апта</string>
+    <string name="next_week_title">Келесі апта</string>
+    <string name="common_schedule_view_type">Жалпы көрініс</string>
+    <string name="vertical_schedule_view_type">Вертикалды көрініс</string>
+    <string name="test_label">Тест</string>
+    <string name="empty_classes_title">Сабақтар жоқ</string>
+    <string name="until_end_class_title">Сабақ аяқталғанша</string>
+    <string name="until_start_class_title">Сабақ басталғанша</string>
+    <string name="tasks_progress_title">Орындалған тапсырмалар</string>
+    <string name="complete_schedule_title">Жақын арада оқиғалар жоқ</string>
+    <string name="analysis_day_title">Күн анализі</string>
+    <string name="analysis_workload_title">Жүктеме</string>
+    <string name="overview_pane_header">Кесте</string>
+    <string name="overview_today_desc">Бүгінге өту</string>
+    <string name="overview_week_view_desc">Апталық кесте</string>
+    <string name="overview_edit_desc">Кестені өңдеу</string>
+    <string name="previous_date_desc">Алдыңғы күн</string>
+    <string name="next_date_desc">Келесі күн</string>
+    <string name="choose_date_desc">Күнді таңдау</string>
+    <string name="date_picker_confirm">Таңдау</string>
+    <string name="date_picker_cancel">Бас тарту</string>
+    <string name="analysis_homeworks_label">Тапсырмалар</string>
+    <string name="analysis_tests_label">Тесттер</string>
+    <string name="analysis_classes_label">Сабақтар</string>
+    <string name="analysis_movement_label">Орын ауыстыру</string>
+    <string name="analysis_tasks_label">Міндеттер</string>
+    <string name="class_sheet_task_title">Тапсырма</string>
+    <string name="none_homework_title">Тапсырма жоқ</string>
+    <string name="homework_is_complete_title">Орындалды</string>
+    <string name="homework_is_complete_short_title">ҮТ дайын</string>
+    <string name="homework_in_progress_title">Орындалуда\u0020</string>
+    <string name="homework_in_progress_short_title">ҮТ орындалуда</string>
+    <string name="homework_is_set_title">Тапсырма берілді</string>
+    <string name="homework_is_set_short_title">ҮТ берілді</string>
+    <string name="homework_is_not_complete_title">Тапсырма орындалмады</string>
+    <string name="homework_is_not_complete_short_title">ҮТ орындалмады</string>
+    <string name="homework_is_skipped_title">Тапсырма өткізіп алынды</string>
+    <string name="homework_is_skipped_short_title">ҮТ өткізіп алынды</string>
+    <string name="again_homework_title">Қайтадан</string>
+    <string name="complete_homework_title">Орындау</string>
+    <string name="add_homework_title">Тапсырма қосу</string>
+    <string name="shared_schedule_sender_header">Жіберуші</string>
+    <string name="shared_schedule_header">Кесте</string>
+    <string name="new_and_linked_data_section_label">Жаңа және байланыстырылған деректер</string>
+    <string name="shared_organization_header">Ұйымдар</string>
+    <string name="organization_linker_dialog_header">Ұйымдар</string>
+    <string name="organization_linker_dialog_title">Егер ұйым бұрын жасалған болса, оны байланыстыру үшін таңдаңыз</string>
+    <string name="shared_subjects_header">Пәндер</string>
+    <string name="subject_linker_dialog_header">Пәндер</string>
+    <string name="subject_linker_dialog_title">Егер пән бұрын жасалған болса, оны байланыстыру үшін таңдаңыз</string>
+    <string name="shared_employees_header">Қызметкерлер</string>
+    <string name="employee_linker_dialog_header">Қызметкерлер</string>
+    <string name="employee_linker_dialog_title">Егер қызметкер профилі бұрын жасалған болса, оны байланыстыру үшін таңдаңыз</string>
+    <string name="link_button_title">Байланыстыру</string>
+    <string name="unlink_button_title">Ажырату</string>
+    <string name="first_week_title">1-апта</string>
+    <string name="second_week_title">2-апта</string>
+    <string name="thirty_week_title">3-апта</string>
+    <string name="accept_shared_schedule_button_title">Жарнама көру және қабылдау</string>
+    <string name="schedule_reward_unavailable_error">Жарнама қазір қолжетімсіз. Кейінірек қайталап көріңіз (VPN өшіріңіз).</string>
+    <string name="reject_shared_schedule_button_title">Бас тарту</string>
+    <string name="create_share_title">Кестені жіберу</string>
+    <string name="create_share_description">Ұйымдарды таңдап, уақытша код жасаңыз. Оған тек олардың кестесі кіреді — профиль мен аккаунтсыз.</string>
+    <string name="create_share_button_title">Код жасау</string>
+    <string name="share_organizations_title">Қай ұйымдармен бөлісу керек</string>
+    <string name="share_organizations_empty">Ағымдағы кестеде сабақтар жоқ — алдымен аптаны толтырыңыз.</string>
+    <string name="share_organization_main_label">Негізгі</string>
+    <string name="receive_share_title">Кестені алу</string>
+    <string name="share_code_label">Алмасу коды</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="receive_share_button_title">Ашу</string>
+    <string name="scan_qr_button_title">QR-кодты сканерлеу</string>
+    <string name="share_code_ready_title">Код дайын</string>
+    <string name="share_expires_at_label">Мерзімі</string>
+    <string name="copy_link_button_title">Кодты көшіру</string>
+    <string name="new_share_button_title">Жаңа код жасау</string>
+    <string name="share_import_success_title">Кесте импортталды</string>
+    <string name="share_invalid_title">Код табылмады немесе қате енгізілді</string>
+    <string name="share_expired_title">Кодтың мерзімі өтіп кеткен</string>
+    <string name="share_claimed_title">Кесте қазір басқа құрылғыда импортталуда</string>
+    <string name="share_consumed_title">Бұл кесте бұрын қабылданған</string>
+    <string name="share_offline_title">Алмасу үшін интернет байланысы қажет</string>
+    <string name="share_rate_limit_message">Әрекеттер тым көп. Кейінірек қайталап көріңіз</string>
+    <string name="share_daily_limit_message">Жариялау шегіне жетті. Бір күннен кейін көріңіз</string>
+    <string name="share_item_limit_message">Бір уақытта 20-дан астам кесте жазбасын жіберуге болмайды</string>
+    <string name="share_payload_limit_message">Кесте тым үлкен</string>
+    <string name="schedule_import_quota_error">Күндік AI квотасы таусылды. Жаңартылғаннан кейін қайталаңыз.</string>
+    <string name="schedule_import_rate_limit_error">AI сұраныстары тым көп. Біраз уақыттан кейін қайталаңыз.</string>
+    <string name="schedule_import_invalid_error">Фотоны, ұйымды және таңдалған әрбір сабақты тексеріңіз.</string>
+    <string name="schedule_import_invalid_image_error">JPEG, PNG, WebP, HEIC немесе AVIF форматындағы дұрыс суретті таңдаңыз.</string>
+    <string name="schedule_import_image_too_large_error">Сурет тым үлкен. Көлемі 20 МБ-қа дейінгі файлды таңдаңыз.</string>
+    <string name="schedule_import_server_error">Кестені тану қызметі уақытша қолжетімсіз.</string>
+    <string name="schedule_import_title">Кестені импорттау (Beta)</string>
+    <string name="schedule_import_source_title">Фото арқылы импорттау</string>
+    <string name="schedule_import_source_description">Кестені фотоға түсіріңіз немесе таңдаңыз (Қателер болуы мүмкін).</string>
+    <string name="schedule_import_large_photo_hint">Бүкіл семестрдің егжей-тегжейлі кестесін жүктемеңіз — AI оны өңдеп үлгермеуі мүмкін</string>
+    <string name="schedule_import_gallery_button">Фото таңдау</string>
+    <string name="schedule_import_camera_button">Фотоға түсіру</string>
+    <string name="schedule_import_photo_selected">Фото импорттауға дайын</string>
+    <string name="schedule_import_organization_label">Ұйым</string>
+    <string name="schedule_import_organization_placeholder">Ұйымды таңдаңыз</string>
+    <string name="schedule_import_organization_selector_header">Ұйым</string>
+    <string name="schedule_import_organization_selector_title">Кесте қайда импортталады</string>
+    <string name="schedule_import_note_label">Топ немесе сынып белгісі</string>
+    <string name="schedule_import_note_placeholder">9б немесе group:251-361</string>
+    <string name="schedule_import_note_description">Егер кестеде бірнеше топ немесе сынып болса, тек өзіңіздікін алу үшін қысқаша белгіні көрсетіңіз.</string>
+    <string name="schedule_import_extract_button">Импорттау</string>
+    <string name="schedule_import_processing_title">Кесте өңделуде</string>
+    <string name="schedule_import_processing_hint">Бұл 3 минутқа дейін созылуы мүмкін</string>
+    <string name="schedule_import_cancel_button">Бас тарту</string>
+    <string name="schedule_import_processing_status_looking">Фотоны көріп, кесте тақтасын іздеудеміз</string>
+    <string name="schedule_import_processing_status_structure">Апта күндерін, бағандарды және құрылымды анықтаудамыз</string>
+    <string name="schedule_import_processing_status_times">Уақыт пен сабақ нөмірлерін оқудамыз</string>
+    <string name="schedule_import_processing_status_group">Фотодан сіздің тобыңызды немесе сыныбыңызды іздеудеміз</string>
+    <string name="schedule_import_processing_status_subjects">Пәндерді, кабинеттерді және оқытушылардың аты-жөнін оқудамыз</string>
+    <string name="schedule_import_processing_status_days">Сабақтарды күндер бойынша реттеудеміз</string>
+    <string name="schedule_import_processing_status_empty">Бос орындар мен үзілістерді сабақтардан ажыратудамыз</string>
+    <string name="schedule_import_processing_status_rows">Уақыттың өз жолына сәйкестігін тексерудеміз</string>
+    <string name="schedule_import_processing_status_clarify">Бұл біраз уақытты алады: түсініксіз жолдар мен қиылған жазуларды нақтылаудамыз</string>
+    <string name="schedule_import_processing_status_free">Сызықшаларды, бос ұяшықтарды және еркін аралықтарды қайта тексерудеміз</string>
+    <string name="schedule_import_processing_status_intervals">Сабақтардың қосылып кетпеуі үшін аралықтарды салыстырудамыз</string>
+    <string name="schedule_import_processing_status_details">Кабинеттерді, оқытушыларды және өткізілетін орынды нақтылаудамыз</string>
+    <string name="schedule_import_processing_status_thinking">Кестені тағы бір рет мұқият тексерудеміз</string>
+    <string name="schedule_import_processing_status_assemble">Кестені жинап, оны соңғы рет тексерудеміз</string>
+    <string name="schedule_import_review_title">Кестені өңдеу</string>
+    <string name="schedule_import_review_description">Бар пәндер мен оқытушыларды тағайындаңыз немесе импортталған деректерді сақтамас бұрын өзгертіңіз.</string>
+    <string name="schedule_import_unparsed_title">Кейбір бөлшектер назар аударуды қажет етеді</string>
+    <string name="schedule_import_apply_button">Сақтау</string>
+    <string name="schedule_import_edit_source_button">Фотоны өзгерту</string>
+    <string name="schedule_import_success_title">Кесте импортталды</string>
+    <string name="schedule_import_success_description">Таңдалған сабақтар, пәндер және оқытушылар жергілікті түрде сақталды.</string>
+    <string name="schedule_import_subjects_title">Пәндер</string>
+    <string name="schedule_import_teachers_title">Оқытушылар</string>
+    <string name="schedule_import_new_badge">Жаңа</string>
+    <string name="schedule_import_move_to_day">Басқа күнге ауыстыру</string>
+    <string name="schedule_import_swap_class">Орындарын ауыстыру</string>
+    <string name="schedule_import_done_button">Дайын</string>
+    <string name="schedule_import_week_value">%1$d-апта</string>
+    <string name="schedule_import_day_label">Күн</string>
+    <string name="schedule_import_week_label">Апта</string>
+    <string name="schedule_import_subject_label">Пән</string>
+    <string name="schedule_import_start_label">Басталуы</string>
+    <string name="schedule_import_end_label">Аяқталуы</string>
+    <string name="schedule_import_teacher_label">Оқытушы</string>
+    <string name="schedule_import_office_label">Аудитория</string>
+    <string name="schedule_import_location_label">Орын</string>
+    <string name="schedule_import_event_type_label">Сабақ түрі</string>
+    <string name="schedule_import_event_type_placeholder">Сабақ түрін таңдаңыз</string>
+    <string name="schedule_import_first_name_label">Аты</string>
+    <string name="schedule_import_second_name_label">Тегі</string>
+    <string name="schedule_import_patronymic_label">Әкесінің аты</string>
+    <string name="schedule_import_subject_placeholder">Пәнді таңдаңыз</string>
+    <string name="schedule_import_teacher_placeholder">Оқытушыны таңдаңыз</string>
+    <string name="schedule_import_time_placeholder">Уақытты таңдаңыз</string>
+    <string name="schedule_import_subject_selector_header">Пән</string>
+    <string name="schedule_import_subject_selector_title">Импортталған және ұйым пәндері</string>
+    <string name="schedule_import_teacher_selector_header">Оқытушы</string>
+    <string name="schedule_import_teacher_selector_title">Импортталған және ұйым оқытушылары</string>
+    <string name="schedule_import_event_type_selector_header">Сабақ түрі</string>
+    <string name="schedule_import_event_type_selector_title">Сабақ түрін таңдаңыз</string>
+    <string name="schedule_import_day_selector_header">Күн</string>
+    <string name="schedule_import_day_selector_title">Апта күнін таңдаңыз</string>
+    <string name="schedule_import_catalog_existing_label">Ұйымдағы</string>
+    <string name="schedule_import_new_subject_name">Жаңа пән</string>
+    <string name="schedule_import_new_teacher_name">Жаңа оқытушы</string>
+    <string name="schedule_import_add_button">Қосу</string>
+    <string name="schedule_import_fast_edit_start">Күннің басталуы</string>
+    <string name="schedule_import_fast_edit_classes">Сабақтардың ұзақтығы</string>
+    <string name="schedule_import_fast_edit_breaks">Үзілістердің ұзақтығы</string>
+    <string name="schedule_import_fast_edit_add_class">Сабақ қосу</string>
+    <string name="schedule_import_fast_edit_start_header">Күннің басталуы</string>
+    <string name="schedule_import_fast_edit_start_title">Барлық сабақтарды 1-сабаққа қатысты жылжыту</string>
+    <string name="schedule_import_fast_edit_start_field">Сабақтардың басталуы</string>
+    <string name="schedule_import_fast_edit_start_placeholder">Қажетті уақытты енгізіңіз</string>
+    <string name="schedule_import_fast_edit_classes_header">Сабақтар</string>
+    <string name="schedule_import_fast_edit_classes_title">Сабақтардың ұзақтығын өзгертіңіз</string>
+    <string name="schedule_import_fast_edit_breaks_header">Үзілістер</string>
+    <string name="schedule_import_fast_edit_breaks_title">Үзілістердің ұзақтығын өзгертіңіз</string>
+    <string name="schedule_import_fast_edit_all">Барлығы</string>
+    <string name="schedule_import_fast_edit_except">Басқа</string>
+    <string name="schedule_import_fast_edit_add_exception">Қосу</string>
+    <string name="schedule_import_fast_edit_duration">Ұзақтығы</string>
+    <string name="schedule_import_fast_edit_number">Нөмірі</string>
+    <string name="schedule_import_swap_days">Күндерді ауыстыру</string>
+    <string name="schedule_import_swap_days_title">Екі күннің сабақтарын өзара алмастыру</string>
+    <string name="schedule_import_swap_days_first">Бірінші күн</string>
+    <string name="schedule_import_swap_days_second">Екінші күн</string>
+    <string name="schedule_import_class_editor_title">Сабақ</string>
+    <string name="schedule_import_subject_editor_title">Пән</string>
+    <string name="schedule_import_teacher_editor_title">Оқытушы</string>
+    <string name="schedule_import_entry_title">%1$d-сабақ</string>
+    <string name="schedule_import_selected_count">%2$d-ден %1$d таңдалды</string>
+    <string name="schedule_import_back_description">Артқа</string>
+    <string name="try_again_button_title">Қайтадан көру</string>
+    <string name="ago_suffix">бұрын</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+</resources>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="week_schedule_editor_header">Кесте редакторы</string>
+    <string name="daily_schedule_editor_header">Күн редакторы</string>
+    <string name="class_editor_header">Оқиғалар редакторы</string>
+    <string name="subject_editor_header">Пәндер редакторы</string>
+    <string name="employee_editor_header">Қызметкер редакторы</string>
+    <string name="organization_editor_header">Ұйым редакторы</string>
+    <string name="homework_editor_header">Тапсырмалар редакторы</string>
+    <string name="profile_editor_header">Профиль</string>
+    <string name="todo_editor_header">Тапсырмалар редакторы</string>
+    <string name="save_button_title">Сақтау</string>
+    <string name="number_of_classes_label">Сабақтар саны</string>
+    <string name="standard_time_interval_header">Стандартты мәндер</string>
+    <string name="classes_title">Сабақтар</string>
+    <string name="breaks_title">Үзілістер</string>
+    <string name="schedule_intervals_dialog_header">Стандартты мәндер</string>
+    <string name="start_of_classes_title">Сабақтардың басталуы</string>
+    <string name="start_of_classes_placeholder">Қажетті уақытты енгізіңіз</string>
+    <string name="except_title">Басқа</string>
+    <string name="all_title">Барлығы</string>
+    <string name="add_title">Қосу</string>
+    <string name="quantity_of_classes_title">Саны:</string>
+    <string name="number_of_class_title">Нөмірі</string>
+    <string name="duration_title">Ұзақтығы</string>
+    <string name="organization_field_label">Ұйым</string>
+    <string name="organization_required_field_label">Ұйым *</string>
+    <string name="organization_field_placeholder">Ұйымды таңдаңыз</string>
+    <string name="organization_selector_header">Ұйым</string>
+    <string name="organization_selector_title">Қажетті ұйымды таңдаңыз</string>
+    <string name="event_type_field_label">Оқиға</string>
+    <string name="event_type_required_field_label">Оқиға *</string>
+    <string name="event_type_field_placeholder">Өткізу форматын таңдаңыз</string>
+    <string name="event_type_selector_header">Оқиға</string>
+    <string name="event_type_selector_title">Өткізу форматын таңдаңыз</string>
+    <string name="subject_field_label">Пән</string>
+    <string name="subject_required_field_label">Пән *</string>
+    <string name="subject_field_placeholder">Пәнді таңдаңыз</string>
+    <string name="subject_selector_header">Пән</string>
+    <string name="subject_selector_title">Қажетті пәнді таңдаңыз</string>
+    <string name="teacher_field_label">Оқытушы</string>
+    <string name="teacher_field_placeholder">Оқытушыны таңдаңыз</string>
+    <string name="teacher_selector_header">Оқытушы</string>
+    <string name="teacher_selector_title">Сабақ оқытушысын таңдаңыз</string>
+    <string name="location_field_label">Орын</string>
+    <string name="location_field_placeholder">Орынды көрсетіңіз</string>
+    <string name="location_selector_header">Орын</string>
+    <string name="location_selector_title">Өткізілетін орынды көрсетіңіз</string>
+    <string name="office_field_label">Кабинет</string>
+    <string name="office_field_placeholder">000</string>
+    <string name="office_selector_header">Кабинет</string>
+    <string name="office_selector_title">Кабинетті көрсетіңіз</string>
+    <string name="start_time_field_label">Басталуы</string>
+    <string name="start_time_required_field_label">Басталуы *</string>
+    <string name="start_time_field_placeholder">00:00</string>
+    <string name="end_time_field_label">Аяқталуы</string>
+    <string name="end_time_required_field_label">Аяқталуы *</string>
+    <string name="end_time_field_placeholder">23:59</string>
+    <string name="standard_time_values_warning_data">Стандартты мәндерді баптау керек</string>
+    <string name="subject_name_field_label">Атауы</string>
+    <string name="subject_name_required_field_label">Атауы *</string>
+    <string name="subject_name_field_placeholder">Пән атауын енгізіңіз</string>
+    <string name="color_picker_label">Түс</string>
+    <string name="color_picker_required_label">Түс *</string>
+    <string name="first_name_field_label">Аты *</string>
+    <string name="second_name_field_label">Тегі</string>
+    <string name="patronymic_field_label">Әкесінің аты</string>
+    <string name="employee_post_field_label">Лауазымы *</string>
+    <string name="employee_post_field_placeholder">Лауазымды таңдаңыз</string>
+    <string name="employee_post_selector_header">Лауазымы</string>
+    <string name="employee_post_selector_title">Қызметкер лауазымын таңдаңыз</string>
+    <string name="birthday_field_label">Туған күні</string>
+    <string name="birthday_field_placeholder">Туған күнін көрсетіңіз</string>
+    <string name="email_field_label">Email</string>
+    <string name="email_field_placeholder">example@example.com</string>
+    <string name="phone_field_label">Телефон</string>
+    <string name="phone_field_placeholder">0-000-000-00-00</string>
+    <string name="web_field_label">Сайт</string>
+    <string name="web_field_placeholder">www.example.com</string>
+    <string name="contact_info_section_header">Байланыс және мәліметтер</string>
+    <string name="homework_date_picker_headline">Кесте күні</string>
+    <string name="homework_date_field_label">Күні</string>
+    <string name="homework_date_field_placeholder">Мерзім күнін көрсетіңіз</string>
+    <string name="link_class_view_title">Сабақты байланыстыру</string>
+    <string name="link_class_view_empty_title">Жалғастыру үшін пәнді таңдаңыз</string>
+    <string name="theory_field_label">Теория</string>
+    <string name="theory_field_placeholder">Тақырып: a, b; Тақырып: c</string>
+    <string name="practice_field_label">Тәжірибе</string>
+    <string name="practice_field_placeholder">Тақырып: a, b. Тақырып: c</string>
+    <string name="presentations_field_label">Баяндамалар</string>
+    <string name="presentations_field_placeholder">Тақырып: a, b | Тақырып: c</string>
+    <string name="test_field_label">Тест</string>
+    <string name="test_field_placeholder">Жұмыс тақырыбын енгізіңіз</string>
+    <string name="priority_view_title">Басымдық</string>
+    <string name="standard_priority_item_title">Қалыпты</string>
+    <string name="medium_priority_item_title">Орташа</string>
+    <string name="high_priority_item_title">Макс.</string>
+    <string name="number_of_class_suffix">сабақ</string>
+    <string name="task_title">Тапсырма</string>
+    <string name="short_name_field_label">Қысқаша атауы *</string>
+    <string name="full_name_field_label">Толық атауы</string>
+    <string name="org_type_field_label">Ұйым түрі *</string>
+    <string name="org_type_selector_header">Ұйым түрі</string>
+    <string name="org_type_field_placeholder">Ұйым түрін көрсетіңіз</string>
+    <string name="organization_status_title">Негізгі ұйым</string>
+    <string name="organization_status_body">Сабақтарда ұйымның тұрақты көрсетілуін өшіреді</string>
+    <string name="fast_edit_daily_schedule_header">Жылдам өңдеу</string>
+    <string name="fast_edit_start_of_day_label">Күннің басталуы</string>
+    <string name="start_of_day_dialog_header">Күннің басталуы</string>
+    <string name="start_of_day_dialog_title">Барлық сабақтарды 1-сабаққа қатысты жылжыту</string>
+    <string name="fast_edit_classes_duration_label">Сабақтардың ұзақтығы</string>
+    <string name="classes_duration_dialog_header">Сабақтар</string>
+    <string name="classes_duration_dialog_title">Сабақтардың ұзақтығын өзгертіңіз</string>
+    <string name="fast_edit_breaks_duration_label">Үзілістердің ұзақтығы</string>
+    <string name="breaks_duration_dialog_header">Үзілістер</string>
+    <string name="breaks_duration_dialog_title">Үзілістердің ұзақтығын өзгертіңіз</string>
+    <string name="return_schedule_title">Қайтару</string>
+    <string name="edit_custom_schedule_title">Өңдеуді бастау</string>
+    <string name="none_classes_title">Сабақтар жоқ</string>
+    <string name="custom_schedule_date_title">Күні</string>
+    <string name="shift_time_error">Сабақтарды жылжыту қатесі! Уақыт шеңберінің бұзылуы</string>
+    <string name="todo_name_field_label">Тапсырма *</string>
+    <string name="todo_name_field_placeholder">Тапсырмаңызды енгізіңіз</string>
+    <string name="todo_description_field_label">Сипаттамасы</string>
+    <string name="todo_description_field_placeholder">Сипаттаманы енгізіңіз</string>
+    <string name="todo_deadline_field_label">Күні</string>
+    <string name="todo_deadline_field_placeholder">Мерзім күнін көрсетіңіз</string>
+    <string name="todo_deadline_date_picker_headline">Тапсырма мерзімі</string>
+    <string name="todo_time_field_label">Уақыты</string>
+    <string name="todo_time_field_placeholder">Мерзім уақытын көрсетіңіз</string>
+    <string name="todo_notification_title">Хабарландырулар</string>
+    <string name="todo_notification_label">Бапталған уақыт аралығында хабарлау</string>
+    <string name="todo_notify_params_before_start">Аяқталу сәтінде</string>
+    <string name="todo_notify_params_before_fifteen_minutes">15 минут бұрын</string>
+    <string name="todo_notify_params_before_one_hour">1 сағат бұрын</string>
+    <string name="todo_notify_params_before_three_hour">3 сағат бұрын</string>
+    <string name="todo_notify_params_before_one_day">1 күн бұрын</string>
+    <string name="todo_notify_params_before_one_week">1 апта бұрын</string>
+    <string name="username_field_label">Көрсетілетін есім *</string>
+    <string name="username_field_placeholder">Аты-жөні</string>
+    <string name="user_gender_field_label">Жынысы</string>
+    <string name="user_gender_field_placeholder">Жынысыңызды көрсетіңіз</string>
+    <string name="city_field_label">Қала</string>
+    <string name="city_field_placeholder">Қалаңызды енгізіңіз</string>
+    <string name="change_password_action_label">Құпия сөзді өзгерту</string>
+    <string name="password_changer_label">Құпия сөз</string>
+    <string name="old_password_field_label">Ескі құпия сөз</string>
+    <string name="password_field_placeholder">Кемінде 6 таңба (a-Z)(0-9)</string>
+    <string name="hide_organization_warning">Ұйымды жасырғыңыз келетініне сенімдісіз бе? Осыдан кейін оны пайдалана алмайсыз</string>
+    <string name="delete_office_warning_title">Бұл кабинетті жойғыңыз келетініне сенімдісіз бе?</string>
+    <string name="delete_location_warning_title">Бұл орынды жойғыңыз келетініне сенімдісіз бе?</string>
+    <string name="subjects_search_bar_placeholder">Пәндерді іздеу</string>
+    <string name="employee_search_bar_placeholder">Оқытушыларды іздеу</string>
+    <string name="schedule_import_open_description">Фотодан импорттау</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+</resources>

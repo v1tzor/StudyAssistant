@@ -36,6 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.handleEffects
 import ru.aleshin.studyassistant.core.common.architecture.store.compose.stateAsState
 import ru.aleshin.studyassistant.core.ui.ads.LocalAdsConfiguration
+import ru.aleshin.studyassistant.core.ui.ads.RewardedAdErrorType
 import ru.aleshin.studyassistant.core.ui.ads.YandexRewardedAdHost
 import ru.aleshin.studyassistant.core.ui.theme.tokens.AdaptiveLayoutDefaults
 import ru.aleshin.studyassistant.core.ui.views.ErrorSnackbar
@@ -154,6 +155,9 @@ internal fun ShareContent(
     YandexRewardedAdHost(
         adUnitId = adsConfiguration?.scheduleImportRewardedId.orEmpty(),
         requestKey = state.rewardChallengeId,
+        allowFallback = { type ->
+            type == RewardedAdErrorType.NO_FILL || type == RewardedAdErrorType.NETWORK_ERROR
+        },
         onRewarded = { challengeId ->
             store.dispatchEvent(ShareEvent.RewardedAdGranted(challengeId))
         },

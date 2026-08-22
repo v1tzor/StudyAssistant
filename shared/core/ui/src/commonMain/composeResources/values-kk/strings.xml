@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="app_name">Study Assistant</string>
+    <string name="cancel_title">Бас тарту</string>
+    <string name="add_title">Қосу</string>
+    <string name="select_confirm_title">Таңдау</string>
+    <string name="create_confirm_title">Жасау</string>
+    <string name="save_confirm_title">Сақтау</string>
+    <string name="change_confirm_title">Өзгерту</string>
+    <string name="ok_confirm_title">ОК</string>
+    <string name="delete_confirm_title">Жою</string>
+    <string name="hide_title">Жасыру</string>
+    <string name="time_picker_dialog_header">Уақытты таңдаңыз</string>
+    <string name="date_picker_dialog_header">Күнді таңдаңыз</string>
+    <string name="warning_dialog_title">Ескерту!</string>
+    <string name="warning_delete_confirm_title">Жою</string>
+    <string name="minute_suffix">м</string>
+    <string name="hour_suffix">с</string>
+    <string name="day_suffix">к</string>
+    <string name="separator">:</string>
+    <string name="am_format_title">AM</string>
+    <string name="pm_format_title">PM</string>
+    <string name="clear_search_bar_desk">Іздеуді тазалау</string>
+    <string name="back_title">Артқа</string>
+    <string name="none_title">Жоқ</string>
+    <string name="absent_title">Қатыспаған</string>
+    <string name="warning_granted_permission_message">Хабарландырулар жіберуге рұқсат берілмеген!</string>
+    <string name="schedule_bottom_item">Кесте</string>
+    <string name="tasks_bottom_item">Тапсырмалар</string>
+    <string name="chat_bottom_item">Көмекші</string>
+    <string name="info_bottom_item">Ақпарат</string>
+    <string name="profile_bottom_item">Профиль</string>
+    <string name="back_icon_desc">Артқа</string>
+    <string name="none_gender">Таңдалмаған</string>
+    <string name="male_gender">Ер</string>
+    <string name="female_gender">Әйел</string>
+    <string name="one_week_plural">1 апта</string>
+    <string name="two_week_plural">2 апта</string>
+    <string name="three_week_plural">3 апта</string>
+    <string name="january_title">Қаңтар</string>
+    <string name="february_title">Ақпан</string>
+    <string name="march_title">Наурыз</string>
+    <string name="april_title">Сәуір</string>
+    <string name="may_title">Мамыр</string>
+    <string name="june_title">Маусым</string>
+    <string name="july_title">Шілде</string>
+    <string name="august_title">Тамыз</string>
+    <string name="september_title">Қыркүйек</string>
+    <string name="october_title">Қазан</string>
+    <string name="november_title">Қараша</string>
+    <string name="december_title">Желтоқсан</string>
+    <string name="monday_title">Дүйсенбі</string>
+    <string name="monday_short_title">Дүй</string>
+    <string name="tuesday_title">Сейсенбі</string>
+    <string name="tuesday_short_title">Сей</string>
+    <string name="wednesday_title">Сәрсенбі</string>
+    <string name="wednesday_short_title">Сәр</string>
+    <string name="thursday_title">Бейсенбі</string>
+    <string name="thursday_short_title">Бей</string>
+    <string name="friday_title">Жұма</string>
+    <string name="friday_short_title">Жұм</string>
+    <string name="saturday_title">Сенбі</string>
+    <string name="saturday_short_title">Сен</string>
+    <string name="sunday_title">Жексенбі</string>
+    <string name="sunday_short_title">Жек</string>
+    <string name="school_organization_type">Мектеп</string>
+    <string name="lyceum_organization_type">Лицей</string>
+    <string name="seminary_organization_type">Семинария</string>
+    <string name="gymnasium_organization_type">Гимназия</string>
+    <string name="college_organization_type">Колледж</string>
+    <string name="university_organization_type">Университет</string>
+    <string name="additional_education_organization_type">Қосымша білім беру</string>
+    <string name="courses_organization_type">Оқу курстары</string>
+    <string name="pcs_unit_suffix">дана</string>
+    <string name="specify_title">Көрсетіңіз</string>
+    <string name="hours_title">Сағат</string>
+    <string name="minutes_title">Минут</string>
+    <string name="event_type_lesson">Сабақ</string>
+    <string name="event_type_lecture">Дәріс</string>
+    <string name="event_type_practice">Тәжірибе</string>
+    <string name="event_type_seminar">Семинар</string>
+    <string name="event_type_class">Сабақ</string>
+    <string name="event_type_online_class">Онлайн сабақ</string>
+    <string name="event_type_webinar">Вебинар</string>
+    <string name="post_employee">Қызметкер</string>
+    <string name="post_teacher">Оқытушы</string>
+    <string name="post_director">Директор</string>
+    <string name="post_mentor">Тәлімгер</string>
+    <string name="post_tutor">Куратор</string>
+    <string name="post_manager">Менеджер</string>
+    <string name="not_selected_title">Таңдалмаған</string>
+    <string name="avatar_desc">Профиль фотосын таңдау</string>
+    <string name="contact_info_label">Атауы</string>
+    <string name="contact_info_value">Мәліметтер *</string>
+    <string name="standard_priority_title">Әдеттегі</string>
+    <string name="medium_priority_title">Маңызды</string>
+    <string name="high_priority_title">Өте маңызды</string>
+    <string name="theoretical_tasks_title">Теория</string>
+    <string name="practical_tasks_title">Тәжірибе</string>
+    <string name="presentations_tasks_title">Баяндама</string>
+    <string name="no_result_title">Нәтиже жоқ</string>
+    <string name="today_title">Бүгін</string>
+    <string name="tomorrow_title">Ертең</string>
+    <string name="default_title">Әдепкі бойынша</string>
+    <string name="english_language_title">English</string>
+    <string name="russian_language_title">Русский</string>
+    <string name="chinese_language_title">Қытайша</string>
+    <string name="belarusian_language_title">Беларуская</string>
+    <string name="kazakh_language_title">Қазақша</string>
+    <string name="light_theme_title">Ашық</string>
+    <string name="dark_theme_title">Қараңғы</string>
+    <string name="exceeding_limit_image_size_message">Сурет &lt;5 MB болуы керек</string>
+    <string name="homeworks_reminder_title">Үй тапсырмасының мерзімі жақын!</string>
+    <string name="homeworks_reminder_body_prefix">Орындау керек пәндер:</string>
+    <string name="homeworks_recommendation_title">Ертеңге тапсырма жоқ!</string>
+    <string name="homeworks_recommendation_body_prefix">Бірақ бүрсігүні орындау керек тапсырмалар саны:\u0020</string>
+    <string name="homeworks_recommendation_body_suffix">. Оларды бүгін орындай аласыз немесе бір бөлігін жасап қойыңыз</string>
+    <string name="start_classes_reminder_title_suffix">\u0020сабақтарыңыз басталады!</string>
+    <string name="start_classes_reminder_title_prefix">\u0020кейін</string>
+    <string name="end_classes_reminder_title">Сабақтар аяқталды! Берілген тапсырмаларды орындау қалды</string>
+    <string name="ongoing_class_reminder_body">Сабақ жүріп жатыр · %1$s</string>
+    <string name="ongoing_class_reminder_unknown_title">Қазіргі сабақ</string>
+    <string name="high_workload_warning_title">Ескерту! Ертең ауыр күн болады.</string>
+    <string name="high_workload_warning_body">Күш жинап, 100% дайын болуыңыз керек!</string>
+    <string name="todo_reminder_title_suffix">Тапсырманың мерзімі мына уақыттан кейін аяқталады:\u0020</string>
+    <string name="network_error_message">Интернет байланысы жоқ! Кейінірек қайталап көріңіз</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+    <string name="voice_input_promt">Сөйлеңіз...</string>
+</resources>

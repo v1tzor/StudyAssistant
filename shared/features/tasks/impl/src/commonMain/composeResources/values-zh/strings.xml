@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="overview_header">任务概览</string>
+    <string name="homeworks_header">作业</string>
+    <string name="todos_header">待办</string>
+    <string name="daily_goals_section_header">每日目标</string>
+    <string name="goals_view_progress_title">进度</string>
+    <string name="goals_view_progress_homework_label">作业</string>
+    <string name="goals_view_progress_todo_label">任务</string>
+    <string name="goals_view_closest_title">近期目标</string>
+    <string name="goals_view_list_title">目标列表</string>
+    <string name="goals_view_list_empty_title">目标列表为空</string>
+    <string name="delete_goal_warning_title">警告！</string>
+    <string name="delete_goal_warning_text">您确定要删除每日目标吗？</string>
+    <string name="goal_creator_headline">计划</string>
+    <string name="goal_creator_title">设置每日目标</string>
+    <string name="goal_creator_date_field_title">日期</string>
+    <string name="goal_creator_date_field_placeholder">选择日期</string>
+    <string name="goal_creator_desired_time_field_title">期望时长</string>
+    <string name="goal_creator_confirm_title">安排</string>
+    <string name="goal_sheet_time_control_title">时间控制</string>
+    <string name="goal_sheet_desired_time_label">期望</string>
+    <string name="goal_sheet_desired_time_picker_title">期望时间</string>
+    <string name="goal_sheet_real_time_label">实际</string>
+    <string name="goal_sheet_time_type_stopwatch">秒表</string>
+    <string name="goal_sheet_time_type_timer">计时器</string>
+    <string name="goal_sheet_time_type_none">无控制</string>
+    <string name="goal_sheet_left_time_label">剩余</string>
+    <string name="goal_sheet_elapsed_time_label">已过时间</string>
+    <string name="goal_sheet_homework_tasks_title">任务</string>
+    <string name="goal_sheet_delete_action_label">删除</string>
+    <string name="goal_sheet_complete_action_label">完成</string>
+    <string name="goal_sheet_cancel_action_label">取消</string>
+    <string name="homeworks_tasks_tab">作业</string>
+    <string name="todos_tasks_tab">待办</string>
+    <string name="share_homeworks_header">任务交换</string>
+    <string name="share_homeworks_button_title">分享</string>
+    <string name="tasks_progress_tomorrow_label">明天</string>
+    <string name="tasks_progress_in_the_week_label">本周</string>
+    <string name="homework_errors_title">错误</string>
+    <string name="homeworks_completed_title">已完成</string>
+    <string name="homework_execution_analysis_header">执行分析</string>
+    <string name="coming_homeworks_execution_analysis_title">近期</string>
+    <string name="all_homeworks_execution_analysis_title">全部时间</string>
+    <string name="scope_of_homeworks_header">任务范围</string>
+    <string name="homeworks_section_header">作业审核</string>
+    <string name="add_homework_title">添加作业</string>
+    <string name="show_all_title">显示全部</string>
+    <string name="homeworks_section_subtitle">本周</string>
+    <string name="none_tasks_title">任务缺失</string>
+    <string name="none_todos_title">待办缺失</string>
+    <string name="theoretical_tasks_bar_name">理论</string>
+    <string name="practical_tasks_bar_name">实践</string>
+    <string name="presentations_tasks_bar_name">演示</string>
+    <string name="in_progress_todos_section_header">进行中</string>
+    <string name="error_todos_section_header">已跳过</string>
+    <string name="completed_todos_section_header">周内已完成</string>
+    <string name="show_all_todos_title">显示全部</string>
+    <string name="until_deadline_date_suffix">截至</string>
+    <string name="none_deadline_title">无截止日期</string>
+    <string name="overdue_deadline_title">已逾期</string>
+    <string name="overall_homeworks_progress">总体进度</string>
+    <string name="homework_test_label">测试</string>
+    <string name="overdue_homeworks_header">错过的任务</string>
+    <string name="detached_active_homeworks_header">活动的脱离任务</string>
+    <string name="overdue_todos_header">错过的待办</string>
+    <string name="none_errors_title">无错误</string>
+    <string name="accept_homework_title">接受</string>
+    <string name="ago_suffix">前</string>
+    <string name="apply_shared_homeworks_title">添加</string>
+    <string name="homeworks_linked_header">添加任务</string>
+    <string name="homeworks_linked_label">通过名称关联科目和课程</string>
+    <string name="target_user_subjects_title">用户</string>
+    <string name="current_user_subjects_title">您</string>
+    <string name="specify_subject_label">指定</string>
+    <string name="classes_not_found_label">未找到课程</string>
+    <string name="subject_selector_header">科目</string>
+    <string name="subject_selector_title">选择合适的科目</string>
+    <string name="linked_class_selector_header">课程</string>
+    <string name="linked_class_selector_title">选择合适的课程</string>
+    <string name="number_of_class_suffix">课</string>
+    <string name="attach_classes_label">附加课程</string>
+    <string name="selection_subject_step_header">1. 选择科目</string>
+    <string name="selection_subject_step_label">选择您想要分享的科目</string>
+    <string name="create_share_code_title">生成代码</string>
+    <string name="homework_share_ready_title">作业代码已就绪</string>
+    <string name="homework_share_expires_at_label">有效期至</string>
+    <string name="copy_share_link_title">复制代码</string>
+    <string name="receive_homework_share_title">接收作业</string>
+    <string name="share_code_label">分享代码</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="open_share_title">打开</string>
+    <string name="scan_qr_button_title">扫描二维码</string>
+    <string name="homework_share_imported_title">作业已添加</string>
+    <string name="homework_share_subject_item">• %1$s</string>
+    <string name="duplicate_homework_share_title">这些作业已在此设备上添加过</string>
+    <string name="invalid_homework_share_title">代码未找到或无效</string>
+    <string name="expired_homework_share_title">代码已过期</string>
+    <string name="share_rate_limit_message">尝试次数过多。请稍后再试</string>
+    <string name="share_daily_limit_message">达到发布限额。请在一天后再试</string>
+    <string name="share_item_limit_message">一次最多可以分享 20 个作业条目</string>
+    <string name="share_payload_limit_message">所选作业数据过大</string>
+    <string name="current_time_range_desc">显示当前日期</string>
+    <string name="test_label">测试</string>
+    <string name="other_error_message">错误！请联系开发者！</string>
+    <string name="open_analytics_desc">打开分析</string>
+</resources>

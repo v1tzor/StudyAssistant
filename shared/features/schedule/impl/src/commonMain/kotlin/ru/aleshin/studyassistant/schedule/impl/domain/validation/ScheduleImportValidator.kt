@@ -47,7 +47,7 @@ internal interface ScheduleImportValidator {
                 val end = parseTime(entry.endTime)
                 entry.repeatWeek in MIN_REPEAT_WEEK..MAX_REPEAT_WEEK &&
                     entry.dayOfWeek in MIN_DAY_OF_WEEK..MAX_DAY_OF_WEEK &&
-                    !entry.subject.isNullOrBlank() &&
+                    !entry.subject.isDash() &&
                     start != null &&
                     end != null &&
                     start < end
@@ -102,6 +102,11 @@ internal interface ScheduleImportValidator {
             val minute = parts[1].toIntOrNull() ?: return null
             val second = parts.getOrNull(2)?.toIntOrNull() ?: 0
             return runCatching { LocalTime(hour, minute, second) }.getOrNull()
+        }
+
+        private fun String?.isDash(): Boolean {
+            val normalized = this?.trim().orEmpty()
+            return normalized.all { char -> char == '-' || char == '—' || char == '–' || char == '.' } || normalized.isEmpty()
         }
 
         private companion object {

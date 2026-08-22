@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="assistant_top_bar_title">Көмекші (Beta)</string>
+    <string name="assistant_expanded_header">Көмекші</string>
+    <string name="assistant_quota_remaining">Бүгінге %1$d / %2$d хабарлама қалды</string>
+    <string name="assistant_send_action_description">Хабарлама жіберу</string>
+    <string name="assistant_clear_history_description">Чат тарихын тазалау</string>
+    <string name="assistant_sender_badge">Көмекші</string>
+    <string name="chat_assistant_error_message">Көмекші жұмысындағы қате</string>
+    <string name="functional_chat_suggestion">Не істей аласың?</string>
+    <string name="homework_chat_suggestion">Ертеңге не берілді?</string>
+    <string name="assistant_chat_text_field_placeholder">Кез келген сұранысты жіберіңіз</string>
+    <string name="assistant_empty_chat_title">Сізге қалай көмектесе аламын?</string>
+    <string name="failure_response_text">Өкінішке орай, сұранысты орындау мүмкін болмады</string>
+    <string name="quota_expired_title">Бүгінгі лимит (%d хабарлама) таусылды.</string>
+    <string name="quota_reset_suggestion_text">Команданы қолдау және тағы %1$d хабарлама алу үшін қысқа жарнаманы көріңіз. Бүгін қолжетімді: %2$d / %3$d.</string>
+    <string name="quota_rewards_exhausted_text">Бүгінгі барлық %d жарнамалық сыйлық пайдаланылды. Квота ертең автоматты түрде жаңартылады.</string>
+    <string name="watch_ad_reward_button">Жарнама көру · +%d хабарлама</string>
+    <string name="ai_settings_button">AI баптау</string>
+    <string name="quota_error_message">Күндік %d хабарлама квотасы таусылды</string>
+    <string name="reward_unavailable_error_message">Жарнама қазір қолжетімсіз. Кейінірек қайталап көріңіз (VPN өшіріңіз).</string>
+    <string name="invalid_request_error_message">Көмекші сұранысты өңдей алмады. Хабарламаны тексеріп, қайталап көріңіз</string>
+    <string name="offline_error_message">Интернет байланысы жоқ</string>
+    <string name="rate_limit_error_message">Сұраныстар тым көп. Біраз уақыттан кейін қайталап көріңіз</string>
+    <string name="server_unavailable_error_message">AI қызметі уақытша қолжетімсіз</string>
+    <string name="try_again_button">Қайталау</string>
+    <string name="other_error_message">Қате! Әзірлеушіге хабарласыңыз!</string>
+    <string name="confirm_todo_creation_title">Бұл тапсырманы жасау керек пе?</string>
+    <string name="confirm_todo_update_title">Бұл тапсырманы өзгерту керек пе?</string>
+    <string name="confirm_todo_completion_title">Бұл тапсырманың мәртебесін өзгерту керек пе?</string>
+    <string name="confirm_todo_deletion_title">Бұл тапсырманы жою керек пе?</string>
+    <string name="confirm_homework_creation_title">Бұл үй тапсырмасын жасау керек пе?</string>
+    <string name="confirm_homework_update_title">Бұл үй тапсырмасын өзгерту керек пе?</string>
+    <string name="confirm_homework_completion_title">Үй тапсырмасының мәртебесін өзгерту керек пе?</string>
+    <string name="confirm_homework_deletion_title">Бұл үй тапсырмасын жою керек пе?</string>
+    <string name="confirm_class_creation_title">Бұл сабақты қосу керек пе?</string>
+    <string name="confirm_class_update_title">Бұл сабақты өзгерту керек пе?</string>
+    <string name="confirm_class_deletion_title">Бұл сабақты жою керек пе?</string>
+    <string name="confirm_subject_creation_title">Бұл пәнді жасау керек пе?</string>
+    <string name="confirm_subject_update_title">Бұл пәнді өзгерту керек пе?</string>
+    <string name="confirm_employee_creation_title">Бұл оқытушыны қосу керек пе?</string>
+    <string name="confirm_employee_update_title">Оқытушы мәліметтерін өзгерту керек пе?</string>
+    <string name="confirm_goal_creation_title">Бұл мақсатты қосу керек пе?</string>
+    <string name="confirm_goal_update_title">Бұл мақсатты өзгерту керек пе?</string>
+    <string name="confirm_goal_completion_title">Бұл мақсаттың мәртебесін өзгерту керек пе?</string>
+    <string name="confirm_goal_deletion_title">Бұл мақсатты жою керек пе?</string>
+    <string name="confirm_generic_change_title">Бұл өзгерісті қолдану керек пе?</string>
+    <string name="confirm_change_description">Көмекші өзгерісті дайындады. Оны құрылғыға сақтамас бұрын тексеріп шығыңыз.</string>
+    <string name="confirm_change_button">Растау</string>
+    <string name="reject_change_button">Бас тарту</string>
+    <string name="name_field_label">Атауы</string>
+    <string name="description_field_label">Сипаттамасы</string>
+    <string name="deadline_field_label">Мерзімі</string>
+    <string name="priority_field_label">Басымдық</string>
+    <string name="theoretical_tasks_field_label">Теория</string>
+    <string name="practical_tasks_field_label">Тәжірибе</string>
+    <string name="presentation_tasks_field_label">Презентация</string>
+    <string name="test_topic_field_label">Тест тақырыбы</string>
+    <string name="schedule_import_action_description">Кестені фото арқылы импорттау</string>
+    <string name="target_field_label">Нысан</string>
+    <string name="completed_field_label">Орындалды</string>
+    <string name="class_field_label">Сабақ</string>
+    <string name="organization_field_label">Ұйым</string>
+    <string name="subject_field_label">Пән</string>
+    <string name="date_field_label">Күні</string>
+    <string name="start_time_field_label">Басталуы</string>
+    <string name="end_time_field_label">Аяқталуы</string>
+    <string name="event_type_field_label">Сабақ түрі</string>
+    <string name="custom_data_field_label">Сабақ атауы</string>
+    <string name="employee_field_label">Оқытушы</string>
+    <string name="office_field_label">Аудитория</string>
+    <string name="location_field_label">Орын</string>
+</resources>

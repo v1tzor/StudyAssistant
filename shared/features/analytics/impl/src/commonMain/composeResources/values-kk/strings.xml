@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="analytics_header">Аналитика</string>
+    <string name="analytics_back_desc">Артқа</string>
+    <string name="analytics_calendar_desc">Күн ауқымын таңдау</string>
+    <string name="analytics_previous_period_desc">Алдыңғы кезең</string>
+    <string name="analytics_next_period_desc">Келесі кезең</string>
+    <string name="analytics_period_week">Апта</string>
+    <string name="analytics_period_month">Ай</string>
+    <string name="analytics_period_year">Жыл</string>
+    <string name="analytics_period_custom">Кезең</string>
+    <string name="analytics_month_january">Қаңтар</string>
+    <string name="analytics_month_february">Ақпан</string>
+    <string name="analytics_month_march">Наурыз</string>
+    <string name="analytics_month_april">Сәуір</string>
+    <string name="analytics_month_may">Мамыр</string>
+    <string name="analytics_month_june">Маусым</string>
+    <string name="analytics_month_july">Шілде</string>
+    <string name="analytics_month_august">Тамыз</string>
+    <string name="analytics_month_september">Қыркүйек</string>
+    <string name="analytics_month_october">Қазан</string>
+    <string name="analytics_month_november">Қараша</string>
+    <string name="analytics_month_december">Желтоқсан</string>
+    <string name="analytics_date_picker_title">Күнді таңдаңыз</string>
+    <string name="analytics_range_picker_title">Кезеңді таңдаңыз</string>
+    <string name="analytics_confirm">Қолдану</string>
+    <string name="analytics_cancel">Бас тарту</string>
+    <string name="analytics_retry">Қайталау</string>
+    <string name="analytics_error_title">Аналитиканы жүктеу мүмкін болмады</string>
+    <string name="analytics_error_body">Деректерді тексеріп, қайталап көріңіз.</string>
+    <string name="analytics_empty_title">Бұл кезеңде деректер жоқ</string>
+    <string name="analytics_empty_body">Мұнда таңдалған кезеңдегі сабақтар мен тапсырмалар көрсетіледі.</string>
+    <string name="analytics_error_message">Бірдеңе дұрыс болмады. Қайталап көріңіз.</string>
+    <string name="analytics_summary_title">Кезең қорытындылары</string>
+    <string name="analytics_insights_title">Кезең бойынша түсініктер</string>
+    <string name="analytics_workload_title">Жүктеме және кесте</string>
+    <string name="analytics_tasks_title">Тапсырмалар</string>
+    <string name="analytics_goals_title">Мақсаттар</string>
+    <string name="analytics_goals_duration">Уақытты бақылау</string>
+    <string name="analytics_organizations_title">Ұйымдар</string>
+    <string name="analytics_subjects_title">Пәндер</string>
+    <string name="analytics_employees_title">Оқытушылар</string>
+    <string name="analytics_regularity_title">Апта ырғағы</string>
+    <string name="analytics_regularity_chart_label">Күндер бойынша орташа оқу жүктемесі</string>
+    <string name="analytics_scheduled_hours">Кесте бойынша</string>
+    <string name="analytics_classes">Сабақтар</string>
+    <string name="analytics_commitments">ҮТ және TODO</string>
+    <string name="analytics_completed">Орындалды</string>
+    <string name="analytics_on_time">Уақытылы</string>
+    <string name="analytics_late">Кешігіп</string>
+    <string name="analytics_no_overloads">Артық жүктеме жоқ</string>
+    <string name="analytics_overdue">Мерзімі өткен</string>
+    <string name="analytics_upcoming">Күтілуде</string>
+    <string name="analytics_backlog">Мерзіміз</string>
+    <string name="analytics_invalid_completion">Орындалу күні жоқ</string>
+    <string name="analytics_previous_period">өткен кезеңге қарағанда</string>
+    <string name="analytics_organizations_count">Ұйымдар</string>
+    <string name="analytics_average_workload">Орташа жүктеме</string>
+    <string name="analytics_peak_load">Ең жоғары жүктеме</string>
+    <string name="analytics_overload_days">Жүктеме %1$d жоғары күндер</string>
+    <string name="analytics_homeworks">ҮТ</string>
+    <string name="analytics_todos">TODO</string>
+    <string name="analytics_tests">Тесттер</string>
+    <string name="analytics_theory">Теориялық бөлімдер</string>
+    <string name="analytics_practice">Тәжірибелік бөлімдер</string>
+    <string name="analytics_presentations">Презентациялар</string>
+    <string name="analytics_standard_priority">Қалыпты басымдық</string>
+    <string name="analytics_medium_priority">Орташа басымдық</string>
+    <string name="analytics_high_priority">Жоғары басымдық</string>
+    <string name="analytics_planned">Жоспарланды</string>
+    <string name="analytics_goal_homeworks">ҮТ бойынша мақсаттар</string>
+    <string name="analytics_goal_todos">TODO бойынша мақсаттар</string>
+    <string name="analytics_desired_time">Қажетті уақыт</string>
+    <string name="analytics_actual_time">Нақты уақыт</string>
+    <string name="analytics_active_timer">Таймер белсенді</string>
+    <string name="analytics_share">Жүктеме үлесі</string>
+    <string name="analytics_on_time_rate">Уақытылы орындалды</string>
+    <string name="analytics_subject_count">Пәндер</string>
+    <string name="analytics_organization_count">Ұйымдар</string>
+    <string name="analytics_frequent_day">Жиі</string>
+    <string name="analytics_not_specified">Көрсетілмеген</string>
+    <string name="analytics_not_available">—</string>
+    <string name="analytics_show_all">Барлығын көрсету</string>
+    <string name="analytics_show_less">Жинау</string>
+    <string name="analytics_study_days">Оқу күндері</string>
+    <string name="analytics_completion_days">Тапсырма орындалған күндер</string>
+    <string name="analytics_longest_streak">Ең ұзақ серия</string>
+    <string name="analytics_days_suffix">күн</string>
+    <string name="analytics_hours_minutes">%1$d с %2$d мин</string>
+    <string name="analytics_minutes">%1$d мин</string>
+    <string name="analytics_percent">%1$s</string>
+    <string name="analytics_percent_symbol">%</string>
+    <string name="analytics_decimal_separator">,</string>
+    <string name="analytics_number">%1$d</string>
+    <string name="analytics_workload_value">%1$s</string>
+    <string name="analytics_chart_workload_desc">Жүктеме %1$s, сабақтар %2$d, ҮТ %3$d, TODO %4$d</string>
+    <string name="analytics_chart_completion_desc">%1$s: орындалған ҮТ %2$d, TODO %3$d</string>
+    <string name="analytics_chart_empty">График үшін деректер жоқ</string>
+    <string name="analytics_chart_regularity_desc">%1$s: орташа жүктеме %2$s</string>
+    <string name="analytics_insight_peak">Ең жоғары жүктеме %1$s болды.</string>
+    <string name="analytics_insight_overload">%1$d күнде жүктеме шектен асты.</string>
+    <string name="analytics_insight_late">Орындалған тапсырмалардың %1$s кешігіп аяқталды.</string>
+    <string name="analytics_insight_organization">Жүктеменің %1$s бөлігі %2$s ұйымына тиесілі.</string>
+    <string name="analytics_insight_subject">Жүктеменің %1$s бөлігі %2$s пәніне тиесілі.</string>
+    <string name="analytics_completion_dynamics">Орындалу динамикасы</string>
+    <string name="analytics_status_distribution">Мәртебелерді бөлу</string>
+    <string name="analytics_task_structure">ҮТ құрылымы</string>
+    <string name="analytics_todo_priorities">TODO басымдықтары</string>
+    <string name="analytics_detail_organization">Ұйым аналитикасы</string>
+    <string name="analytics_detail_subject">Пән аналитикасы</string>
+    <string name="analytics_detail_employee">Оқытушы аналитикасы</string>
+</resources>

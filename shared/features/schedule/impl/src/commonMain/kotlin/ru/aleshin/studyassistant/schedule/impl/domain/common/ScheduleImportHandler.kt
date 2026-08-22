@@ -109,14 +109,15 @@ internal interface ScheduleImportHandler {
 
             val classes = timeNormalizer.normalize(
                 classes = draft.entries.map { entry ->
-                    val teacherId = resolveTeacherId(
+                    val isDashSubject = entry.subject.isDash()
+                    val teacherId = if (isDashSubject) null else resolveTeacherId(
                         entryTeacherId = entry.teacherId,
                         teacherName = entry.teacher,
                         employees = employees,
                         createdEmployeeIds = createdEmployeeIds,
                         organizationId = organization.uid,
                     )
-                    val subjectId = resolveSubjectId(
+                    val subjectId = if (isDashSubject) null else resolveSubjectId(
                         entrySubjectId = entry.subjectId,
                         subjectName = entry.subject,
                         eventType = entry.eventType.toEventType(),
@@ -142,7 +143,7 @@ internal interface ScheduleImportHandler {
                         office = entry.office.orEmpty(),
                         location = entry.location,
                         eventType = entry.eventType.toEventType(),
-                        included = entry.included,
+                        included = entry.included && !isDashSubject,
                     )
                 }
             )
@@ -666,6 +667,11 @@ internal interface ScheduleImportHandler {
 
         private fun String?.normalized(): String = orEmpty().trim().lowercase()
 
+        private fun String?.isDash(): Boolean {
+            val normalized = this?.trim().orEmpty()
+            return normalized.all { char -> char == '-' || char == '—' || char == '–' || char == '.' } || normalized.isEmpty()
+        }
+
         private fun String.capitalized(): String {
             return trim().split(Regex("\\s+")).filter(String::isNotEmpty).joinToString(" ") { part ->
                 part.replaceFirstChar { char -> if (char.isLowerCase()) char.titlecase() else char.toString() }
@@ -673,7 +679,7 @@ internal interface ScheduleImportHandler {
         }
 
         private companion object {
-            const val FUZZY_THRESHOLD = 0.5
+            const val FUZZY_THRESHOLD = 0.7
             const val DEFAULT_CLASS_MINUTES = 45
             const val DEFAULT_BREAK_MINUTES = 10
             const val MINUTES_IN_DAY = 24 * 60

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Stanislav Aleshin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ @author Stanislav Aleshin on 21.08.2026.
+  -->
+
+<resources>
+    <string name="overview_header">Агляд заданняў</string>
+    <string name="homeworks_header">Заданні</string>
+    <string name="todos_header">Задачы</string>
+    <string name="daily_goals_section_header">Дзённыя мэты</string>
+    <string name="goals_view_progress_title">Прагрэс</string>
+    <string name="goals_view_progress_homework_label">Дамашнія заданні</string>
+    <string name="goals_view_progress_todo_label">Задачы</string>
+    <string name="goals_view_closest_title">Мэты на бліжэйшыя дні</string>
+    <string name="goals_view_list_title">Спіс мэтаў</string>
+    <string name="goals_view_list_empty_title">Спіс мэтаў пусты</string>
+    <string name="delete_goal_warning_title">Папярэджанне!</string>
+    <string name="delete_goal_warning_text">Вы сапраўды хочаце выдаліць мэту на дзень?</string>
+    <string name="goal_creator_headline">Планаванне</string>
+    <string name="goal_creator_title">Усталюйце дзённую мэту</string>
+    <string name="goal_creator_date_field_title">Дата</string>
+    <string name="goal_creator_date_field_placeholder">Выберыце дату</string>
+    <string name="goal_creator_desired_time_field_title">Жаданая працягласць</string>
+    <string name="goal_creator_confirm_title">Запланаваць</string>
+    <string name="goal_sheet_time_control_title">Час выканання</string>
+    <string name="goal_sheet_desired_time_label">Плануемае</string>
+    <string name="goal_sheet_desired_time_picker_title">Плануемы час</string>
+    <string name="goal_sheet_real_time_label">Сапраўднае</string>
+    <string name="goal_sheet_time_type_stopwatch">Секундамер</string>
+    <string name="goal_sheet_time_type_timer">Таймер</string>
+    <string name="goal_sheet_time_type_none">Без кантролю</string>
+    <string name="goal_sheet_left_time_label">Засталося</string>
+    <string name="goal_sheet_elapsed_time_label">Прайшло</string>
+    <string name="goal_sheet_homework_tasks_title">Заданні</string>
+    <string name="goal_sheet_delete_action_label">Выдаліць</string>
+    <string name="goal_sheet_complete_action_label">Выканаць</string>
+    <string name="goal_sheet_cancel_action_label">Адмяніць</string>
+    <string name="homeworks_tasks_tab">Дамашнія заданні</string>
+    <string name="todos_tasks_tab">Задачы</string>
+    <string name="share_homeworks_header">Абмен заданнямі</string>
+    <string name="share_homeworks_button_title">Падзяліцца</string>
+    <string name="tasks_progress_tomorrow_label">На заўтра</string>
+    <string name="tasks_progress_in_the_week_label">На тыдні</string>
+    <string name="homework_errors_title">Памылкі</string>
+    <string name="homeworks_completed_title">Выканана</string>
+    <string name="homework_execution_analysis_header">Аналітыка выканання</string>
+    <string name="coming_homeworks_execution_analysis_title">Бліжэйшы час</string>
+    <string name="all_homeworks_execution_analysis_title">За ўвесь час</string>
+    <string name="scope_of_homeworks_header">Аб’ём заданняў</string>
+    <string name="homeworks_section_header">Агляд дамашніх заданняў</string>
+    <string name="add_homework_title">Дадаць заданне</string>
+    <string name="show_all_title">Глядзець усё</string>
+    <string name="homeworks_section_subtitle">Бягучы тыдзень</string>
+    <string name="none_tasks_title">Заданні адсутнічаюць</string>
+    <string name="none_todos_title">Задачы адсутнічаюць</string>
+    <string name="theoretical_tasks_bar_name">Тэорыя</string>
+    <string name="practical_tasks_bar_name">Практыка</string>
+    <string name="presentations_tasks_bar_name">Даклады</string>
+    <string name="in_progress_todos_section_header">У працэсе</string>
+    <string name="error_todos_section_header">Прапушчана</string>
+    <string name="completed_todos_section_header">Выканана за тыдзень</string>
+    <string name="show_all_todos_title">Паказаць усё</string>
+    <string name="until_deadline_date_suffix">Да</string>
+    <string name="none_deadline_title">Без дэдлайна</string>
+    <string name="overdue_deadline_title">Пратэрмінавана</string>
+    <string name="overall_homeworks_progress">Агульны прагрэс</string>
+    <string name="homework_test_label">Тэст</string>
+    <string name="overdue_homeworks_header">Прапушчаныя заданні</string>
+    <string name="detached_active_homeworks_header">Актыўныя адмацаваныя заданні</string>
+    <string name="overdue_todos_header">Прапушчаныя задачы</string>
+    <string name="none_errors_title">Памылкі адсутнічаюць</string>
+    <string name="accept_homework_title">Прыняць</string>
+    <string name="ago_suffix">таму</string>
+    <string name="apply_shared_homeworks_title">Дадаць</string>
+    <string name="homeworks_linked_header">Даданне заданняў</string>
+    <string name="homeworks_linked_label">Звяжыце прадметы і заняткі па назве</string>
+    <string name="target_user_subjects_title">Карыстальнік</string>
+    <string name="current_user_subjects_title">Вы</string>
+    <string name="specify_subject_label">Пазначыць</string>
+    <string name="classes_not_found_label">Заняткі не знойдзены</string>
+    <string name="subject_selector_header">Прадмет</string>
+    <string name="subject_selector_title">Выберыце адпаведны прадмет</string>
+    <string name="linked_class_selector_header">Занятак</string>
+    <string name="linked_class_selector_title">Выберыце адпаведны занятак</string>
+    <string name="number_of_class_suffix">занятак</string>
+    <string name="attach_classes_label">Прымацуйце заданне</string>
+    <string name="selection_subject_step_header">1. Выбар прадметаў</string>
+    <string name="selection_subject_step_label">Выберыце прадметы якімі хочаце падзяліцца</string>
+    <string name="create_share_code_title">Стварыць код</string>
+    <string name="homework_share_ready_title">Код дамашніх заданняў гатовы</string>
+    <string name="homework_share_expires_at_label">Дзейнічае да</string>
+    <string name="copy_share_link_title">Капіяваць код</string>
+    <string name="receive_homework_share_title">Атрымаць дамашнія заданні</string>
+    <string name="share_code_label">Код абмену</string>
+    <string name="share_code_placeholder">XXXX-XXXX-XXXX</string>
+    <string name="open_share_title">Адкрыць</string>
+    <string name="scan_qr_button_title">Сканіраваць QR-код</string>
+    <string name="homework_share_imported_title">Дамашнія заданні дададзены</string>
+    <string name="homework_share_subject_item">• %1$s</string>
+    <string name="duplicate_homework_share_title">Гэтыя заданні ўжо былі дададзены на гэтай прыладзе</string>
+    <string name="invalid_homework_share_title">Код не знойдзены ці ўведзены няправільна</string>
+    <string name="expired_homework_share_title">Тэрмін дзеяння кода скончыўся</string>
+    <string name="share_rate_limit_message">Занадта шмат спроб. Паспрабуйце пазней</string>
+    <string name="share_daily_limit_message">Дасягнуты ліміт публікацый. Паспрабуйце праз суткі</string>
+    <string name="share_item_limit_message">За раз можна падзяліцца не больш чым 20 заданнямі</string>
+    <string name="share_payload_limit_message">Выбраныя заданні займаюць занадта шмат месца</string>
+    <string name="current_time_range_desc">Адлюстраваць бягучыя даты</string>
+    <string name="test_label">Тэст</string>
+    <string name="other_error_message">Памылка! Звярніцеся да распрацоўшчыка!</string>
+    <string name="open_analytics_desc">Адкрыць аналітыку</string>
+</resources>
