@@ -30,7 +30,18 @@ StudyAssistant
 
 ---
 
-[<img src="https://www.rustore.ru/help/icons/logo-color-dark.png" height="63" alt="Download on the RuStore">](https://www.rustore.ru/catalog/app/ru.aleshin.studyassistant)[<img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png" height="70" alt="Download APK from Github">](https://github.com/v1tzor/StudyAssistant/releases/latest/download/1.1.0-studyassistant-github-release.apk)
+<p>
+  <a href="https://appgallery.huawei.com/app/C113967217" target="_blank">
+    <img src="https://github.com/user-attachments/assets/f02b4096-d02b-4982-aa98-644bace52eac" height="63" alt="Download from AppGallery" />
+  </a>
+  <a href="https://www.rustore.ru/catalog/app/ru.aleshin.studyassistant" target="_blank">
+    <img src="https://www.rustore.ru/help/icons/logo-color-dark.png" width="188" height="63" alt="Download from RuStore" />
+  </a>
+  <a href="https://github.com/v1tzor/StudyAssistant/releases/latest/download/1.1.0-studyassistant-github-release.apk" target="_blank">
+    <img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png" height="63" alt="Get it on Github" />
+  </a>
+</p>
+
 
 
 ## 🎓 Your Ultimate Academic Organizer
