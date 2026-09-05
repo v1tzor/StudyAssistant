@@ -71,7 +71,7 @@ data class OpenRouterConfig(
         const val DEFAULT_SOCKS_HOST = "127.0.0.1"
         const val DEFAULT_SOCKS_PORT = 10_808
 
-        const val MODEL = "meta/muse-spark-1.2-contributor"
+        const val MODEL = "meta/muse-spark-1.3-contributor"
 
         fun from(
             applicationConfig: ApplicationConfig,
