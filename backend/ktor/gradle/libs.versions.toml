@@ -1,18 +1,18 @@
 [versions]
 
 # Kotlin
-kotlin = "2.4.10"
+kotlin = "2.4.21"
 kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
 
 # Ktor
-ktor = "3.5.2"
-exposed = "1.4.0"
+ktor = "3.6.0"
+exposed = "1.5.1"
 hikari = "7.1.0"
-postgresql = "42.7.13"
-flyway = "13.2.0"
+postgresql = "42.7.14"
+flyway = "13.10.0"
 
-logback = "1.6.2"
+logback = "1.6.5"
 
 # Tests
 testcontainers = "2.0.5"
